@@ -35,6 +35,7 @@ namespace AbyssCore{
 
             SDL_Thread* renderThread;
 
+            Window* mainWindow;
             IWindowsGroup* group;
 
             static Core* INSTANCE;
@@ -72,7 +73,10 @@ namespace AbyssCore{
             void Dispose();
 
             IWindowsGroup* GetGroup();
+            void SetMainWindow(Window* w);
             bool IsRunning();
+
+            void Stop();
     };
 
     typedef struct{
@@ -85,6 +89,8 @@ namespace AbyssCore{
     void StartCore();
     void DisposeCore();
     void OpenFont(const char* filePath);
+    void AssignMainWindow(Window * w);
+    void AssignSubWindow(Window * w, AString* name);
 }
 
 #endif

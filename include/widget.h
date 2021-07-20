@@ -33,7 +33,6 @@ namespace AbyssCore{
             virtual void SetColor(SDL_Color color);
             virtual void SetVisible(bool v);
             virtual void SetAction(Action action);
-
     };
 }
 

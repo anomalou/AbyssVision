@@ -10,7 +10,7 @@ file(GLOB_RECURSE SOURCES ${PROJECT_DIR}/include/*.h ${PROJECT_DIR}/src/*.cpp)
 set(SDL2_INCLUDE_DIR ${PROJECT_DIR}/sdl/include/SDL2)
 set(SDL2_LIBRARY_DIR ${PROJECT_DIR}/sdl/lib)
 
-add_executable(AbyssVision ${SOURCES})
+add_library(AbyssVision ${SOURCES})
 
 target_include_directories(AbyssVision PUBLIC ${SDL2_INCLUDE_DIR})
 target_include_directories(AbyssVision PUBLIC ${PROJECT_DIR}/include)

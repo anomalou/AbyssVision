@@ -150,10 +150,10 @@ namespace AbyssCore{
         int y = event.y;
 
         if(CloseHit(x, y) && CanClose()){
-            needDestroy = true;
+            CloseAction();
         }
         if(MinimazeHit(x, y) && CanMinimaze()){
-            SetMinimaze(!isMinimazied);
+            MinimazeAction();
         }
     }
 
@@ -189,8 +189,20 @@ namespace AbyssCore{
         }
 
         if(ResizeHit(x, y) && !IsMinimazed() && CanResize()){
-            SetSize(rect.w + xrel, rect.h + yrel);
+            ResizeAction(rect.w + xrel, rect.h + yrel);
         }
+    }
+
+    void Window::CloseAction(){
+        needDestroy = true;
+    }
+
+    void Window::MinimazeAction(){
+        isMinimazied = !isMinimazied;
+    }
+
+    void Window::ResizeAction(int w, int h){
+        SetSize(w, h);
     }
 
     vector<Widget*> Window::GetPull(){

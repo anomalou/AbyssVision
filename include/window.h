@@ -71,6 +71,10 @@ namespace AbyssCore{
             virtual void ProcessMove(SDL_MouseMotionEvent event);
             virtual void ProcessDrag(SDL_MouseMotionEvent event);
 
+            virtual void CloseAction();
+            virtual void MinimazeAction();
+            virtual void ResizeAction(int w, int h);
+
             virtual vector<Widget*> GetPull();
             virtual bool AssignWidget(Widget* w, AString* byName);
             virtual bool DestroyWidget(Widget* w);

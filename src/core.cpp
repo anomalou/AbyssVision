@@ -41,6 +41,32 @@ namespace AbyssCore{
         }
     }
 
+    void AssignMainWindow(Window * w){
+        Core* core = Core::GetInstance();
+
+        w->SetPos(0, 0);
+        w->SetSize(RESOLUTION_X, RESOLUTION_Y - HEADER_HEIGHT);
+
+        core->GetGroup()->Create(w, new AString("Main window"));
+        core->GetGroup()->FocusWindow(w);
+        w->SetVisible(true);
+        core->SetMainWindow(w);
+
+        w->AllowResize(true);
+    }
+
+    void AssignSubWindow(Window * w, AString* name){
+        Core* core = Core::GetInstance();
+
+        w->SetPos(0, 0);
+        w->SetSize(100, 100);
+
+        core->GetGroup()->Create(w, name);
+        w->SetVisible(true);
+
+        w->AllowResize(true);
+    }
+
     Core::Core(){
         isRunning = false;
     }
@@ -85,21 +111,33 @@ namespace AbyssCore{
 
         //TODO: testing windows here
 
-        Window* window = new MainWindow();
-        Window* test = new MainWindow();
-        window->SetRect(SDL_Rect({0, 0, 500, 100}));
-        test->SetRect(SDL_Rect({100, 100, 500, 200}));
+        // Window* window = new MainWindow();
+        // Window* test = new MainWindow();
+        // window->SetRect(SDL_Rect({0, 0, 500, 100}));
+        // test->SetRect(SDL_Rect({100, 100, 500, 200}));
 
 
-        group->Create(window, new AString("main_window"));
-        group->Create(test, new AString("test"));
-        group->FocusWindow(window);
-        test->AllowClose(true);
-        test->AllowMinimaze(false);
-        test->AllowResize(true);
-        test->SetVisible(true);
-        window->AllowResize(true);
-        window->SetVisible(true);
+        // group->Create(window, new AString("main_window"));
+        // group->Create(test, new AString("test"));
+        // group->FocusWindow(window);
+        // test->AllowClose(true);
+        // test->AllowMinimaze(false);
+        // test->AllowResize(true);
+        // test->SetVisible(true);
+        // window->AllowResize(true);
+        // window->SetVisible(true);
+
+        if(mainWindow == nullptr){
+            Window* mw = new MainWindow();
+
+            mw->SetPos(0, 0);
+            mw->SetSize(RESOLUTION_X, RESOLUTION_Y - HEADER_HEIGHT);
+
+            mainWindow = mw;
+            mw->SetVisible(true);
+            group->FocusWindow(mw);
+            group->Create(mw, new AString("Main window"));
+        }
 
         Input();
     }
@@ -156,14 +194,15 @@ namespace AbyssCore{
             SDL_RenderClear(render);
 
             for(Window* w : group->GetPull()){
-                if(w != group->CurrentFocus()){
+                if(w != group->CurrentFocus() && w->IsVisible()){
                     renderPtrs->corePtr->DrawWindow(render, w);
                 }
             }
 
             Window* currentFocus = group->CurrentFocus();
 
-            renderPtrs->corePtr->DrawWindow(render, currentFocus);
+            if(currentFocus->IsVisible())
+                renderPtrs->corePtr->DrawWindow(render, currentFocus);
 
             SDL_RenderPresent(render);
             SDL_Delay(1000/FPS);
@@ -373,8 +412,16 @@ namespace AbyssCore{
         return group;
     }
 
+    void Core::SetMainWindow(Window* w){
+        mainWindow = w;
+    }
+
     bool Core::IsRunning(){
         return isRunning;
+    }
+
+    void Core::Stop(){
+        isRunning = false;
     }
 
     bool Core::InWindow(Window* w, int x, int y){

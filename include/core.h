@@ -5,7 +5,7 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <windowsgroup.h>
-#include <solidgroup.h>
+#include <systemgroup.h>
 #include <window.h>
 #include <mainwindow.h>
 #include <astring.h>
@@ -37,8 +37,11 @@ namespace AbyssCore{
 
             IWindowsGroup* group;
 
+            static Core* INSTANCE;
+
         public:
             Core();
+            static Core* GetInstance();
             ~Core();
 
         private:
@@ -49,9 +52,9 @@ namespace AbyssCore{
 
             void DrawWindow(SDL_Renderer* render, Window* w);
 
-            static void DrawWindowHead(SDL_Renderer *render, Window* w);
-            static void DrawWindowBody(SDL_Renderer* render, Window* w);
-            static void DrawWindowControl(SDL_Renderer* render, Window* w);
+            void DrawWindowHead(SDL_Renderer *render, Window* w);
+            void DrawWindowBody(SDL_Renderer* render, Window* w);
+            void DrawWindowControl(SDL_Renderer* render, Window* w);
 
             void ProcessMouse(SDL_Event event);
             void MoveMouse(SDL_Event event);
@@ -59,12 +62,6 @@ namespace AbyssCore{
             void ClickMouse(SDL_Event event);
 
             bool InWindow(Window* w, int x, int y);
-            bool InHeader(Window* w, int x, int y);
-            bool InBody(Window* w, int x, int y);
-
-            bool CloseHit(int x, int y);
-            bool MinimazeHit(int x, int y);
-            bool ResizeHit(int x, int y);
 
             void Input();
             static int Render(void *rendPtr);
@@ -73,14 +70,16 @@ namespace AbyssCore{
             bool Init();
             void Start();
             void Dispose();
+
+            IWindowsGroup* GetGroup();
+            bool IsRunning();
     };
 
     typedef struct{
         Core* corePtr;
     }RenderPtrs;
 
-    static Core* core = nullptr;
-    static TTF_Font* font = nullptr;
+    static TTF_Font* font;
 
     bool InitCore();
     void StartCore();

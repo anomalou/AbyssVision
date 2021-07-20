@@ -1,12 +1,11 @@
-#include <solidgroup.h>
-#include <windowsgroup.h>
+#include <systemgroup.h>
 
 namespace AbyssCore{
-    SolidGroup::SolidGroup(){
+    SystemGroup::SystemGroup(){
         windowsPull = vector<Window*>();
     }
 
-    int SolidGroup::FreeID(){
+    int SystemGroup::FreeID(){
         int max = START_ID;
         for(Window* w : windowsPull){
             if(w->GetID() > max)
@@ -16,13 +15,13 @@ namespace AbyssCore{
         return max;
     }
 
-    vector<Window*> SolidGroup::GetPull(){
+    vector<Window*> SystemGroup::GetPull(){
         vector<Window*> pull = vector<Window*>(windowsPull);
 
         return pull;
     }
 
-    bool SolidGroup::Create(Window* window, AString* byName){
+    bool SystemGroup::Create(Window* window, AString* byName){
         if(window == nullptr)
             return false;
 
@@ -37,7 +36,7 @@ namespace AbyssCore{
         return true;
     }
 
-    bool SolidGroup::Destroy(Window* window){
+    bool SystemGroup::Destroy(Window* window){
         for(size_t i = 0; i < windowsPull.size(); i++){
             if(windowsPull[i] == window){
                 windowsPull.erase(windowsPull.begin() + i);
@@ -49,7 +48,7 @@ namespace AbyssCore{
         return false;
     }
 
-    Window* SolidGroup::Find(AString* byName){
+    Window* SystemGroup::Find(AString* byName){
         for(Window* w : windowsPull){
             if(strcmp(w->GetName()->ToChars(), byName->ToChars()) == 0){
                 return w;
@@ -59,7 +58,7 @@ namespace AbyssCore{
         return nullptr;
     }
 
-    Window* SolidGroup::Find(int byID){
+    Window* SystemGroup::Find(int byID){
         for(Window* w : windowsPull){
             if(w->GetID() == byID){
                 return w;
@@ -69,12 +68,18 @@ namespace AbyssCore{
         return nullptr;
     }
 
-    void SolidGroup::FocusWindow(Window* window){
+    void SystemGroup::FocusWindow(Window* window){
         focus = window;
     }
 
-    Window* SolidGroup::CurrentFocus(){
+    Window* SystemGroup::CurrentFocus(){
         return focus;
     }
 
+    void SystemGroup::ProcessWindows(){
+        for(Window* w : windowsPull){
+            if(w->NeedDestroy())
+                Destroy(w);
+        }
+    }
 }

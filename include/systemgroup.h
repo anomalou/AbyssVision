@@ -1,5 +1,5 @@
-#ifndef SOLIDGROUP_H
-#define SOLIDGROUP_H
+#ifndef SYSTEMGROUP_H
+#define SYSTEMGROUP_H
 
 #include <windowsgroup.h>
 #include <vector>
@@ -7,7 +7,7 @@
 using namespace std;
 
 namespace AbyssCore{
-    class SolidGroup : public IWindowsGroup{
+    class SystemGroup : public IWindowsGroup{
         private:
             vector<Window*> windowsPull;
             Window* focus;
@@ -16,7 +16,7 @@ namespace AbyssCore{
             virtual int FreeID();
 
         public:
-            SolidGroup();
+            SystemGroup();
             virtual vector<Window*> GetPull();
             virtual bool Create(Window* window, AString* byName);
             virtual bool Destroy(Window* window);
@@ -24,6 +24,7 @@ namespace AbyssCore{
             virtual Window* Find(int byID);
             virtual void FocusWindow(Window* window);
             virtual Window* CurrentFocus();
+            virtual void ProcessWindows();
     };
 }
 

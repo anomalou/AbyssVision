@@ -22,6 +22,7 @@ namespace AbyssCore{
             virtual Window* Find(int byID) = 0;
             virtual void FocusWindow(Window* window) = 0;
             virtual Window* CurrentFocus() = 0;
+            virtual void ProcessWindows() = 0;
     };
 }
 

@@ -4,7 +4,7 @@ using namespace std;
 
 namespace AbyssCore{
     bool InitCore(){
-        core = new Core();
+        Core* core = Core::GetInstance();
         if(core->Init()){
             return true;
         }
@@ -12,12 +12,16 @@ namespace AbyssCore{
     }
 
     void StartCore(){
+        Core* core = Core::GetInstance();
+
         if(core != nullptr){
             core->Start();
         }
     }
 
     void DisposeCore(){
+        Core* core = Core::GetInstance();
+
         if(core != nullptr){
             if(font != nullptr)
                 TTF_CloseFont(font);
@@ -27,6 +31,8 @@ namespace AbyssCore{
     }
 
     void OpenFont(const char* filePath){
+        Core* core = Core::GetInstance();
+
         if(core != nullptr){
             if(font != nullptr){
                 TTF_CloseFont(font);
@@ -37,6 +43,16 @@ namespace AbyssCore{
 
     Core::Core(){
         isRunning = false;
+    }
+
+    Core* Core::INSTANCE;
+
+    Core* Core::GetInstance(){
+        if(INSTANCE == nullptr){
+            INSTANCE = new Core();
+        }
+
+        return INSTANCE;
     }
 
     bool Core::Init(){
@@ -54,7 +70,7 @@ namespace AbyssCore{
             return false;
         }
 
-        group = new SolidGroup();
+        group = new SystemGroup();
 
         return true;
     }
@@ -123,7 +139,11 @@ namespace AbyssCore{
                     break;
                 }
             }
+
+            group->ProcessWindows();
         }
+
+        
     }
 
     int Core::Render(void *rendPtr){
@@ -170,7 +190,7 @@ namespace AbyssCore{
         rect->w = width;
         rect->h = height;
 
-        if(core->group->CurrentFocus() == w)
+        if(group->CurrentFocus() == w)
             SDL_SetRenderDrawColor(render, WHITE);
         else
             SDL_SetRenderDrawColor(render, GRAY);
@@ -201,11 +221,43 @@ namespace AbyssCore{
     void Core::DrawWindowBody(SDL_Renderer *render, Window* w){
         SDL_Rect rect = {w->GetRect().x, w->GetRect().y + HEADER_HEIGHT - 1, w->GetRect().w, w->GetRect().h};
 
-        SDL_SetRenderDrawColor(render, WHITE);
+        SDL_Color windowColor = w->GetColor();
+
+        SDL_SetRenderDrawColor(render, windowColor.r, windowColor.g, windowColor.b, windowColor.a);
         SDL_RenderFillRect(render, &rect);
 
         SDL_SetRenderDrawColor(render, BLACK);
         SDL_RenderDrawRect(render, &rect);
+
+        for(Widget* w : w->GetPull()){
+            SDL_Rect wrect = w->GetRect();
+            wrect.x += rect.x;
+            wrect.y += rect.y;
+
+            if(wrect.x < 0){
+                wrect.w += wrect.x;
+                wrect.x += abs(wrect.x);
+            }
+            
+            if((wrect.x + wrect.w) > (rect.x + rect.w))
+                wrect.w -= (wrect.x + wrect.w) - (rect.x + rect.w);
+
+            if(wrect.y < 0){
+                wrect.h += wrect.y;
+                wrect.y += abs(wrect.y);
+            }
+
+            if((wrect.y + wrect.h) > (rect.y + rect.h))
+                wrect.h -= (wrect.y + wrect.h) - (rect.y + rect.h);
+
+            SDL_Color widgetColor = w->GetColor();
+
+            SDL_SetRenderDrawColor(render, widgetColor.r, widgetColor.g, widgetColor.b, widgetColor.a);
+            SDL_RenderFillRect(render, &wrect);
+
+            SDL_SetRenderDrawColor(render, BLACK);
+            SDL_RenderDrawRect(render, &wrect);
+        }
     }
 
     void Core::DrawWindowControl(SDL_Renderer * render, Window* w){
@@ -271,28 +323,23 @@ namespace AbyssCore{
     }
 
     void Core::MoveMouse(SDL_Event event){
-
-    }
-
-    void Core::DragMouse(SDL_Event event){
-        Window* window = group->CurrentFocus();
+        Window* currentFocus = group->CurrentFocus();
 
         int x = event.motion.x;
         int y = event.motion.y;
-        int xrel = event.motion.xrel;
-        int yrel = event.motion.yrel;
 
-        // printf("%d:%d -> %d:%d\n", x, y, xrel, yrel);
+        if(InWindow(currentFocus, x, y) && currentFocus->IsVisible())
+            currentFocus->ProcessMove(event.motion);
+    }
 
-        SDL_Rect rect = window->GetRect();
+    void Core::DragMouse(SDL_Event event){
+        Window* currentFocus = group->CurrentFocus();
 
-        if(InHeader(window, x, y)){
-            window->SetPos(rect.x + xrel, rect.y + yrel);
-        }
+        int x = event.motion.x;
+        int y = event.motion.y;
 
-        if(ResizeHit(x, y) && !window->IsMinimazed() && window->CanResize()){
-            window->SetSize(rect.w + xrel, rect.h + yrel);
-        }
+        if(InWindow(currentFocus, x, y) && currentFocus->IsVisible())
+            currentFocus->ProcessDrag(event.motion);
     }
 
     void Core::ClickMouse(SDL_Event event){
@@ -304,26 +351,15 @@ namespace AbyssCore{
         //mouse button down
 
         if(event.type == SDL_MOUSEBUTTONDOWN){
-            if(InWindow(currentFocus, x, y)){
-                if(InHeader(currentFocus, x, y)){
-                    //close button
-
-                    if(CloseHit(x, y) && currentFocus->CanClose()){
-                        group->Destroy(currentFocus);
-                    }
-                    if(MinimazeHit(x, y) && currentFocus->CanMinimaze()){
-                        currentFocus->SetMinimaze(!currentFocus->IsMinimazed());
-                    }
-                }else if(InBody(currentFocus, x, y)){
-                    //process window logic
-                }
+            if(InWindow(currentFocus, x, y) && currentFocus->IsVisible()){
+                currentFocus->ProcessClick(event.button);
                 return;
             }
 
             for(Window* w : group->GetPull()){
                 SDL_Rect rect = w->GetRect();
 
-                if(InWindow(w, x, y)){
+                if(InWindow(w, x, y) && w->IsVisible()){
                     if(w != group->CurrentFocus()){
                         group->FocusWindow(w);
                         break;
@@ -331,6 +367,14 @@ namespace AbyssCore{
                 }
             }
         }
+    }
+
+    IWindowsGroup* Core::GetGroup(){
+        return group;
+    }
+
+    bool Core::IsRunning(){
+        return isRunning;
     }
 
     bool Core::InWindow(Window* w, int x, int y){
@@ -344,59 +388,6 @@ namespace AbyssCore{
                 return true;
         }
 
-        return false;
-    }
-
-    bool Core::InHeader(Window* w, int x, int y){
-        SDL_Rect rect = w->GetRect();
-
-        if(x > rect.x && x < (rect.x + rect.w) && y > rect.y && y < (rect.y + HEADER_HEIGHT))
-            return true;
-        return false;
-    }
-
-    bool Core::InBody(Window* w, int x, int y){
-        SDL_Rect rect = w->GetRect();
-
-        if(x > rect.x && x < (rect.x + rect.w) && y > (rect.y + HEADER_HEIGHT) && y < (rect.y + rect.h + HEADER_HEIGHT))
-            return true;
-        return false;
-    }
-
-    bool Core::CloseHit(int x, int y){
-        Window* currentFocus = group->CurrentFocus();
-        SDL_Rect currentFRect = currentFocus->GetRect();
-        SDL_Rect closeHitBox = currentFocus->GetCloseHitBox();
-
-        SDL_Rect crossRect = {currentFRect.x + closeHitBox.x, currentFRect.y + closeHitBox.y, closeHitBox.w, closeHitBox.h};
-    
-        if(x > crossRect.x && x < (crossRect.x + crossRect.w) && y > crossRect.y && y < (crossRect.y + crossRect.h))
-            return true;
-
-        return false;
-    }
-
-    bool Core::MinimazeHit(int x, int y){
-        Window* currentFocus = group->CurrentFocus();
-        SDL_Rect currentFRect = currentFocus->GetRect();
-        SDL_Rect minimazeHitBox = currentFocus->GetMinimazeHitBox();
-
-        SDL_Rect minRect = {currentFRect.x + minimazeHitBox.x, currentFRect.y + minimazeHitBox.y, minimazeHitBox.w, minimazeHitBox.h};
-        if(x > minRect.x && x < (minRect.x + minRect.w) && y > minRect.y && y < (minRect.y + minRect.h))
-            return true;
-        
-        return false;
-    }
-
-    bool Core::ResizeHit(int x, int y){
-        Window* currentFocus = group->CurrentFocus();
-        SDL_Rect currentFRect = currentFocus->GetRect();
-        SDL_Rect resizeHitBox = currentFocus->GetResizeHitBox();
-
-        SDL_Rect resRect = {currentFRect.x + resizeHitBox.x, currentFRect.y + resizeHitBox.y, resizeHitBox.w, resizeHitBox.h};
-        if(x > resRect.x && x < (resRect.x + resRect.w) && y > resRect.y && y < (resRect.y + resRect.h))
-            return true;
-        
         return false;
     }
 

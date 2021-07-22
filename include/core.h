@@ -12,8 +12,8 @@
 #include <colors.h>
 #include <windowproperty.h>
 
-#define RESOLUTION_X 1280
-#define RESOLUTION_Y 640
+#define RESOLUTION_X 1920
+#define RESOLUTION_Y 1080
 
 #define RENDERER_FLAGS SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
 
@@ -23,7 +23,7 @@
 #define FPS120 120
 #define FPSINF 1000
 
-#define FPS FPS60
+#define FPS FPS120
 
 namespace AbyssCore{
     class Core{
@@ -37,6 +37,8 @@ namespace AbyssCore{
 
             Window* mainWindow;
             IWindowsGroup* group;
+
+            SDL_Point mousePosition;
 
             static Core* INSTANCE;
 

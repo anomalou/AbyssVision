@@ -2,24 +2,35 @@
 #include <core.h>
 
 namespace AbyssCore{
-    void CloseThis(void * ptr){
-        Window* w = static_cast<Window*>(ptr);
+    void Open(void* w, void * ptr){
+        MainWindow* win = static_cast<MainWindow*>(ptr);
+        if(Core::GetInstance()->GetGroup()->Find(new AString("empty")) == nullptr){
+            win->window = new EmptyWindow();
+            AssignSubWindow(win->window, new AString("empty"));
+        }
+    }
+    void Hide(void* w, void * ptr){
+        MainWindow* win = static_cast<MainWindow*>(ptr);
 
-        w->SetMinimaze(true);
-
-        // Core* c = Core::GetInstance();
-
-        // c->GetGroup()->Destroy(w);
+        if(Core::GetInstance()->GetGroup()->Find(new AString("empty")) != nullptr)
+            win->window->SetVisible(!win->window->IsVisible());
     }
 
     MainWindow::MainWindow() : Window(){
-        button = new Button();
+        open = new Button();
+        hide = new Button();
 
-        button->SetPos(100, 20);
-        button->SetSize(100, 50);
+        open->SetPos(0, 0);
+        open->SetSize(50, 50);
 
-        button->SetAction(CloseThis);
+        open->SetAction(Click, Open);
 
-        AssignWidget(button, new AString("close button"));
+        hide->SetPos(60, 0);
+        hide->SetSize(50, 50);
+
+        hide->SetAction(Click, Hide);
+
+        AssignWidget(open, new AString("open"));
+        AssignWidget(hide, new AString("hide"));
     }
 }

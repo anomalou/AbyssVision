@@ -7,16 +7,23 @@ namespace AbyssCore{
         widgetPull = vector<Widget*>();
 
         rect = SDL_Rect({0, 0, 100, 100});
-        color = SDL_Color({WHITE});
+        style = Style{{WHITE}, {BLACK}, {OPAGUE_GRAY}, 5, {WHITE}, {BLACK}, {GRAY}, {WHITE}, {GRAY}, {WHITE}, {WHITE}};
 
         canMinimaze = true;
-        canClose = false;
+        canClose = true;
         canResize = false;
 
-        isVisible = false;
+        isVisible = true;
         isMinimazied = false;
 
         needDestroy = false;
+
+        beginGClick = false;
+        beginGDrag = false;
+        beginGResize = false;
+
+        beginClick = false;
+        beginGDrag = false;
 
         CalculateControlHitBox();
 
@@ -35,8 +42,8 @@ namespace AbyssCore{
         return rect;
     }
 
-    SDL_Color Window::GetColor(){
-        return color;
+    Style Window::GetStyle(){
+        return style;
     }
 
     bool Window::IsVisible(){
@@ -100,8 +107,8 @@ namespace AbyssCore{
         CalculateControlHitBox();
     }
 
-    void Window::SetColor(SDL_Color color){
-        this->color = color;
+    void Window::SetStyle(Style style){
+        this->style = style;
     }
 
     void Window::SetVisible(bool v){
@@ -130,53 +137,59 @@ namespace AbyssCore{
         resizeHitBox = {rect.w - CBUTTON_WIDTH, rect.h + HEADER_HEIGHT - CBUTTON_WIDTH, CBUTTON_WIDTH, CBUTTON_WIDTH};
     }
 
-    void Window::ProcessClick(SDL_MouseButtonEvent event){
+    void Window::ProcessGlobalClick(SDL_MouseButtonEvent event){
         int x = event.x;
         int y = event.y;
 
         //mouse button down
 
-        if(event.type == SDL_MOUSEBUTTONDOWN){
-            if(InHeader(x, y)){
-                ProcessHeaderClick(event);
-            }else if(InBody(x, y)){
-                ProcessBodyClick(event);
-            }
+        if(InHeader(x, y)){
+            ProcessGlobalHeaderClick(event);
+        }else if(InBody(x, y)){
+            ProcessGlobalBodyClick(event);
+        }
+
+        if(event.type == SDL_MOUSEBUTTONUP && event.button == SDL_BUTTON_LEFT){
+            beginGClick = false;
+            beginGDrag = false;
+            beginGResize = false;
         }
     }
 
-    void Window::ProcessHeaderClick(SDL_MouseButtonEvent event){
+    void Window::ProcessGlobalHeaderClick(SDL_MouseButtonEvent event){
         int x = event.x;
         int y = event.y;
+
+        if(event.type == SDL_MOUSEBUTTONDOWN && event.button == SDL_BUTTON_LEFT)
+            beginGDrag = true;
 
         if(CloseHit(x, y) && CanClose()){
-            CloseAction();
+            if(event.type == SDL_MOUSEBUTTONDOWN)
+                beginGClick = true;
+            if(beginGClick && event.type == SDL_MOUSEBUTTONUP)
+                CloseAction();
         }
         if(MinimazeHit(x, y) && CanMinimaze()){
-            MinimazeAction();
+            if(event.type == SDL_MOUSEBUTTONDOWN)
+                beginGClick = true;
+            if(beginGClick && event.type == SDL_MOUSEBUTTONUP)
+                MinimazeAction();
         }
     }
 
-    void Window::ProcessBodyClick(SDL_MouseButtonEvent event){
+    void Window::ProcessGlobalBodyClick(SDL_MouseButtonEvent event){
         int x = event.x;
         int y = event.y;
 
-        for(Widget* w : widgetPull){
-            SDL_Rect rect = w->GetRect();
-            rect.x += this->rect.x;
-            rect.y += this->rect.y + HEADER_HEIGHT - 1;
-
-            if(x > rect.x && x < (rect.x + rect.w) && y > rect.y && y < (rect.y + rect.h)){
-                w->DoAction(this);
-            }
-        }
+        if(ResizeHit(x, y) && !IsMinimazed() && CanResize() && event.type == SDL_MOUSEBUTTONDOWN && event.button == SDL_BUTTON_LEFT)
+            beginGResize = true;
     }
 
-    void Window::ProcessMove(SDL_MouseMotionEvent event){
-
+    void Window::ProcessGlobalMove(SDL_MouseMotionEvent event){
+        
     }
 
-    void Window::ProcessDrag(SDL_MouseMotionEvent event){
+    void Window::ProcessGlobalDrag(SDL_MouseMotionEvent event){
         int x = event.x;
         int y = event.y;
         int xrel = event.xrel;
@@ -184,12 +197,113 @@ namespace AbyssCore{
 
         SDL_Rect rect = GetRect();
 
-        if(InHeader(x, y)){
-            SetPos(rect.x + xrel, rect.y + yrel);
+        if(beginGDrag){
+            SDL_Point pos;
+
+            pos.x = rect.x + xrel;
+
+            if(x < rect.x)
+                pos.x = x - HEADER_HEIGHT / 2;
+            if(x > (rect.x + rect.w))
+                pos.x = x - rect.w + HEADER_HEIGHT / 2 + CBUTTON_WIDTH * 2;
+            if(y < rect.y || y > rect.y + HEADER_HEIGHT)
+                pos.y = y - HEADER_HEIGHT / 2;
+            else
+                pos.y = rect.y + yrel;
+
+            if(pos.y < 0)
+                pos.y = 0;
+                
+            SetPos(pos.x, pos.y);
         }
 
-        if(ResizeHit(x, y) && !IsMinimazed() && CanResize()){
-            ResizeAction(rect.w + xrel, rect.h + yrel);
+        if(beginGResize)
+            ResizeAction(rect.w + (x - rect.w - rect.x) + HEADER_HEIGHT / 2, rect.h + (y - rect.h - rect.y - HEADER_HEIGHT / 2));
+    }
+
+    void Window::ProcessClick(SDL_MouseButtonEvent event){
+        int x = event.x;
+        int y = event.y;
+
+        if(y >= HEADER_HEIGHT)
+            ProcessBodyClick(event);
+        else
+            ProcessHeaderClick(event);
+
+        if(event.type == SDL_MOUSEBUTTONUP && event.button == SDL_BUTTON_LEFT){
+            beginClick = false;
+            beginDrag = false;
+        }
+    }
+
+    void Window::ProcessHeaderClick(SDL_MouseButtonEvent event){
+        
+    }
+
+    void Window::ProcessBodyClick(SDL_MouseButtonEvent event){
+        int x = event.x;
+        int y = event.y;
+
+        for(Widget* w : widgetPull){
+            if(w->IsVisible() && !w->IsDisabled()){
+                if(event.button == SDL_BUTTON_LEFT){
+                    SDL_Rect rect = w->GetRect();
+                    rect.y += HEADER_HEIGHT - 1;
+
+                    if(w->GetState() == Pressed){
+                        w->SetState(Idle);
+                    }
+
+                    if(x >= rect.x && x <= (rect.x + rect.w) && y >= rect.y && y <= (rect.y + rect.h)){
+                        if(event.type == SDL_MOUSEBUTTONDOWN){
+                            beginClick = true;
+                            w->SetState(Pressed);
+                        }
+                        if(beginClick && event.type == SDL_MOUSEBUTTONUP){
+                            w->SetState(Hovered);
+                            w->ProcessClick(event, this);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    void Window::ProcessMove(SDL_MouseMotionEvent event){
+        int x = event.x;
+        int y = event.y;
+
+        for(Widget* w : widgetPull){
+            if(w->IsVisible() && !w->IsDisabled()){
+                SDL_Rect rect = w->GetRect();
+                rect.y += HEADER_HEIGHT - 1;
+
+                if(w->GetState() == Hovered)
+                    w->SetState(Idle);
+
+                if(w->GetState() == Idle){
+                    if(x >= rect.x && x <= (rect.x + rect.w) && y >= rect.y && y <= (rect.y + rect.h)){
+                        w->SetState(Hovered);
+                        w->ProcessMove(event, this);
+                    }
+                }
+            }
+        }
+    }
+
+    void Window::ProcessDrag(SDL_MouseMotionEvent event){
+        int x = event.x;
+        int y = event.y;
+
+        for(Widget* w : widgetPull){
+            if(w->IsVisible() && !w->IsDisabled()){
+                SDL_Rect rect = w->GetRect();
+                rect.y += HEADER_HEIGHT - 1;
+
+                if(x >= rect.x && x <= (rect.x + rect.w) && y >= rect.y && y <= (rect.y + rect.h)){
+                    w->ProcessDrag(event, this);
+                }
+            }
         }
     }
 
@@ -203,6 +317,11 @@ namespace AbyssCore{
 
     void Window::ResizeAction(int w, int h){
         SetSize(w, h);
+    }
+
+    void Window::Paint(SDL_Renderer* render){
+        SDL_SetRenderDrawColor(render, style.background.r, style.background.g, style.background.b, style.background.a);
+        SDL_RenderClear(render);
     }
 
     vector<Widget*> Window::GetPull(){
@@ -248,7 +367,7 @@ namespace AbyssCore{
     bool Window::InHeader(int x, int y){
         SDL_Rect rect = GetRect();
 
-        if(x > rect.x && x < (rect.x + rect.w) && y > rect.y && y < (rect.y + HEADER_HEIGHT))
+        if(x >= rect.x && x <= (rect.x + rect.w) && y >= rect.y && y <= (rect.y + HEADER_HEIGHT))
             return true;
         return false;
     }
@@ -256,7 +375,7 @@ namespace AbyssCore{
     bool Window::InBody(int x, int y){
         SDL_Rect rect = GetRect();
 
-        if(x > rect.x && x < (rect.x + rect.w) && y > (rect.y + HEADER_HEIGHT) && y < (rect.y + rect.h + HEADER_HEIGHT))
+        if(x >= rect.x && x <= (rect.x + rect.w) && y >= (rect.y + HEADER_HEIGHT) && y <= (rect.y + rect.h + HEADER_HEIGHT))
             return true;
         return false;
     }
@@ -267,7 +386,7 @@ namespace AbyssCore{
 
         SDL_Rect crossRect = {currentFRect.x + closeHitBox.x, currentFRect.y + closeHitBox.y, closeHitBox.w, closeHitBox.h};
     
-        if(x > crossRect.x && x < (crossRect.x + crossRect.w) && y > crossRect.y && y < (crossRect.y + crossRect.h))
+        if(x >= crossRect.x && x <= (crossRect.x + crossRect.w) && y >= crossRect.y && y <= (crossRect.y + crossRect.h))
             return true;
 
         return false;
@@ -278,7 +397,7 @@ namespace AbyssCore{
         SDL_Rect minimazeHitBox = GetMinimazeHitBox();
 
         SDL_Rect minRect = {currentFRect.x + minimazeHitBox.x, currentFRect.y + minimazeHitBox.y, minimazeHitBox.w, minimazeHitBox.h};
-        if(x > minRect.x && x < (minRect.x + minRect.w) && y > minRect.y && y < (minRect.y + minRect.h))
+        if(x >= minRect.x && x <= (minRect.x + minRect.w) && y >= minRect.y && y <= (minRect.y + minRect.h))
             return true;
         
         return false;
@@ -289,7 +408,7 @@ namespace AbyssCore{
         SDL_Rect resizeHitBox = GetResizeHitBox();
 
         SDL_Rect resRect = {currentFRect.x + resizeHitBox.x, currentFRect.y + resizeHitBox.y, resizeHitBox.w, resizeHitBox.h};
-        if(x > resRect.x && x < (resRect.x + resRect.w) && y > resRect.y && y < (resRect.y + resRect.h))
+        if(x >= resRect.x && x <= (resRect.x + resRect.w) && y >= resRect.y && y <= (resRect.y + resRect.h))
             return true;
         
         return false;

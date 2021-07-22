@@ -10,10 +10,6 @@ int main(int argc, char* args[]){
     OpenFont("arial.ttf");
 
     AssignMainWindow(new MainWindow());
-    Window* test = new MainWindow();
-    test->AllowMinimaze(false);
-
-    AssignSubWindow(test, new AString("test"));
 
     StartCore();
 

@@ -4,6 +4,9 @@
 #include <window.h>
 
 namespace AbyssCore{
+    /**
+     * \brief Sub window class for debugging
+     */
     class EmptyWindow : public Window{
         public:
             SDL_Point pos;

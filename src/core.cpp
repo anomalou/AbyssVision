@@ -96,7 +96,7 @@ namespace AbyssCore{
         }
 
         group = new SystemGroup();
-        // SDL_ShowCursor(SDL_DISABLE);
+        SDL_ShowCursor(SDL_DISABLE);
 
         return true;
     }
@@ -178,15 +178,15 @@ namespace AbyssCore{
             SDL_RenderClear(render);
 
             for(Window* w : group->GetPull()){
-                if(w != group->CurrentFocus() && w->IsVisible()){
+                if(w->IsVisible()){
                     renderPtrs->corePtr->DrawWindow(render, w);
                 }
             }
 
-            Window* currentFocus = group->CurrentFocus();
+            SDL_Rect rect = {renderPtrs->corePtr->mousePosition.x, renderPtrs->corePtr->mousePosition.y, 10, 10};
 
-            if(currentFocus->IsVisible())
-                renderPtrs->corePtr->DrawWindow(render, currentFocus);
+            SDL_SetRenderDrawColor(render, BLACK);
+            SDL_RenderDrawRect(render, &rect);
 
             // SDL_Point pos = renderPtrs->corePtr->mousePosition;
 
@@ -411,45 +411,35 @@ namespace AbyssCore{
             event.motion.y -= currentFocus->GetRect().y;
 
             currentFocus->ProcessDrag(event.motion);
-        }
-
-        
+        }        
     }
 
     void Core::ClickMouse(SDL_Event event){
         int x = event.button.x;
         int y = event.button.y;
 
-        //mouse button down
+        vector<Window*> windowPull = group->GetPull();
+        vector<Window*> invertPull = vector<Window*>();
 
-        Window* currentFocus = group->CurrentFocus();
-
-        if(currentFocus->IsVisible()){
-            currentFocus->ProcessGlobalClick(event.button);
+        while(windowPull.size() != 0){
+            invertPull.push_back(windowPull.back());
+            windowPull.pop_back();
         }
 
-        if(InWindow(currentFocus, x, y) && currentFocus->IsVisible()){
-            event.button.x -= currentFocus->GetRect().x;
-            event.button.y -= currentFocus->GetRect().y;
-            currentFocus->ProcessClick(event.button);
-            return;
-        }
-
-        if(event.type == SDL_MOUSEBUTTONDOWN){
-            for(Window* w : group->GetPull()){
-                SDL_Rect rect = w->GetRect();
-
-                if(InWindow(w, x, y) && w->IsVisible()){
+        for(Window* w : invertPull){
+            if(w->IsVisible()){
+                if(InWindow(w, x, y)){
                     if(w != group->CurrentFocus()){
                         group->FocusWindow(w);
-                        w->ProcessGlobalClick(event.button);
-
-                        event.button.x -= w->GetRect().x;
-                        event.button.y -= w->GetRect().y;
-
-                        w->ProcessClick(event.button);
-                        break;
                     }
+
+                    w->ProcessGlobalClick(event.button);
+
+                    event.button.x -= w->GetRect().x;
+                    event.button.y -= w->GetRect().y;
+
+                    w->ProcessClick(event.button);
+                    break;
                 }
             }
         }

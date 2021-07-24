@@ -6,6 +6,9 @@
 #include <button.h>
 
 namespace AbyssCore{
+    /**
+     * \brief Main window class for debugging new features
+     */
     class MainWindow : public Window{
         private:
             Button* open;

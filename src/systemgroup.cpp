@@ -2,7 +2,7 @@
 
 namespace AbyssCore{
     SystemGroup::SystemGroup(){
-        windowsPull = vector<Window*>();
+        windowsPull = list<Window*>();
     }
 
     int SystemGroup::FreeID(){
@@ -16,7 +16,11 @@ namespace AbyssCore{
     }
 
     vector<Window*> SystemGroup::GetPull(){
-        vector<Window*> pull = vector<Window*>(windowsPull);
+        vector<Window*> pull = vector<Window*>();
+
+        for(Window* w : windowsPull){
+            pull.push_back(w);
+        }
 
         return pull;
     }
@@ -37,11 +41,11 @@ namespace AbyssCore{
     }
 
     bool SystemGroup::Destroy(Window* window){
-        for(size_t i = 0; i < windowsPull.size(); i++){
-            if(windowsPull[i] == window){
-                windowsPull.erase(windowsPull.begin() + i);
-                if(window == focus)
-                    focus = windowsPull.back();
+        for(auto w = windowsPull.begin(); w != windowsPull.end(); w++){
+            if(*w == window){
+                windowsPull.erase(w);
+                // if(window == focus)
+                //     focus = windowsPull.back();
                 return true;
             }
         }
@@ -69,11 +73,18 @@ namespace AbyssCore{
     }
 
     void SystemGroup::FocusWindow(Window* window){
-        focus = window;
+        // focus = window;
+        for(auto w = windowsPull.begin(); w != windowsPull.end(); w++){
+            if(*w == window){
+                windowsPull.erase(w);
+                windowsPull.push_back(window);
+                break;
+            }
+        }
     }
 
     Window* SystemGroup::CurrentFocus(){
-        return focus;
+        return windowsPull.back();
     }
 
     void SystemGroup::ProcessWindows(){

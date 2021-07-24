@@ -2,35 +2,67 @@
 #include <core.h>
 
 namespace AbyssCore{
-    void Open(void* w, void * ptr){
-        MainWindow* win = static_cast<MainWindow*>(ptr);
+    void Open(Widget* sender, ActionEvent event){
+        MainWindow* mainWindow = dynamic_cast<MainWindow*>(event.parent);
+
         if(Core::GetInstance()->GetGroup()->Find(new AString("empty")) == nullptr){
-            win->window = new EmptyWindow();
-            AssignSubWindow(win->window, new AString("empty"));
+            mainWindow->window = new EmptyWindow();
+            AssignSubWindow(mainWindow->window, new AString("empty"));
         }
     }
-    void Hide(void* w, void * ptr){
-        MainWindow* win = static_cast<MainWindow*>(ptr);
+    void Hide(Widget* sender, ActionEvent event){
+        MainWindow* mainWindow = dynamic_cast<MainWindow*>(event.parent);
 
         if(Core::GetInstance()->GetGroup()->Find(new AString("empty")) != nullptr)
-            win->window->SetVisible(!win->window->IsVisible());
+            mainWindow->window->SetVisible(!mainWindow->window->IsVisible());
+    }
+
+    void MoveAction(Widget* sender, ActionEvent event){
+        EmptyWindow* empty = dynamic_cast<EmptyWindow*>(Core::GetInstance()->GetGroup()->Find(new AString("empty")));
+
+        if(empty != nullptr){
+            SDL_Point pos = empty->pos;
+            empty->pos = {pos.x + event.xrel, pos.y + event.yrel};
+        }
+    }
+
+    void FullAction(Widget* sender, ActionEvent event){
+        Window* parent = event.parent;
+
+        parent->SetFull(!parent->IsFull());
     }
 
     MainWindow::MainWindow() : Window(){
         open = new Button();
         hide = new Button();
+        slide = new Button();
+        full = new Button();
 
-        open->SetPos(0, 0);
+        open->SetPos(10, 10);
         open->SetSize(50, 50);
 
         open->SetAction(Click, Open);
 
-        hide->SetPos(60, 0);
+        hide->SetPos(70, 10);
         hide->SetSize(50, 50);
 
         hide->SetAction(Click, Hide);
 
+        slide->SetPos(130, 10);
+        slide->SetSize(100, 100);
+
+        slide->SetAction(Drag, MoveAction);
+
+        full->SetPos(240, 10);
+        full->SetSize(50, 50);
+
+        full->style.background = SDL_Color({RED});
+
+        full->SetAction(Click, FullAction);
+
         AssignWidget(open, new AString("open"));
         AssignWidget(hide, new AString("hide"));
+        AssignWidget(slide, new AString("move"));
+        AssignWidget(full, new AString("full"));
     }
 }

@@ -10,12 +10,20 @@ namespace AbyssCore{
         private:
             Button* open;
             Button* hide;
+            Button* slide;
+            Button* full;
 
-        public:
+        private:
             EmptyWindow* window;
 
         public:
             MainWindow();
+
+        friend void Open(Widget* sender, ActionEvent event);
+        friend void Hide(Widget* sender, ActionEvent event);
+        friend void MoveAction(Widget* sender, ActionEvent event);
+        friend void FullAction(Widget* sender, ActionEvent event);
+            
     };
 }
 

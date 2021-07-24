@@ -6,7 +6,11 @@
 namespace AbyssCore{
     class EmptyWindow : public Window{
         public:
+            SDL_Point pos;
             EmptyWindow();
+
+        public:
+            void Paint(SDL_Renderer* render) override;
     };
 }
 

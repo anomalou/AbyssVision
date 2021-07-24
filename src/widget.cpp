@@ -8,9 +8,7 @@ namespace AbyssCore{
 
         state = Idle;
 
-        click = nullptr;
-        drag = nullptr;
-        move = nullptr;
+        actions = map<ActionType, Action>();
     }
 
     AString* Widget::GetName(){
@@ -19,10 +17,6 @@ namespace AbyssCore{
 
     SDL_Rect Widget::GetRect(){
         return rect;
-    }
-
-    Style Widget::GetStyle(){
-        return style;
     }
 
     State Widget::GetState(){
@@ -53,10 +47,6 @@ namespace AbyssCore{
         this->rect = rect;
     }
 
-    void Widget::SetStyle(Style style){
-        this->style = style;
-    }
-
     void Widget::SetState(State state){
         this->state = state;
     }
@@ -70,32 +60,51 @@ namespace AbyssCore{
     }
 
     void Widget::SetAction(ActionType type, Action action){
-        switch(type){
-            case Click:
-                click = action;
-            break;
-            case Drag:
-                drag = action;
-            break;
-            case Move:
-                move = action;
-            break;
+        if(actions.count(type) == 0){
+            actions.insert(make_pair(type, action));
         }
     }
 
-    void Widget::ProcessClick(SDL_MouseButtonEvent event, void * parent){
-        if(click != nullptr)
-            click(this, parent);
+    void Widget::ProcessClick(SDL_MouseButtonEvent event, Window * parent){
+        if(actions.count(Click) != 0){
+            ActionEvent aevent = {
+                parent,
+                event.x,
+                event.y,
+                0,
+                0,
+                event.button
+            };
+            actions[Click](this, aevent);
+        }
     }
 
-    void Widget::ProcessDrag(SDL_MouseMotionEvent event, void * parent){
-        if(drag != nullptr)
-            drag(this, parent);
+    void Widget::ProcessDrag(SDL_MouseMotionEvent event, Window * parent){
+        if(actions.count(Drag) != 0){
+            ActionEvent aevent = {
+                parent,
+                event.x,
+                event.y,
+                event.xrel,
+                event.yrel,
+                event.state
+            };
+            actions[Drag](this, aevent);
+        }
     }
 
-    void Widget::ProcessMove(SDL_MouseMotionEvent event, void * parent){
-        if(move != nullptr)
-            move(this, parent);
+    void Widget::ProcessMove(SDL_MouseMotionEvent event, Window * parent){
+        if(actions.count(Move) != 0){
+            ActionEvent aevent = {
+                parent,
+                event.x,
+                event.y,
+                event.xrel,
+                event.yrel,
+                event.state
+            };
+            actions[Move](this, aevent);
+        }
     }
 
     void Widget::Paint(SDL_Renderer* render){
@@ -107,5 +116,12 @@ namespace AbyssCore{
             SDL_SetRenderDrawColor(render, style.hover.r, style.hover.g, style.hover.b, style.hover.a);
         
         SDL_RenderClear(render);
+
+        SDL_SetRenderDrawColor(render, style.border.r, style.border.g, style.border.b, style.border.a);
+        SDL_Rect rect = this->rect;
+        rect.x = 0;
+        rect.y = 0;
+
+        SDL_RenderDrawRect(render, &rect);
     }
 }

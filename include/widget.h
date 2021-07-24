@@ -5,9 +5,12 @@
 #include <astring.h>
 #include <colors.h>
 #include <style.h>
+#include <map>
+
+using namespace std;
 
 namespace AbyssCore{
-    typedef void (*Action)(void*, void*);
+    class Window;
 
     typedef enum{
         Click,
@@ -15,26 +18,40 @@ namespace AbyssCore{
         Move
     }ActionType;
 
+    typedef struct{
+        Window* parent;
+        int x;
+        int y;
+        int xrel;
+        int yrel;
+        Uint32 button;
+    }ActionEvent;
+
     class Widget{
+
+        typedef void (*Action)(Widget*, ActionEvent);
+
         protected:
             AString* name;
             SDL_Rect rect;
-            Style style;
+            
             State state;
             bool isVisible;
             bool isDisabled;
 
-            Action click;
-            Action drag;
-            Action move;
-            
+            map<ActionType, Action> actions;
+
+        public:
+            /**
+             * \brief Widget style
+             */
+            Style style;
 
         public:
             Widget();
 
             virtual AString* GetName();
             virtual SDL_Rect GetRect();
-            virtual Style GetStyle();
             virtual State GetState();
             virtual bool IsVisible();
             virtual bool IsDisabled();
@@ -43,7 +60,6 @@ namespace AbyssCore{
             virtual void SetPos(int x, int y);
             virtual void SetSize(int w, int h);
             virtual void SetRect(SDL_Rect rect);
-            virtual void SetStyle(Style style);
             virtual void SetState(State state);
             virtual void SetVisible(bool v);
             virtual void SetDisable(bool d);
@@ -52,17 +68,17 @@ namespace AbyssCore{
             /**
              * \brief void * parent ptr to parent window
              */
-            virtual void ProcessClick(SDL_MouseButtonEvent event, void * parent);
+            virtual void ProcessClick(SDL_MouseButtonEvent event, Window * parent);
 
             /**
              * \brief void * parent ptr to parent window
              */
-            virtual void ProcessDrag(SDL_MouseMotionEvent event, void * parent);
+            virtual void ProcessDrag(SDL_MouseMotionEvent event, Window * parent);
 
             /**
              * \brief void * parent ptr to parent window
              */
-            virtual void ProcessMove(SDL_MouseMotionEvent event, void * parent);
+            virtual void ProcessMove(SDL_MouseMotionEvent event, Window * parent);
 
             virtual void Paint(SDL_Renderer* render);
     };

@@ -26,6 +26,7 @@ namespace AbyssCore{
             bool canMinimaze;
             bool canClose;
             bool canResize;
+            bool canMove;
 
             bool needDestroy;
             
@@ -34,11 +35,9 @@ namespace AbyssCore{
             int id;
             AString* name;
             SDL_Rect rect;
-            Style style;
             bool isVisible;
             bool isMinimazied;
-
-            bool isDragging;
+            bool isFull;
 
         protected:
             SDL_Rect closeHitBox;
@@ -49,17 +48,21 @@ namespace AbyssCore{
             vector<Widget*> widgetPull;
 
         public:
+            Style style;
+
+        public:
             Window();
 
             virtual int GetID();
             virtual AString* GetName();
             virtual SDL_Rect GetRect();
-            virtual Style GetStyle();
             virtual bool IsVisible();
             virtual bool IsMinimazed();
+            virtual bool IsFull();
             virtual bool CanMinimaze();
             virtual bool CanClose();
             virtual bool CanResize();
+            virtual bool CanMoving();
             virtual SDL_Rect GetCloseHitBox();
             virtual SDL_Rect GetMinimazeHitBox();
             virtual SDL_Rect GetResizeHitBox();
@@ -70,12 +73,13 @@ namespace AbyssCore{
             virtual void SetPos(int x, int y);
             virtual void SetSize(int w, int h);
             virtual void SetRect(SDL_Rect rect);
-            virtual void SetStyle(Style style);
             virtual void SetVisible(bool v);
             virtual void SetMinimaze(bool m);
+            virtual void SetFull(bool f);
             virtual void AllowMinimaze(bool b);
             virtual void AllowClose(bool b);
             virtual void AllowResize(bool b);
+            virtual void AllowMoving(bool m);
 
             virtual void ProcessGlobalClick(SDL_MouseButtonEvent event);
             virtual void ProcessGlobalHeaderClick(SDL_MouseButtonEvent event);
@@ -105,10 +109,13 @@ namespace AbyssCore{
 
             virtual bool InHeader(int x, int y);
             virtual bool InBody(int x, int y);
+            virtual bool InWidget(Widget* w, int x, int y);
 
             virtual bool CloseHit(int x, int y);
             virtual bool MinimazeHit(int x, int y);
             virtual bool ResizeHit(int x, int y);
+
+            
     };
 
     typedef struct{

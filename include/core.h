@@ -2,6 +2,7 @@
 #define CORE_H
 
 #include <iostream>
+#include <algorithm>
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <windowsgroup.h>
@@ -12,8 +13,8 @@
 #include <colors.h>
 #include <windowproperty.h>
 
-#define RESOLUTION_X 1920
-#define RESOLUTION_Y 1080
+#define RESOLUTION_X 1240
+#define RESOLUTION_Y 680
 
 #define RENDERER_FLAGS SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
 
@@ -24,6 +25,8 @@
 #define FPSINF 1000
 
 #define FPS FPS120
+
+using namespace std;
 
 namespace AbyssCore{
     class Core{

@@ -12,9 +12,11 @@ namespace AbyssCore{
         canMinimaze = true;
         canClose = true;
         canResize = false;
+        canMove = true;
 
         isVisible = true;
         isMinimazied = false;
+        isFull = true;
 
         needDestroy = false;
 
@@ -42,16 +44,16 @@ namespace AbyssCore{
         return rect;
     }
 
-    Style Window::GetStyle(){
-        return style;
-    }
-
     bool Window::IsVisible(){
         return isVisible;
     }
 
     bool Window::IsMinimazed(){
         return isMinimazied;
+    }
+
+    bool Window::IsFull(){
+        return isFull;
     }
 
     bool Window::CanMinimaze(){
@@ -64,6 +66,10 @@ namespace AbyssCore{
 
     bool Window::CanResize(){
         return canResize;
+    }
+
+    bool Window::CanMoving(){
+        return canMove;
     }
 
     SDL_Rect Window::GetCloseHitBox(){
@@ -107,16 +113,16 @@ namespace AbyssCore{
         CalculateControlHitBox();
     }
 
-    void Window::SetStyle(Style style){
-        this->style = style;
-    }
-
     void Window::SetVisible(bool v){
         isVisible = v;
     }
 
     void Window::SetMinimaze(bool m){
         isMinimazied = m;
+    }
+
+    void Window::SetFull(bool f){
+        isFull = f;
     }
 
     void Window::AllowMinimaze(bool b){
@@ -129,6 +135,10 @@ namespace AbyssCore{
 
     void Window::AllowResize(bool b){
         canResize = b;
+    }
+
+    void Window::AllowMoving(bool m){
+        canMove = m;
     }
 
     void Window::CalculateControlHitBox(){
@@ -160,16 +170,16 @@ namespace AbyssCore{
         int x = event.x;
         int y = event.y;
 
-        if(event.type == SDL_MOUSEBUTTONDOWN && event.button == SDL_BUTTON_LEFT)
+        if(event.type == SDL_MOUSEBUTTONDOWN && event.button == SDL_BUTTON_LEFT && IsFull() && CanMoving())
             beginGDrag = true;
 
-        if(CloseHit(x, y) && CanClose()){
+        if(CloseHit(x, y) && CanClose() && IsFull()){
             if(event.type == SDL_MOUSEBUTTONDOWN)
                 beginGClick = true;
             if(beginGClick && event.type == SDL_MOUSEBUTTONUP)
                 CloseAction();
         }
-        if(MinimazeHit(x, y) && CanMinimaze()){
+        if(MinimazeHit(x, y) && CanMinimaze() && IsFull()){
             if(event.type == SDL_MOUSEBUTTONDOWN)
                 beginGClick = true;
             if(beginGClick && event.type == SDL_MOUSEBUTTONUP)
@@ -181,7 +191,7 @@ namespace AbyssCore{
         int x = event.x;
         int y = event.y;
 
-        if(ResizeHit(x, y) && !IsMinimazed() && CanResize() && event.type == SDL_MOUSEBUTTONDOWN && event.button == SDL_BUTTON_LEFT)
+        if(ResizeHit(x, y) && !IsMinimazed() && CanResize() && IsFull() && event.type == SDL_MOUSEBUTTONDOWN && event.button == SDL_BUTTON_LEFT)
             beginGResize = true;
     }
 
@@ -225,9 +235,14 @@ namespace AbyssCore{
         int x = event.x;
         int y = event.y;
 
-        if(y >= HEADER_HEIGHT)
+        int header_offset = HEADER_HEIGHT;
+
+        if(!IsFull())
+            header_offset = 0;
+
+        if(y >= header_offset)
             ProcessBodyClick(event);
-        else
+        else if(y < header_offset)
             ProcessHeaderClick(event);
 
         if(event.type == SDL_MOUSEBUTTONUP && event.button == SDL_BUTTON_LEFT){
@@ -247,14 +262,12 @@ namespace AbyssCore{
         for(Widget* w : widgetPull){
             if(w->IsVisible() && !w->IsDisabled()){
                 if(event.button == SDL_BUTTON_LEFT){
-                    SDL_Rect rect = w->GetRect();
-                    rect.y += HEADER_HEIGHT - 1;
 
                     if(w->GetState() == Pressed){
                         w->SetState(Idle);
                     }
 
-                    if(x >= rect.x && x <= (rect.x + rect.w) && y >= rect.y && y <= (rect.y + rect.h)){
+                    if(InWidget(w, x, y)){
                         if(event.type == SDL_MOUSEBUTTONDOWN){
                             beginClick = true;
                             w->SetState(Pressed);
@@ -275,14 +288,11 @@ namespace AbyssCore{
 
         for(Widget* w : widgetPull){
             if(w->IsVisible() && !w->IsDisabled()){
-                SDL_Rect rect = w->GetRect();
-                rect.y += HEADER_HEIGHT - 1;
-
                 if(w->GetState() == Hovered)
                     w->SetState(Idle);
 
                 if(w->GetState() == Idle){
-                    if(x >= rect.x && x <= (rect.x + rect.w) && y >= rect.y && y <= (rect.y + rect.h)){
+                    if(InWidget(w, x, y)){
                         w->SetState(Hovered);
                         w->ProcessMove(event, this);
                     }
@@ -297,10 +307,7 @@ namespace AbyssCore{
 
         for(Widget* w : widgetPull){
             if(w->IsVisible() && !w->IsDisabled()){
-                SDL_Rect rect = w->GetRect();
-                rect.y += HEADER_HEIGHT - 1;
-
-                if(x >= rect.x && x <= (rect.x + rect.w) && y >= rect.y && y <= (rect.y + rect.h)){
+                if(InWidget(w, x, y)){
                     w->ProcessDrag(event, this);
                 }
             }
@@ -322,6 +329,14 @@ namespace AbyssCore{
     void Window::Paint(SDL_Renderer* render){
         SDL_SetRenderDrawColor(render, style.background.r, style.background.g, style.background.b, style.background.a);
         SDL_RenderClear(render);
+
+        SDL_SetRenderDrawColor(render, style.border.r, style.border.g, style.border.b, style.border.a);
+        
+        SDL_Rect rect = this->rect;
+        rect.x = 0;
+        rect.y = 0;
+        
+        SDL_RenderDrawRect(render, &rect);
     }
 
     vector<Widget*> Window::GetPull(){
@@ -377,6 +392,19 @@ namespace AbyssCore{
 
         if(x >= rect.x && x <= (rect.x + rect.w) && y >= (rect.y + HEADER_HEIGHT) && y <= (rect.y + rect.h + HEADER_HEIGHT))
             return true;
+        return false;
+    }
+
+    bool Window::InWidget(Widget* w, int x, int y){
+        SDL_Rect rect = w->GetRect();
+
+        if(IsFull())
+            rect.y += HEADER_HEIGHT - 1;
+
+        if(x >= rect.x && x <= (rect.x + rect.w) && y >= rect.y && y <= (rect.y + rect.h)){
+            return true;
+        }
+
         return false;
     }
 

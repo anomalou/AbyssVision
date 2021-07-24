@@ -1,7 +1,5 @@
 #include "core.h"
 
-using namespace std;
-
 namespace AbyssCore{
     bool InitCore(){
         Core* core = Core::GetInstance();
@@ -192,9 +190,8 @@ namespace AbyssCore{
 
             // SDL_Point pos = renderPtrs->corePtr->mousePosition;
 
-            // SDL_SetRenderDrawColor(render, BLACK);
-            
-            // SDL_RenderDrawPoint(render, pos.x, pos.y);
+            // if(currentFocus->IsVisible())
+            //     renderPtrs->corePtr->DrawWindow(render, currentFocus);
 
             SDL_RenderPresent(render);
             SDL_Delay(1000/FPS);
@@ -204,10 +201,12 @@ namespace AbyssCore{
     }
 
     void Core::DrawWindow(SDL_Renderer* render, Window* w){
-        DrawWindowHead(render, w);
+        if(w->IsFull())
+            DrawWindowHead(render, w);
         if(!w->IsMinimazed())
             DrawWindowBody(render, w);
-        DrawWindowControl(render, w);
+        if(w->IsFull())
+            DrawWindowControl(render, w);
     }
 
     void Core::DrawWindowHead(SDL_Renderer *render, Window* w){
@@ -217,10 +216,10 @@ namespace AbyssCore{
         int height = HEADER_HEIGHT;
         SDL_Rect rect = SDL_Rect({x, y, width, height});
 
-        SDL_Color focus = w->GetStyle().focus;
-        SDL_Color nofocus = w->GetStyle().nofocus;
+        SDL_Color focus = w->style.focus;
+        SDL_Color nofocus = w->style.nofocus;
 
-        SDL_Color border = w->GetStyle().border;
+        SDL_Color border = w->style.border;
 
         if(group->CurrentFocus() == w)
             SDL_SetRenderDrawColor(render, focus.r, focus.g, focus.b, focus.a);
@@ -230,14 +229,14 @@ namespace AbyssCore{
         SDL_SetRenderDrawColor(render, border.r, border.g, border.b, border.a);
         SDL_RenderDrawRect(render, &rect);
 
-        SDL_Color shadow = w->GetStyle().shadow;
-        int shadow_size = w->GetStyle().shadow_size;
+        SDL_Color shadow = w->style.shadow;
+        int shadow_size = w->style.shadow_size;
 
         SDL_SetRenderDrawColor(render, shadow.r, shadow.g, shadow.b, shadow.a);
-        SDL_RenderFillRect(render, new SDL_Rect({rect.x + rect.w, rect.y + shadow_size, shadow_size, HEADER_HEIGHT - shadow_size}));
+        SDL_RenderFillRect(render, new SDL_Rect({rect.x + rect.w, rect.y + shadow_size, shadow_size, HEADER_HEIGHT}));
 
         if(w->IsMinimazed())
-            SDL_RenderFillRect(render, new SDL_Rect({rect.x + shadow_size, rect.y + HEADER_HEIGHT, rect.w, shadow_size}));
+            SDL_RenderFillRect(render, new SDL_Rect({rect.x + shadow_size, rect.y + HEADER_HEIGHT, rect.w - shadow_size, shadow_size}));
         
         //window title
 
@@ -262,10 +261,12 @@ namespace AbyssCore{
     }
 
     void Core::DrawWindowBody(SDL_Renderer *render, Window* w){
-        SDL_Rect rect = {w->GetRect().x, w->GetRect().y + HEADER_HEIGHT - 1, w->GetRect().w, w->GetRect().h};
+        SDL_Rect rect = w->GetRect();
 
-        SDL_Color background = w->GetStyle().background;
-        SDL_Color border = w->GetStyle().border;
+        if(w->IsFull())
+            rect.y += HEADER_HEIGHT - 1;
+
+        // SDL_Color border = w->GetStyle().border;
 
         SDL_Texture* bodyTex = SDL_CreateTexture(render, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, rect.w, rect.h);
         SDL_SetRenderTarget(render, bodyTex);
@@ -282,10 +283,10 @@ namespace AbyssCore{
                 SDL_RenderCopy(render, widgetTex, NULL, &wrect);
                 SDL_DestroyTexture(widgetTex);
 
-                SDL_Color border = w->GetStyle().border;
+                // SDL_Color border = w->GetStyle().border;
 
-                SDL_SetRenderDrawColor(render, border.r, border.g, border.b, border.a);
-                SDL_RenderDrawRect(render, &wrect);
+                // SDL_SetRenderDrawColor(render, border.r, border.g, border.b, border.a);
+                // SDL_RenderDrawRect(render, &wrect);
             }
         }
 
@@ -293,15 +294,15 @@ namespace AbyssCore{
         SDL_RenderCopy(render, bodyTex, NULL, &rect);
         SDL_DestroyTexture(bodyTex);
 
-        SDL_SetRenderDrawColor(render, border.r, border.g, border.b, border.a);
-        SDL_RenderDrawRect(render, &rect);
+        // SDL_SetRenderDrawColor(render, border.r, border.g, border.b, border.a);
+        // SDL_RenderDrawRect(render, &rect);
 
-        SDL_Color shadow = w->GetStyle().shadow;
-        int shadow_size = w->GetStyle().shadow_size;
+        SDL_Color shadow = w->style.shadow;
+        int shadow_size = w->style.shadow_size;
 
         SDL_SetRenderDrawColor(render, shadow.r, shadow.g, shadow.b, shadow.a);
         SDL_Rect shadows[2] = {{rect.x + shadow_size, rect.y + rect.h, rect.w - shadow_size, shadow_size},
-                               {rect.x + rect.w, rect.y + 1, shadow_size, rect.h + shadow_size - 1}};
+                               {rect.x + rect.w, rect.y + shadow_size + 1, shadow_size, rect.h - 1}};
 
         SDL_RenderFillRects(render, shadows, 2);
     }
@@ -321,10 +322,10 @@ namespace AbyssCore{
         SDL_Rect resRect = {wRect.x + resizeHitBox.x, wRect.y + resizeHitBox.y, resizeHitBox.w, resizeHitBox.h};
         SDL_Rect rects[2] = {crossRect, minRect};
 
-        SDL_Color control = w->GetStyle().control;
-        SDL_Color border = w->GetStyle().border;
-        SDL_Color enabled = w->GetStyle().enabled;
-        SDL_Color disabled = w->GetStyle().disabled;
+        SDL_Color control = w->style.control;
+        SDL_Color border = w->style.border;
+        SDL_Color enabled = w->style.enabled;
+        SDL_Color disabled = w->style.disabled;
 
         SDL_SetRenderDrawColor(render, control.r, control.g, control.b, control.a);
         SDL_RenderFillRects(render, rects, 2);
@@ -472,14 +473,26 @@ namespace AbyssCore{
 
     bool Core::InWindow(Window* w, int x, int y){
         SDL_Rect rect = w->GetRect();
+        int left = rect.x;
+        int right = rect.x + rect.w;
+        int top = rect.y;
+        int bottom = rect.y + rect.h + HEADER_HEIGHT;
 
         if(w->IsMinimazed()){
-            if(x > rect.x && x < (rect.x + rect.w) && y > rect.y && y < (rect.y + HEADER_HEIGHT))
-                return true;
+            if(w->IsFull())
+                bottom = rect.y + HEADER_HEIGHT;
+            else
+                bottom = rect.y;
         }else{
-            if(x > rect.x && x < (rect.x + rect.w) && y > rect.y && y < (rect.y + rect.h + HEADER_HEIGHT))
-                return true;
+            if(w->IsFull())
+                bottom = rect.y + rect.h + HEADER_HEIGHT;
+            else
+                bottom = rect.y + rect.h;
         }
+
+
+        if(x > left && x < right && y > top && y < bottom)
+            return true;
 
         return false;
     }
@@ -491,7 +504,7 @@ namespace AbyssCore{
             SDL_WINDOWPOS_CENTERED, 
             RESOLUTION_X, 
             RESOLUTION_Y, 
-            SDL_WINDOW_FULLSCREEN
+            0
         );
 
         if(!window)

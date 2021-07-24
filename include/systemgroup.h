@@ -2,15 +2,15 @@
 #define SYSTEMGROUP_H
 
 #include <windowsgroup.h>
-#include <vector>
+#include <list>
 
 using namespace std;
 
 namespace AbyssCore{
     class SystemGroup : public IWindowsGroup{
         private:
-            vector<Window*> windowsPull;
-            Window* focus;
+            list<Window*> windowsPull;
+            // Window* focus;
 
         protected:
             virtual int FreeID();

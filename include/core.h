@@ -3,8 +3,12 @@
 
 #include <iostream>
 #include <algorithm>
+#include <thread>
 #include <SDL.h>
+#include <SDL_opengl.h>
 #include <SDL_ttf.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <windowsgroup.h>
 #include <systemgroup.h>
 #include <window.h>
@@ -12,90 +16,55 @@
 #include <astring.h>
 #include <colors.h>
 #include <windowproperty.h>
-
-#define RESOLUTION_X 1240
-#define RESOLUTION_Y 680
-
-#define RENDERER_FLAGS SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
-
-#define FPS10 10
-#define FPS30 30
-#define FPS60 60
-#define FPS120 120
-#define FPSINF 1000
-
-#define FPS FPS120
+#include <graphics.h>
+#include <application.h>
 
 using namespace std;
 
 namespace AbyssCore{
     class Core{
         private:
-            bool isRunning;
+            static bool isRunning;
 
-            SDL_Window* window;
-            SDL_Renderer* renderer;
+            static SDL_Window* window;
 
-            SDL_Thread* renderThread;
+            static IWindowsGroup* group;
 
-            Window* mainWindow;
-            IWindowsGroup* group;
+            static thread* render;
 
-            SDL_Point mousePosition;
-
-            static Core* INSTANCE;
-
-        public:
-            Core();
-            static Core* GetInstance();
-            ~Core();
+            static SDL_GLContext glContext;
 
         private:
-            bool CreateWindow();
-            bool CreateRenderer();
-            void DisposeWindow();
-            void DisposeRenderer();
+            static bool CreateSDLWindow();
+            static bool InitOpenGL();
+            static void DisposeWindow();
 
-            void DrawWindow(SDL_Renderer* render, Window* w);
+            static void DrawWindow(Window* w);
 
-            void DrawWindowHead(SDL_Renderer *render, Window* w);
-            void DrawWindowBody(SDL_Renderer* render, Window* w);
-            void DrawWindowControl(SDL_Renderer* render, Window* w);
+            static void DrawWindowHead(Window* w);
+            static void DrawWindowBody(Window* w);
+            static void DrawWindowControl(Window* w);
 
-            void ProcessMouse(SDL_Event event);
-            void MoveMouse(SDL_Event event);
-            void DragMouse(SDL_Event event);
-            void ClickMouse(SDL_Event event);
+            static void ProcessMouse(SDL_Event event);
+            static void MoveMouse(SDL_Event event);
+            static void DragMouse(SDL_Event event);
+            static void ClickMouse(SDL_Event event);
 
-            bool InWindow(Window* w, int x, int y);
+            static bool InWindow(Window* w, int x, int y);
 
-            void Input();
-            static int Render(void *rendPtr);
+            static void Input();
+            static void Render();
 
         public:
-            bool Init();
-            void Start();
-            void Dispose();
+            static bool Init();
+            static void Start();
+            static void Dispose();
 
-            IWindowsGroup* GetGroup();
-            void SetMainWindow(Window* w);
-            bool IsRunning();
+            static IWindowsGroup* GetGroup();
+            static bool IsRunning();
 
-            void Stop();
+            static void Stop();
     };
-
-    typedef struct{
-        Core* corePtr;
-    }RenderPtrs;
-
-    static TTF_Font* font;
-
-    bool InitCore();
-    void StartCore();
-    void DisposeCore();
-    void OpenFont(const char* filePath);
-    void AssignMainWindow(Window * w);
-    void AssignSubWindow(Window * w, AString* name);
 }
 
 #endif

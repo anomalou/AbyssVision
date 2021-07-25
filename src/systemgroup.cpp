@@ -84,7 +84,9 @@ namespace AbyssCore{
     }
 
     Window* SystemGroup::CurrentFocus(){
-        return windowsPull.back();
+        if(windowsPull.size() > 0)
+            return windowsPull.back();
+        return NULL;
     }
 
     void SystemGroup::ProcessWindows(){

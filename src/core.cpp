@@ -1,84 +1,11 @@
 #include "core.h"
 
 namespace AbyssCore{
-    bool InitCore(){
-        Core* core = Core::GetInstance();
-        if(core->Init()){
-            return true;
-        }
-        return false;
-    }
-
-    void StartCore(){
-        Core* core = Core::GetInstance();
-
-        if(core != nullptr){
-            core->Start();
-        }
-    }
-
-    void DisposeCore(){
-        Core* core = Core::GetInstance();
-
-        if(core != nullptr){
-            if(font != nullptr)
-                TTF_CloseFont(font);
-            core->Dispose();
-            core = nullptr;
-        }
-    }
-
-    void OpenFont(const char* filePath){
-        Core* core = Core::GetInstance();
-
-        if(core != nullptr){
-            if(font != nullptr){
-                TTF_CloseFont(font);
-            }
-            font = TTF_OpenFont(filePath, FSIZE);
-        }
-    }
-
-    void AssignMainWindow(Window * w){
-        Core* core = Core::GetInstance();
-
-        w->SetPos(0, 0);
-        w->SetSize(RESOLUTION_X, RESOLUTION_Y - HEADER_HEIGHT);
-
-        core->GetGroup()->Create(w, new AString("Main window"));
-        core->GetGroup()->FocusWindow(w);
-        w->SetVisible(true);
-        w->AllowClose(false);
-        core->SetMainWindow(w);
-
-        w->AllowResize(true);
-    }
-
-    void AssignSubWindow(Window * w, AString* name){
-        Core* core = Core::GetInstance();
-
-        w->SetPos(0, 0);
-        w->SetSize(100, 100);
-
-        core->GetGroup()->Create(w, name);
-        w->SetVisible(true);
-
-        w->AllowResize(true);
-    }
-
-    Core::Core(){
-        isRunning = false;
-    }
-
-    Core* Core::INSTANCE;
-
-    Core* Core::GetInstance(){
-        if(INSTANCE == nullptr){
-            INSTANCE = new Core();
-        }
-
-        return INSTANCE;
-    }
+    bool Core::isRunning;
+    SDL_Window* Core::window;
+    IWindowsGroup* Core::group;
+    thread* Core::render;
+    SDL_GLContext Core::glContext;
 
     bool Core::Init(){
         if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -87,16 +14,15 @@ namespace AbyssCore{
         if(TTF_Init() != 0)
             return false;
 
-        if(!CreateWindow())
+        // SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
+	    // SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
+	    // SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
+
+        if(!CreateSDLWindow())
             return false;
-        
-        if(!CreateRenderer()){
-            DisposeWindow();
-            return false;
-        }
 
         group = new SystemGroup();
-        SDL_ShowCursor(SDL_DISABLE);
+        // SDL_ShowCursor(SDL_DISABLE);
 
         return true;
     }
@@ -104,33 +30,29 @@ namespace AbyssCore{
     void Core::Start(){
         isRunning = true;
 
-        RenderPtrs* ptrs = (RenderPtrs*)malloc(sizeof(RenderPtrs));
-        ptrs->corePtr = this;
-
-        renderThread = SDL_CreateThread(Render, "input", ptrs);
-
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BlendMode::SDL_BLENDMODE_BLEND);
-
-        if(mainWindow == nullptr){
+        if(group->CurrentFocus() == NULL){
             Window* mw = new MainWindow();
 
             mw->SetPos(0, 0);
             mw->SetSize(RESOLUTION_X, RESOLUTION_Y - HEADER_HEIGHT);
 
-            mainWindow = mw;
             mw->SetVisible(true);
             group->FocusWindow(mw);
             group->Create(mw, new AString("Main window"));
         }
 
-        Input();
+        render = new thread(Render);
+
+        while(isRunning){
+            Input();
+        }
+
     }
 
     void Core::Dispose(){
         isRunning = false;
 
         DisposeWindow();
-        DisposeRenderer();
 
         SDL_Quit();
     }
@@ -138,76 +60,86 @@ namespace AbyssCore{
     void Core::Input(){
         SDL_Event event;
 
-        while(isRunning){
-            while(SDL_PollEvent(&event)){
-                switch(event.type){
-                    case SDL_QUIT:
-                        isRunning = false;
-                    break;
-                    case SDL_MOUSEBUTTONDOWN:
-                    case SDL_MOUSEBUTTONUP:
-                    case SDL_MOUSEMOTION:
-                    case SDL_MOUSEWHEEL:
-                        ProcessMouse(event);
-                    break;
-                    case SDL_KEYDOWN:
-                    {
-                        switch(event.key.keysym.scancode){
-                            case SDL_SCANCODE_ESCAPE:
-                                isRunning = false;
-                            break;
-                        }
-                    }   
-                    break;
+        while(SDL_PollEvent(&event)){
+            switch(event.type){
+                case SDL_QUIT:
+                    isRunning = false;
+                break;
+                case SDL_WINDOWEVENT:
+                {
+                    if(event.window.event == SDL_WINDOWEVENT_RESIZED){
+                        SDL_GetWindowSize(window, &Application::screen_width, &Application::screen_height);
+                    }
                 }
+                break;
+                case SDL_MOUSEBUTTONDOWN:
+                case SDL_MOUSEBUTTONUP:
+                case SDL_MOUSEMOTION:
+                case SDL_MOUSEWHEEL:
+                    ProcessMouse(event);
+                break;
+                case SDL_KEYDOWN:
+                {
+                    switch(event.key.keysym.scancode){
+                        case SDL_SCANCODE_ESCAPE:
+                            isRunning = false;
+                        break;
+                    }
+                }   
+                break;
             }
-
-            group->ProcessWindows();
         }
 
+        group->ProcessWindows();
         
     }
 
-    int Core::Render(void *rendPtr){
-        RenderPtrs* renderPtrs = (RenderPtrs*)rendPtr;
-        SDL_Renderer* render = renderPtrs->corePtr->renderer;
-        IWindowsGroup* group = renderPtrs->corePtr->group;
+    void Core::Render(){
+        glContext = SDL_GL_CreateContext(window);
 
-        while(renderPtrs->corePtr->isRunning){
-            SDL_SetRenderDrawColor(render, LIGHT_GRAY);
-            SDL_RenderClear(render);
+        if(!InitOpenGL()){
+            DisposeWindow();
+            isRunning = false;
+            return;
+        }
+
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+        while(isRunning){
+            glViewport(0, 0, Application::screen_width, Application::screen_height);
+            
+            glClear(GL_COLOR_BUFFER_BIT);
 
             for(Window* w : group->GetPull()){
                 if(w->IsVisible()){
-                    renderPtrs->corePtr->DrawWindow(render, w);
+                    DrawWindow(w);
                 }
             }
 
-            SDL_Rect rect = {renderPtrs->corePtr->mousePosition.x, renderPtrs->corePtr->mousePosition.y, 10, 10};
 
-            SDL_SetRenderDrawColor(render, BLACK);
-            SDL_RenderDrawRect(render, &rect);
+            // SDL_FRect frect = ConvertToNormal(screen_width, screen_height, rect);
 
-            // SDL_Point pos = renderPtrs->corePtr->mousePosition;
+            // glBegin(GL_LINE_LOOP);
 
-            // if(currentFocus->IsVisible())
-            //     renderPtrs->corePtr->DrawWindow(render, currentFocus);
+            //     glVertex2f(frect.x, frect.y - frect.h);
+            //     glVertex2f(frect.x, frect.y);
+            //     glVertex2f(frect.x + frect.w, frect.y);
+            //     glVertex2f(frect.x + frect.w, frect.y - frect.h);
 
-            SDL_RenderPresent(render);
-            SDL_Delay(1000/FPS);
+            // glEnd();
+
+            SDL_GL_SwapWindow(window);
         }
-
-        return 0;
     }
 
-    void Core::DrawWindow(SDL_Renderer* render, Window* w){
+    void Core::DrawWindow(Window* w){
         SDL_Rect rect = w->GetRect();
 
         int width = rect.w;
         int height = rect.h;
 
-        rect.w += w->style.shadow_size;
-        rect.h += w->style.shadow_size;
+        // rect.w += w->style.shadow_size;
+        // rect.h += w->style.shadow_size;
 
         if(w->IsMinimazed())
             rect.h -= height;
@@ -215,28 +147,29 @@ namespace AbyssCore{
         if(w->IsFull())
             rect.h += HEADER_HEIGHT;
 
-        SDL_Texture* windowTexture = SDL_CreateTexture(render, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET, rect.w, rect.h);
-        SDL_SetRenderTarget(render, windowTexture);
-        SDL_SetTextureBlendMode(windowTexture, SDL_BlendMode::SDL_BLENDMODE_BLEND);
+        // SDL_Texture* windowTexture = SDL_CreateTexture(render, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET, rect.w, rect.h);
+        // SDL_SetRenderTarget(render, windowTexture);
+        // SDL_SetTextureBlendMode(windowTexture, SDL_BlendMode::SDL_BLENDMODE_BLEND);
 
         if(w->IsFull())
-            DrawWindowHead(render, w);
+            DrawWindowHead(w);
         if(!w->IsMinimazed())
-            DrawWindowBody(render, w);
+            DrawWindowBody(w);
         if(w->IsFull())
-            DrawWindowControl(render, w);
+            DrawWindowControl(w);
 
-        SDL_SetRenderTarget(render, NULL);
-        SDL_RenderCopy(render, windowTexture, NULL, &rect);
-        SDL_DestroyTexture(windowTexture);
+        // SDL_SetRenderTarget(render, NULL);
+        // SDL_RenderCopy(render, windowTexture, NULL, &rect);
+        // SDL_DestroyTexture(windowTexture);
     }
 
-    void Core::DrawWindowHead(SDL_Renderer *render, Window* w){
-        int x = 0;
-        int y = 0;
-        int width = w->GetRect().w;
-        int height = HEADER_HEIGHT;
-        SDL_Rect rect = SDL_Rect({x, y, width, height});
+    void Core::DrawWindowHead(Window* w){
+        // int x = 0;
+        // int y = 0;
+        // int width = w->GetRect().w;
+        // int height = HEADER_HEIGHT;
+        SDL_Rect rect = w->GetRect();
+        rect.h = HEADER_HEIGHT;
 
         SDL_Color focus = w->style.focus;
         SDL_Color nofocus = w->style.nofocus;
@@ -244,102 +177,129 @@ namespace AbyssCore{
         SDL_Color border = w->style.border;
 
         if(group->CurrentFocus() == w)
-            SDL_SetRenderDrawColor(render, focus.r, focus.g, focus.b, focus.a);
+            GLSetColor(focus);
         else
-            SDL_SetRenderDrawColor(render, nofocus.r, nofocus.g, nofocus.b, nofocus.a);
-        SDL_RenderFillRect(render, &rect);
-        SDL_SetRenderDrawColor(render, border.r, border.g, border.b, border.a);
-        SDL_RenderDrawRect(render, &rect);
+            GLSetColor(nofocus);
+        GLFillRect(rect);
+        GLSetColor(border);
+        GLDrawRect(rect);
 
-        SDL_Color shadow = w->style.shadow;
-        int shadow_size = w->style.shadow_size;
+        // SDL_Color shadow = w->style.shadow;
+        // int shadow_size = w->style.shadow_size;
 
-        SDL_SetRenderDrawColor(render, shadow.r, shadow.g, shadow.b, shadow.a);
-        SDL_RenderFillRect(render, new SDL_Rect({rect.x + rect.w, rect.y + shadow_size, shadow_size, HEADER_HEIGHT}));
+        // SDL_SetRenderDrawColor(render, shadow.r, shadow.g, shadow.b, shadow.a);
+        // SDL_RenderFillRect(render, new SDL_Rect({rect.x + rect.w, rect.y + shadow_size, shadow_size, HEADER_HEIGHT}));
 
-        if(w->IsMinimazed())
-            SDL_RenderFillRect(render, new SDL_Rect({rect.x + shadow_size, rect.y + HEADER_HEIGHT, rect.w - shadow_size, shadow_size}));
+        // if(w->IsMinimazed())
+        //     SDL_RenderFillRect(render, new SDL_Rect({rect.x + shadow_size, rect.y + HEADER_HEIGHT, rect.w - shadow_size, shadow_size}));
         
-        //window title
+        // //window title
 
-        rect.x = x + FSIGN_WIDTH / 2;
-        rect.y = y + FSIGN_HEIGHT / 2;
-        rect.w = FSIGN_WIDTH * w->GetName()->Length();
-        rect.h = FSIGN_HEIGHT;
+        // rect.x = x + FSIGN_WIDTH / 2;
+        // rect.y = y + FSIGN_HEIGHT / 2;
+        // rect.w = FSIGN_WIDTH * w->GetName()->Length();
+        // rect.h = FSIGN_HEIGHT;
 
-        if((rect.w + FSIGN_WIDTH / 2) > w->GetRect().w)
-            rect.w = w->GetRect().w - FSIGN_WIDTH / 2;
+        // if((rect.w + FSIGN_WIDTH / 2) > w->GetRect().w)
+        //     rect.w = w->GetRect().w - FSIGN_WIDTH / 2;
 
-        SDL_Color color = {BLACK};
+        // SDL_Color color = {BLACK};
 
-        SDL_Surface* surface = TTF_RenderText_Solid(font, w->GetName()->ToChars(), color);
+        // SDL_Surface* surface = TTF_RenderText_Solid(font, w->GetName()->ToChars(), color);
 
-        SDL_Texture* header = SDL_CreateTextureFromSurface(render, surface);
+        // SDL_Texture* header = SDL_CreateTextureFromSurface(render, surface);
 
-        SDL_RenderCopy(render, header, NULL, &rect);
+        // SDL_RenderCopy(render, header, NULL, &rect);
 
-        SDL_FreeSurface(surface);
-        SDL_DestroyTexture(header);
+        // SDL_FreeSurface(surface);
+        // SDL_DestroyTexture(header);
     }
 
-    void Core::DrawWindowBody(SDL_Renderer *render, Window* w){
+    void Core::DrawWindowBody(Window* w){
         SDL_Rect rect = w->GetRect();
-        rect.x = 0;
+        // rect.x = 0;
 
         if(w->IsFull())
-            rect.y = HEADER_HEIGHT - 1;
-        else
-            rect.y = 0;
+            rect.y += HEADER_HEIGHT;
 
-        // SDL_Color border = w->GetStyle().border;
-        SDL_Texture* currTarget = SDL_GetRenderTarget(render);
+        SDL_Color background = w->style.background;
+        SDL_Color border = w->style.border;
 
-        SDL_Texture* bodyTex = SDL_CreateTexture(render, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, rect.w, rect.h);
-        SDL_SetRenderTarget(render, bodyTex);
-        w->Paint(render);
+        GLSetColor(background);
+        GLFillRect(rect);
+        
 
-        for(Widget* w : w->GetPull()){
+        for(Widget * w : w->GetPull()){
             if(w->IsVisible()){
                 SDL_Rect wrect = w->GetRect();
+                wrect.x += rect.x;
+                wrect.y += rect.y;
 
-                SDL_Texture* widgetTex = SDL_CreateTexture(render, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, wrect.w, wrect.h);
-                SDL_SetRenderTarget(render, widgetTex);
-                w->Paint(render);
-                SDL_SetRenderTarget(render, bodyTex);
-                SDL_RenderCopy(render, widgetTex, NULL, &wrect);
-                SDL_DestroyTexture(widgetTex);
+                SDL_Color background = w->style.background;
+                SDL_Color border = w->style.border;
 
-                // SDL_Color border = w->GetStyle().border;
-
-                // SDL_SetRenderDrawColor(render, border.r, border.g, border.b, border.a);
-                // SDL_RenderDrawRect(render, &wrect);
+                GLSetColor(background);
+                GLFillRect(wrect);
+                GLSetColor(border);
+                GLDrawRect(wrect);
             }
         }
 
-        SDL_SetRenderTarget(render, currTarget);
-        SDL_RenderCopy(render, bodyTex, NULL, &rect);
-        SDL_DestroyTexture(bodyTex);
+        GLSetColor(border);
+        GLDrawRect(rect);
 
-        // SDL_SetRenderDrawColor(render, border.r, border.g, border.b, border.a);
-        // SDL_RenderDrawRect(render, &rect);
+        // else
+        //     rect.y = 0;
 
-        SDL_Color shadow = w->style.shadow;
-        int shadow_size = w->style.shadow_size;
+        // SDL_Color border = w->GetStyle().border;
+        // SDL_Texture* currTarget = SDL_GetRenderTarget(render);
 
-        SDL_SetRenderDrawColor(render, shadow.r, shadow.g, shadow.b, shadow.a);
-        SDL_Rect shadows[2] = {{rect.x + shadow_size, rect.y + rect.h, rect.w - shadow_size, shadow_size},
-                               {rect.x + rect.w, rect.y + shadow_size + 1, shadow_size, rect.h - 1}};
+        // SDL_Texture* bodyTex = SDL_CreateTexture(render, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, rect.w, rect.h);
+        // SDL_SetRenderTarget(render, bodyTex);
+        // w->Paint(render);
 
-        SDL_RenderFillRects(render, shadows, 2);
+        // for(Widget* w : w->GetPull()){
+        //     if(w->IsVisible()){
+        //         SDL_Rect wrect = w->GetRect();
+
+        //         SDL_Texture* widgetTex = SDL_CreateTexture(render, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, wrect.w, wrect.h);
+        //         SDL_SetRenderTarget(render, widgetTex);
+        //         w->Paint(render);
+        //         SDL_SetRenderTarget(render, bodyTex);
+        //         SDL_RenderCopy(render, widgetTex, NULL, &wrect);
+        //         SDL_DestroyTexture(widgetTex);
+
+        //         // SDL_Color border = w->GetStyle().border;
+
+        //         // SDL_SetRenderDrawColor(render, border.r, border.g, border.b, border.a);
+        //         // SDL_RenderDrawRect(render, &wrect);
+        //     }
+        // }
+
+        // SDL_SetRenderTarget(render, currTarget);
+        // SDL_RenderCopy(render, bodyTex, NULL, &rect);
+        // SDL_DestroyTexture(bodyTex);
+
+        // // SDL_SetRenderDrawColor(render, border.r, border.g, border.b, border.a);
+        // // SDL_RenderDrawRect(render, &rect);
+
+        // SDL_Color shadow = w->style.shadow;
+        // int shadow_size = w->style.shadow_size;
+
+        // SDL_SetRenderDrawColor(render, shadow.r, shadow.g, shadow.b, shadow.a);
+        // SDL_Rect shadows[2] = {{rect.x + shadow_size, rect.y + rect.h, rect.w - shadow_size, shadow_size},
+        //                        {rect.x + rect.w, rect.y + shadow_size + 1, shadow_size, rect.h - 1}};
+
+        // SDL_RenderFillRects(render, shadows, 2);
     }
 
-    void Core::DrawWindowControl(SDL_Renderer * render, Window* w){
+    void Core::DrawWindowControl(Window* w){
         SDL_Rect wRect = w->GetRect();
-        wRect.x = 0;
-        wRect.y = 0;
+        // wRect.x = 0;
+        // wRect.y = 0;
 
-        int hmargin = (CBUTTON_WIDTH - CSIGN_SIZE) / 2;
-        int vmargin = (HEADER_HEIGHT - CSIGN_SIZE) / 2;
+        // int hmargin = (CBUTTON_WIDTH - CSIGN_SIZE) / 2;
+        // int vmargin = (HEADER_HEIGHT - CSIGN_SIZE) / 2;
 
         SDL_Rect closeHitBox = w->GetCloseHitBox();
         SDL_Rect minimazeHitBox = w->GetMinimazeHitBox();
@@ -355,40 +315,50 @@ namespace AbyssCore{
         SDL_Color enabled = w->style.enabled;
         SDL_Color disabled = w->style.disabled;
 
-        SDL_SetRenderDrawColor(render, control.r, control.g, control.b, control.a);
-        SDL_RenderFillRects(render, rects, 2);
+        GLSetColor(control);
+        GLFillRect(rects[0]);
+        GLFillRect(rects[1]);
+        GLSetColor(border);
+        GLDrawRect(rects[0]);
+        GLDrawRect(rects[1]);
 
-        SDL_SetRenderDrawColor(render, border.r, border.g, border.b, border.a);
-        SDL_RenderDrawRects(render, rects, 2);
-
-        //cross
-        if(w->CanClose())
-            SDL_SetRenderDrawColor(render, enabled.r, enabled.g, enabled.b, enabled.a);
-        else
-            SDL_SetRenderDrawColor(render, disabled.r, disabled.g, disabled.b, disabled.a);
-
-        SDL_RenderDrawLine(render, crossRect.x + hmargin, crossRect.y + vmargin, crossRect.x + crossRect.w - hmargin, crossRect.y + crossRect.h - vmargin);
-        SDL_RenderDrawLine(render, crossRect.x + hmargin, crossRect.y + crossRect.h - vmargin, crossRect.x + crossRect.w - hmargin, crossRect.y + vmargin);
-
-        //minimize
-
-        if(w->CanMinimaze())
-            SDL_SetRenderDrawColor(render, enabled.r, enabled.g, enabled.b, enabled.a);
-        else
-            SDL_SetRenderDrawColor(render, disabled.r, disabled.g, disabled.b, disabled.a);
-
-        SDL_RenderDrawLine(render, minRect.x + hmargin, minRect.y + HEADER_HEIGHT / 2, minRect.x + minRect.w - hmargin, minRect.y + HEADER_HEIGHT / 2);
-    
-        //resize
-
-        if(w->CanResize() && !w->IsMinimazed()){
-            SDL_SetRenderDrawColor(render, BLACK);
-
-            SDL_Point points[4] = {{resRect.x, resRect.y + resRect.h - 2}, {resRect.x + resRect.w - 1, resRect.y - 1},
-                                   {resRect.x + resRect.w - 1, resRect.y + resRect.h - 2}, {resRect.x, resRect.y + resRect.h - 2}};
-            
-            SDL_RenderDrawLines(render, points, 4);
+        if(!w->IsMinimazed() && w->CanResize()){
+            GLDrawRect(resRect);
         }
+        // SDL_SetRenderDrawColor(render, control.r, control.g, control.b, control.a);
+        // SDL_RenderFillRects(render, rects, 2);
+
+        // SDL_SetRenderDrawColor(render, border.r, border.g, border.b, border.a);
+        // SDL_RenderDrawRects(render, rects, 2);
+
+        // //cross
+        // if(w->CanClose())
+        //     SDL_SetRenderDrawColor(render, enabled.r, enabled.g, enabled.b, enabled.a);
+        // else
+        //     SDL_SetRenderDrawColor(render, disabled.r, disabled.g, disabled.b, disabled.a);
+
+        // SDL_RenderDrawLine(render, crossRect.x + hmargin, crossRect.y + vmargin, crossRect.x + crossRect.w - hmargin, crossRect.y + crossRect.h - vmargin);
+        // SDL_RenderDrawLine(render, crossRect.x + hmargin, crossRect.y + crossRect.h - vmargin, crossRect.x + crossRect.w - hmargin, crossRect.y + vmargin);
+
+        // //minimize
+
+        // if(w->CanMinimaze())
+        //     SDL_SetRenderDrawColor(render, enabled.r, enabled.g, enabled.b, enabled.a);
+        // else
+        //     SDL_SetRenderDrawColor(render, disabled.r, disabled.g, disabled.b, disabled.a);
+
+        // SDL_RenderDrawLine(render, minRect.x + hmargin, minRect.y + HEADER_HEIGHT / 2, minRect.x + minRect.w - hmargin, minRect.y + HEADER_HEIGHT / 2);
+    
+        // //resize
+
+        // if(w->CanResize() && !w->IsMinimazed()){
+        //     SDL_SetRenderDrawColor(render, BLACK);
+
+        //     SDL_Point points[4] = {{resRect.x, resRect.y + resRect.h - 2}, {resRect.x + resRect.w - 1, resRect.y - 1},
+        //                            {resRect.x + resRect.w - 1, resRect.y + resRect.h - 2}, {resRect.x, resRect.y + resRect.h - 2}};
+            
+        //     SDL_RenderDrawLines(render, points, 4);
+        // }
     }
 
     void Core::ProcessMouse(SDL_Event event){
@@ -408,7 +378,7 @@ namespace AbyssCore{
         int x = event.motion.x;
         int y = event.motion.y;
 
-        mousePosition = {x, y};
+        Application::mousePosition = {x, y};
 
         if(currentFocus->IsVisible()){
             currentFocus->ProcessGlobalMove(event.motion);
@@ -428,7 +398,7 @@ namespace AbyssCore{
         int x = event.motion.x;
         int y = event.motion.y;
 
-        mousePosition = {x, y};
+        Application::mousePosition = {x, y};
 
         if(currentFocus->IsVisible()){
             currentFocus->ProcessGlobalDrag(event.motion);
@@ -477,10 +447,6 @@ namespace AbyssCore{
         return group;
     }
 
-    void Core::SetMainWindow(Window* w){
-        mainWindow = w;
-    }
-
     bool Core::IsRunning(){
         return isRunning;
     }
@@ -515,14 +481,14 @@ namespace AbyssCore{
         return false;
     }
 
-    bool Core::CreateWindow(){
+    bool Core::CreateSDLWindow(){
         window = SDL_CreateWindow(
             "AbyssVision", 
             SDL_WINDOWPOS_CENTERED, 
             SDL_WINDOWPOS_CENTERED, 
             RESOLUTION_X, 
             RESOLUTION_Y, 
-            0
+            WINDOW_FLAGS
         );
 
         if(!window)
@@ -530,23 +496,37 @@ namespace AbyssCore{
         return true;
     }
 
-    bool Core::CreateRenderer(){
-        renderer = SDL_CreateRenderer(window, -1, RENDERER_FLAGS);
+    bool Core::InitOpenGL(){
+        SDL_GL_SetSwapInterval(1);
 
-        if(!renderer)
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+        SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
+        SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
+
+        auto error = GL_NO_ERROR;
+
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+
+        error = glGetError();
+
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
+        error = glGetError();
+
+        if( error != GL_NO_ERROR )
+        {
+            printf("Error initializing OpenGL! %s\n", gluErrorString(error));
             return false;
+        }
+
         return true;
     }
 
     void Core::DisposeWindow(){
         if(window){
             SDL_DestroyWindow(window);
-        }
-    }
-
-    void Core::DisposeRenderer(){
-        if(renderer){
-            SDL_DestroyRenderer(renderer);
         }
     }
 }

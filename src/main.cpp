@@ -6,27 +6,36 @@ using namespace AbyssCore;
 
 int main(int argc, char* args[]){
     
-    InitCore();
-    OpenFont("arial.ttf");
+    // InitCore();
+    // OpenFont("arial.ttf");
 
     MainWindow* mw = new MainWindow();
+    mw->AllowClose(false);
 
-    AssignMainWindow(mw);
+    Core::Init();
 
-    EmptyWindow* e1 = new EmptyWindow();
-    EmptyWindow* e2 = new EmptyWindow();
-    EmptyWindow* e3 = new EmptyWindow();
-    EmptyWindow* e4 = new EmptyWindow();
+    Core::GetGroup()->Create(mw, new AString("main window"));
 
-    AssignSubWindow(e1, new AString("e1"));
-    AssignSubWindow(e2, new AString("e2"));
-    AssignSubWindow(e3, new AString("e3"));
-    AssignSubWindow(e4, new AString("e4"));
+    Core::Start();
+
+    Core::Dispose();
+
+    // AssignMainWindow(mw);
+
+    // EmptyWindow* e1 = new EmptyWindow();
+    // EmptyWindow* e2 = new EmptyWindow();
+    // EmptyWindow* e3 = new EmptyWindow();
+    // EmptyWindow* e4 = new EmptyWindow();
+
+    // AssignSubWindow(e1, new AString("e1"));
+    // AssignSubWindow(e2, new AString("e2"));
+    // AssignSubWindow(e3, new AString("e3"));
+    // AssignSubWindow(e4, new AString("e4"));
 
 
-    StartCore();
+    // StartCore();
 
-    DisposeCore();
+    // DisposeCore();
 
     return 0;
 }

@@ -5,25 +5,25 @@ namespace AbyssCore{
     void Open(Widget* sender, ActionEvent event){
         MainWindow* mainWindow = dynamic_cast<MainWindow*>(event.parent);
 
-        if(Core::GetInstance()->GetGroup()->Find(new AString("empty")) == nullptr){
+        if(Core::GetGroup()->Find(new AString("empty")) == nullptr){
             mainWindow->window = new EmptyWindow();
-            AssignSubWindow(mainWindow->window, new AString("empty"));
+            Core::GetGroup()->Create(mainWindow->window, new AString("empty"));
         }
     }
     void Hide(Widget* sender, ActionEvent event){
         MainWindow* mainWindow = dynamic_cast<MainWindow*>(event.parent);
 
-        if(Core::GetInstance()->GetGroup()->Find(new AString("empty")) != nullptr)
+        if(Core::GetGroup()->Find(new AString("empty")) != nullptr)
             mainWindow->window->SetVisible(!mainWindow->window->IsVisible());
     }
 
     void MoveAction(Widget* sender, ActionEvent event){
-        EmptyWindow* empty = dynamic_cast<EmptyWindow*>(Core::GetInstance()->GetGroup()->Find(new AString("empty")));
+        // EmptyWindow* empty = dynamic_cast<EmptyWindow*>(Core::GetInstance()->GetGroup()->Find(new AString("empty")));
 
-        if(empty != nullptr){
-            SDL_Point pos = empty->pos;
-            empty->pos = {pos.x + event.xrel, pos.y + event.yrel};
-        }
+        // if(empty != nullptr){
+        //     SDL_Point pos = empty->pos;
+        //     empty->pos = {pos.x + event.xrel, pos.y + event.yrel};
+        // }
     }
 
     void FullAction(Widget* sender, ActionEvent event){

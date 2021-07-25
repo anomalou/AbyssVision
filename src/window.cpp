@@ -11,7 +11,7 @@ namespace AbyssCore{
 
         canMinimaze = true;
         canClose = true;
-        canResize = false;
+        canResize = true;
         canMove = true;
 
         isVisible = true;
@@ -209,6 +209,8 @@ namespace AbyssCore{
 
         if(beginGDrag){
             SDL_Point pos;
+
+            printf("Drag\n");
 
             pos.x = rect.x + xrel;
 

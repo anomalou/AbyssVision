@@ -14,7 +14,7 @@ add_executable(AbyssVision ${SOURCES})
 
 target_include_directories(AbyssVision PUBLIC ${SDL2_INCLUDE_DIR})
 target_include_directories(AbyssVision PUBLIC ${PROJECT_DIR}/include)
-target_link_libraries(AbyssVision -lmingw32 ${SDL2_LIBRARY_DIR}/libSDL2main.a ${SDL2_LIBRARY_DIR}/libSDL2.dll.a ${SDL2_LIBRARY_DIR}/libSDL2_ttf.dll.a -mwindows -mconsole)
+target_link_libraries(AbyssVision -lmingw32 -lopengl32 -lglu32 ${SDL2_LIBRARY_DIR}/libSDL2main.a ${SDL2_LIBRARY_DIR}/libSDL2.dll.a ${SDL2_LIBRARY_DIR}/libSDL2_ttf.dll.a -mwindows -mconsole)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

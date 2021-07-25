@@ -10,7 +10,6 @@ namespace AbyssCore{
     class SystemGroup : public IWindowsGroup{
         private:
             list<Window*> windowsPull;
-            // Window* focus;
 
         protected:
             virtual int FreeID();

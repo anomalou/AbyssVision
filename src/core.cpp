@@ -201,17 +201,39 @@ namespace AbyssCore{
     }
 
     void Core::DrawWindow(SDL_Renderer* render, Window* w){
+        SDL_Rect rect = w->GetRect();
+
+        int width = rect.w;
+        int height = rect.h;
+
+        rect.w += w->style.shadow_size;
+        rect.h += w->style.shadow_size;
+
+        if(w->IsMinimazed())
+            rect.h -= height;
+
+        if(w->IsFull())
+            rect.h += HEADER_HEIGHT;
+
+        SDL_Texture* windowTexture = SDL_CreateTexture(render, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET, rect.w, rect.h);
+        SDL_SetRenderTarget(render, windowTexture);
+        SDL_SetTextureBlendMode(windowTexture, SDL_BlendMode::SDL_BLENDMODE_BLEND);
+
         if(w->IsFull())
             DrawWindowHead(render, w);
         if(!w->IsMinimazed())
             DrawWindowBody(render, w);
         if(w->IsFull())
             DrawWindowControl(render, w);
+
+        SDL_SetRenderTarget(render, NULL);
+        SDL_RenderCopy(render, windowTexture, NULL, &rect);
+        SDL_DestroyTexture(windowTexture);
     }
 
     void Core::DrawWindowHead(SDL_Renderer *render, Window* w){
-        int x = w->GetRect().x;
-        int y = w->GetRect().y;
+        int x = 0;
+        int y = 0;
         int width = w->GetRect().w;
         int height = HEADER_HEIGHT;
         SDL_Rect rect = SDL_Rect({x, y, width, height});
@@ -262,11 +284,15 @@ namespace AbyssCore{
 
     void Core::DrawWindowBody(SDL_Renderer *render, Window* w){
         SDL_Rect rect = w->GetRect();
+        rect.x = 0;
 
         if(w->IsFull())
-            rect.y += HEADER_HEIGHT - 1;
+            rect.y = HEADER_HEIGHT - 1;
+        else
+            rect.y = 0;
 
         // SDL_Color border = w->GetStyle().border;
+        SDL_Texture* currTarget = SDL_GetRenderTarget(render);
 
         SDL_Texture* bodyTex = SDL_CreateTexture(render, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, rect.w, rect.h);
         SDL_SetRenderTarget(render, bodyTex);
@@ -290,7 +316,7 @@ namespace AbyssCore{
             }
         }
 
-        SDL_SetRenderTarget(render, NULL);
+        SDL_SetRenderTarget(render, currTarget);
         SDL_RenderCopy(render, bodyTex, NULL, &rect);
         SDL_DestroyTexture(bodyTex);
 
@@ -309,6 +335,8 @@ namespace AbyssCore{
 
     void Core::DrawWindowControl(SDL_Renderer * render, Window* w){
         SDL_Rect wRect = w->GetRect();
+        wRect.x = 0;
+        wRect.y = 0;
 
         int hmargin = (CBUTTON_WIDTH - CSIGN_SIZE) / 2;
         int vmargin = (HEADER_HEIGHT - CSIGN_SIZE) / 2;

@@ -13,7 +13,7 @@ namespace AbyssCore{
             AString();
             AString(const char* str);
 
-            char* ToChars();
+            const char* ToChars();
             int Length();
 
         public:

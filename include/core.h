@@ -6,17 +6,16 @@
 #include <thread>
 #include <SDL.h>
 #include <SDL_opengl.h>
-#include <SDL_ttf.h>
-#include <GL/gl.h>
 #include <GL/glu.h>
+#include <SDL_ttf.h>
 #include <windowsgroup.h>
 #include <systemgroup.h>
 #include <window.h>
 #include <mainwindow.h>
 #include <astring.h>
 #include <colors.h>
-#include <windowproperty.h>
-#include <graphics.h>
+#include <wparams.h>
+#include <aogl.h>
 #include <application.h>
 
 using namespace std;
@@ -36,7 +35,6 @@ namespace AbyssCore{
 
         private:
             static bool CreateSDLWindow();
-            static bool InitOpenGL();
             static void DisposeWindow();
 
             static void DrawWindow(Window* w);

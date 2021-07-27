@@ -2,7 +2,7 @@
 #define WINDOW_H
 
 #include <SDL.h>
-#include <windowproperty.h>
+#include <wparams.h>
 #include <astring.h>
 #include <colors.h>
 #include <widget.h>

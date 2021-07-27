@@ -5,14 +5,16 @@ include(CTest)
 
 set(PROJECT_DIR "C:/Projects/AbyssVision")  #set full path here
 
-file(GLOB_RECURSE SOURCES ${PROJECT_DIR}/include/*.h ${PROJECT_DIR}/src/*.cpp)
+file(GLOB_RECURSE SOURCES ${PROJECT_DIR}/include/*.h ${PROJECT_DIR}/src/*.cpp ${PROJECT_DIR}/glad/src/*.cpp)
 
 set(SDL2_INCLUDE_DIR ${PROJECT_DIR}/sdl/include/SDL2)
+set(GLAD_INCLUDE_DIR ${PROJECT_DIR}/glad/include)
 set(SDL2_LIBRARY_DIR ${PROJECT_DIR}/sdl/lib)
 
 add_executable(AbyssVision ${SOURCES})
 
 target_include_directories(AbyssVision PUBLIC ${SDL2_INCLUDE_DIR})
+target_include_directories(AbyssVision PUBLIC ${GLAD_INCLUDE_DIR})
 target_include_directories(AbyssVision PUBLIC ${PROJECT_DIR}/include)
 target_link_libraries(AbyssVision -lmingw32 -lopengl32 -lglu32 ${SDL2_LIBRARY_DIR}/libSDL2main.a ${SDL2_LIBRARY_DIR}/libSDL2.dll.a ${SDL2_LIBRARY_DIR}/libSDL2_ttf.dll.a -mwindows -mconsole)
 

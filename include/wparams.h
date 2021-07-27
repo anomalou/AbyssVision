@@ -1,5 +1,5 @@
-#ifndef WINDOWPROPERTY_H
-#define WINDOWPROPERTY_H
+#ifndef WPARAMS_H
+#define WPARAMS_H
 
 #define HEADER_HEIGHT 30
 #define CBUTTON_WIDTH 25

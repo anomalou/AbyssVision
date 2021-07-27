@@ -14,9 +14,7 @@ namespace AbyssCore{
         if(TTF_Init() != 0)
             return false;
 
-        // SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
-	    // SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
-	    // SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
+        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
         if(!CreateSDLWindow())
             return false;
@@ -95,20 +93,21 @@ namespace AbyssCore{
     }
 
     void Core::Render(){
-        glContext = SDL_GL_CreateContext(window);
 
-        if(!InitOpenGL()){
+        if(!GLInit(glContext, window)){
             DisposeWindow();
             isRunning = false;
             return;
         }
 
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClearStencil(0x00);
 
         while(isRunning){
             glViewport(0, 0, Application::screen_width, Application::screen_height);
             
             glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_STENCIL_BUFFER_BIT);
 
             for(Window* w : group->GetPull()){
                 if(w->IsVisible()){
@@ -177,12 +176,11 @@ namespace AbyssCore{
         SDL_Color border = w->style.border;
 
         if(group->CurrentFocus() == w)
-            GLSetColor(focus);
+            GLFillRect(rect, focus);
         else
-            GLSetColor(nofocus);
-        GLFillRect(rect);
-        GLSetColor(border);
-        GLDrawRect(rect);
+            GLFillRect(rect, nofocus);
+
+        GLDrawRect(rect, border);
 
         // SDL_Color shadow = w->style.shadow;
         // int shadow_size = w->style.shadow_size;
@@ -217,7 +215,6 @@ namespace AbyssCore{
 
     void Core::DrawWindowBody(Window* w){
         SDL_Rect rect = w->GetRect();
-        // rect.x = 0;
 
         if(w->IsFull())
             rect.y += HEADER_HEIGHT;
@@ -225,9 +222,17 @@ namespace AbyssCore{
         SDL_Color background = w->style.background;
         SDL_Color border = w->style.border;
 
-        GLSetColor(background);
-        GLFillRect(rect);
-        
+        glEnable(GL_STENCIL_TEST);
+
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glStencilMask(0xFF);
+
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+
+        GLFillRect(rect, background);
+
+        glStencilFunc(GL_EQUAL, 1, 0xFF);
+        glStencilMask(0);
 
         for(Widget * w : w->GetPull()){
             if(w->IsVisible()){
@@ -238,15 +243,15 @@ namespace AbyssCore{
                 SDL_Color background = w->style.background;
                 SDL_Color border = w->style.border;
 
-                GLSetColor(background);
-                GLFillRect(wrect);
-                GLSetColor(border);
-                GLDrawRect(wrect);
+                GLFillRect(wrect, background);
+                GLDrawRect(wrect, border);
             }
         }
 
-        GLSetColor(border);
-        GLDrawRect(rect);
+        glDisable(GL_STENCIL_TEST);
+        glStencilMask(0xFF);
+
+        GLDrawRect(rect, border);
 
         // else
         //     rect.y = 0;
@@ -306,7 +311,7 @@ namespace AbyssCore{
         SDL_Rect resizeHitBox = w->GetResizeHitBox();
 
         SDL_Rect crossRect = {wRect.x + closeHitBox.x, wRect.y + closeHitBox.y, closeHitBox.w, closeHitBox.h};
-        SDL_Rect minRect = {wRect.x + minimazeHitBox.x, wRect.y + minimazeHitBox.y, minimazeHitBox.w, minimazeHitBox.h};
+        SDL_Rect minRect = {wRect.x + minimazeHitBox.x - 1, wRect.y + minimazeHitBox.y, minimazeHitBox.w, minimazeHitBox.h};
         SDL_Rect resRect = {wRect.x + resizeHitBox.x, wRect.y + resizeHitBox.y, resizeHitBox.w, resizeHitBox.h};
         SDL_Rect rects[2] = {crossRect, minRect};
 
@@ -315,15 +320,13 @@ namespace AbyssCore{
         SDL_Color enabled = w->style.enabled;
         SDL_Color disabled = w->style.disabled;
 
-        GLSetColor(control);
-        GLFillRect(rects[0]);
-        GLFillRect(rects[1]);
-        GLSetColor(border);
-        GLDrawRect(rects[0]);
-        GLDrawRect(rects[1]);
+        GLFillRect(rects[0], control);
+        GLFillRect(rects[1], control);
+        GLDrawRect(rects[0], border);
+        GLDrawRect(rects[1], border);
 
         if(!w->IsMinimazed() && w->CanResize()){
-            GLDrawRect(resRect);
+            GLDrawRect(resRect, border);
         }
         // SDL_SetRenderDrawColor(render, control.r, control.g, control.b, control.a);
         // SDL_RenderFillRects(render, rects, 2);
@@ -493,34 +496,6 @@ namespace AbyssCore{
 
         if(!window)
             return false;
-        return true;
-    }
-
-    bool Core::InitOpenGL(){
-        SDL_GL_SetSwapInterval(1);
-
-        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-        SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
-        SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
-
-        auto error = GL_NO_ERROR;
-
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-
-        error = glGetError();
-
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-
-        error = glGetError();
-
-        if( error != GL_NO_ERROR )
-        {
-            printf("Error initializing OpenGL! %s\n", gluErrorString(error));
-            return false;
-        }
-
         return true;
     }
 

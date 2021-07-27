@@ -24,7 +24,7 @@ namespace AbyssCore{
         this->length = length;
     }
 
-    char* AString::ToChars(){
+    const char* AString::ToChars(){
         return _str;
     }
 

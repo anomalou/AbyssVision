@@ -210,8 +210,6 @@ namespace AbyssCore{
         if(beginGDrag){
             SDL_Point pos;
 
-            printf("Drag\n");
-
             pos.x = rect.x + xrel;
 
             if(x < rect.x)

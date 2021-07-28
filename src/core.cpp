@@ -175,12 +175,16 @@ namespace AbyssCore{
 
         SDL_Color border = w->style.border;
 
-        if(group->CurrentFocus() == w)
-            GLFillRect(rect, focus);
-        else
-            GLFillRect(rect, nofocus);
+        clearShader->Use();
 
-        GLDrawRect(rect, border);
+        if(group->CurrentFocus() == w)
+            GLFill2DRect(rect, focus);
+        else
+            GLFill2DRect(rect, nofocus);
+
+        defaultShader->Use();
+
+        GLDraw2DRect(rect, border);
 
         // SDL_Color shadow = w->style.shadow;
         // int shadow_size = w->style.shadow_size;
@@ -222,6 +226,8 @@ namespace AbyssCore{
         SDL_Color background = w->style.background;
         SDL_Color border = w->style.border;
 
+        clearShader->Use();
+
         glEnable(GL_STENCIL_TEST);
 
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -229,7 +235,7 @@ namespace AbyssCore{
 
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
 
-        GLFillRect(rect, background);
+        GLFill2DRect(rect, background);
 
         glStencilFunc(GL_EQUAL, 1, 0xFF);
         glStencilMask(0);
@@ -243,15 +249,21 @@ namespace AbyssCore{
                 SDL_Color background = w->style.background;
                 SDL_Color border = w->style.border;
 
-                GLFillRect(wrect, background);
-                GLDrawRect(wrect, border);
+                clearShader->Use();
+
+                GLFill2DRect(wrect, background);
+                GLDraw2DRect(wrect, border);
             }
         }
 
         glDisable(GL_STENCIL_TEST);
         glStencilMask(0xFF);
 
-        GLDrawRect(rect, border);
+        defaultShader->Use();
+
+        GLDraw2DRect(rect, border);
+
+        glClear(GL_STENCIL_BUFFER_BIT);
 
         // else
         //     rect.y = 0;
@@ -320,13 +332,18 @@ namespace AbyssCore{
         SDL_Color enabled = w->style.enabled;
         SDL_Color disabled = w->style.disabled;
 
-        GLFillRect(rects[0], control);
-        GLFillRect(rects[1], control);
-        GLDrawRect(rects[0], border);
-        GLDrawRect(rects[1], border);
+        clearShader->Use();
+
+        GLFill2DRect(rects[0], control);
+        GLFill2DRect(rects[1], control);
+
+        defaultShader->Use();
+
+        GLDraw2DRect(rects[0], border);
+        GLDraw2DRect(rects[1], border);
 
         if(!w->IsMinimazed() && w->CanResize()){
-            GLDrawRect(resRect, border);
+            GLDraw2DRect(resRect, border);
         }
         // SDL_SetRenderDrawColor(render, control.r, control.g, control.b, control.a);
         // SDL_RenderFillRects(render, rects, 2);

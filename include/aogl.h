@@ -6,9 +6,17 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <stdio.h>
+#include <fstream>
+#include <string>
+#include <sstream>
 #include <application.h>
 #include <astring.h>
 
+#define VSHADER 0
+#define FSHADER 1
+#define PROGRAM 2
+
+using namespace std;
 
 namespace AbyssCore{
 
@@ -60,8 +68,11 @@ namespace AbyssCore{
 
     aFRect GLConvertToNormal(SDL_Rect rect);
     aFColor GLConvertColor(SDL_Color color);
-    void GLDrawRect(SDL_Rect rect, SDL_Color color);
-    void GLFillRect(SDL_Rect rect, SDL_Color color);
+    void GLDraw2DRect(SDL_Rect rect, SDL_Color color);
+    void GLFill2DRect(SDL_Rect rect, SDL_Color color);
+    void GLBind2DVertices(float* vertices, int size);
+    void GLDraw2DVertices(GLenum mode, int vnumber);
+    void GLUnbindVertices();
 
     class Shader{
         private:
@@ -73,8 +84,15 @@ namespace AbyssCore{
         public:
             void Use();
 
+            void Load(AString* vpath, AString* fpath);
+
+            bool GetError(int proc, Uint32 type);
+
             void SetFloat(AString* name, float value);
     };
+
+    extern Shader* defaultShader; 
+    extern Shader* clearShader;
 }
 
 #endif

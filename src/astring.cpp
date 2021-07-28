@@ -61,4 +61,29 @@ namespace AbyssCore{
 
         return *this;
     }
+
+    AString& AString::operator+(const char* str){
+        int length = 0;
+        int copyOffset = 0;
+
+        while(str[length] != '\0')
+            length++;
+
+        if(_str != nullptr){
+            _str = (char*)realloc(_str, sizeof(char) * (this->length + length + 1));
+            copyOffset = this->length;
+            this->length += length;
+        }else{
+            _str = (char*)malloc(sizeof(char) * (length + 1));
+            this->length = length;
+        }
+
+        for(int i = copyOffset; i < length; i++){
+            _str[i] = str[i];
+        }
+        
+        _str[this->length] = '\0';
+
+        return *this;
+    }
 }

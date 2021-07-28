@@ -25,6 +25,9 @@ namespace AbyssCore{
     PFNGLVERTEXATTRIBPOINTERPROC GLVertexAttribPointer;
     PFNGLENABLEVERTEXATTRIBARRAYPROC GLEnableVertexAttribArray;
 
+    Shader* defaultShader; 
+    Shader* clearShader;
+
     bool GLInit(SDL_GLContext& context, SDL_Window* window){
         context = SDL_GL_CreateContext(window);
 
@@ -51,6 +54,13 @@ namespace AbyssCore{
         GLVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer");
         GLEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glEnableVertexAttribArray");
 #endif
+
+        defaultShader = new Shader();
+        defaultShader->Load(new AString("shaders/defaultVertex.glsl"), new AString("shaders/defaultFragment.glsl"));
+
+        clearShader = new Shader();
+        clearShader->Load(new AString("shaders/clearVertex.glsl"), new AString("shaders/clearFragment.glsl"));
+
         SDL_GL_SetSwapInterval(1);
 
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -104,11 +114,9 @@ namespace AbyssCore{
         return aFColor({r, g, b, a});
     }
 
-    void GLDrawRect(SDL_Rect rect, SDL_Color color){
+    void GLDraw2DRect(SDL_Rect rect, SDL_Color color){
         aFRect frect = GLConvertToNormal(rect);
         aFColor fcolor = GLConvertColor(color);
-
-        unsigned int VBO, VAO;
 
         float vertices[] = {
             frect.left, frect.bottom, fcolor.r, fcolor.g, fcolor.b, fcolor.a,
@@ -117,34 +125,16 @@ namespace AbyssCore{
             frect.right, frect.bottom, fcolor.r, fcolor.g, fcolor.b, fcolor.a
         };
 
-        Shader* defaultShader = new Shader();
+        GLBind2DVertices(vertices, 24);
 
-        defaultShader->Use();
+        GLDraw2DVertices(GL_LINE_LOOP, 4);
 
-        GLGenVertexArrays(1, &VAO);
-        GLGenBuffers(1, &VBO);
-
-        GLBindVertexArray(VAO);
-
-        GLBindBuffer(GL_ARRAY_BUFFER, VBO);
-        GLBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-        GLVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-        GLEnableVertexAttribArray(0);
-
-        GLVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(2 * sizeof(float)));
-        GLEnableVertexAttribArray(1);
-
-        glDrawArrays(GL_LINE_LOOP, 0, 4);
-
-        GLBindBuffer(GL_ARRAY_BUFFER, 0);
+        GLUnbindVertices();
     }
 
-    void GLFillRect(SDL_Rect rect, SDL_Color color){
+    void GLFill2DRect(SDL_Rect rect, SDL_Color color){
         aFRect frect = GLConvertToNormal(rect);
         aFColor fcolor = GLConvertColor(color);
-
-        unsigned int VBO, VAO;
 
         float vertices[] = {
             frect.left, frect.bottom, fcolor.r, fcolor.g, fcolor.b, fcolor.a,
@@ -153,9 +143,17 @@ namespace AbyssCore{
             frect.right, frect.bottom, fcolor.r, fcolor.g, fcolor.b, fcolor.a
         };
 
-        Shader* defaultShader = new Shader();
+        GLBind2DVertices(vertices, 24);
 
-        defaultShader->Use();
+        GLDraw2DVertices(GL_QUADS, 4);
+
+        GLUnbindVertices();
+    }
+
+    void GLBind2DVertices(float* vertices, int size){
+        // float fvertices[] = {vertices};
+
+        unsigned int VBO, VAO;
 
         GLGenVertexArrays(1, &VAO);
         GLGenBuffers(1, &VBO);
@@ -163,37 +161,54 @@ namespace AbyssCore{
         GLBindVertexArray(VAO);
 
         GLBindBuffer(GL_ARRAY_BUFFER, VBO);
-        GLBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        GLBufferData(GL_ARRAY_BUFFER, sizeof(float) * size, vertices, GL_STATIC_DRAW);
 
         GLVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
         GLEnableVertexAttribArray(0);
 
         GLVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(2 * sizeof(float)));
         GLEnableVertexAttribArray(1);
+    }
 
-        glDrawArrays(GL_QUADS, 0, 4);
+    void GLDraw2DVertices(GLenum mode, int vnumber){
+        glDrawArrays(mode, 0, vnumber);
+    }
 
+    void GLUnbindVertices(){
         GLBindBuffer(GL_ARRAY_BUFFER, 0);
+        GLBindVertexArray(0);
     }
 
     Shader::Shader(){
-        const char* vShaderCode = "#version 330 core\n"
-                                  "layout (location = 0) in vec2 aPos;\n"
-                                  "layout (location = 1) in vec4 color;\n"
-                                  "out vec4 vertexColor;\n"
-                                  "void main()\n"
-                                  "{\n"
-                                  "   gl_Position = vec4(aPos, 0.0, 1.0);\n"
-                                  "   vertexColor = vec4(aPos, color.b, color.a);\n"
-                                  "}\0";
+        
+    }
 
-        const char* fShaderCode = "#version 330 core\n"
-                                  "out vec4 FragColor;\n"
-                                  "in vec4 vertexColor;\n"
-                                  "void main()\n"
-                                  "{\n"
-                                  "   FragColor = vertexColor;\n"
-                                  "}\n\0";
+    void Shader::Use(){
+        GLUseProgram(ID);
+    }
+
+    void Shader::Load(AString* vpath, AString* fpath){
+        
+        ifstream vfile(vpath->ToChars(), ios::binary);
+        ifstream ffile(fpath->ToChars(), ios::binary);
+
+        if(!vfile.is_open() || !ffile.is_open())
+            return;
+
+        stringstream vss;
+        stringstream fss;
+
+        vss << vfile.rdbuf();
+        fss << ffile.rdbuf();
+
+        string vs = vss.str();
+        string fs = fss.str();
+
+        vfile.close();
+        ffile.close();
+
+        const char* vShaderCode = vs.c_str();
+        const char* fShaderCode = fs.c_str();
 
         unsigned int vertex, fragment;
         int success;
@@ -205,11 +220,8 @@ namespace AbyssCore{
 
         GLCompileShader(vertex);
 
-        GLGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
-        if(!success){
-            GLGetShaderInfoLog(vertex, 512, NULL, info);
-            printf("Vertex shader compile error! %s\n", info);
-        }
+        if(!GetError(vertex, VSHADER))
+            return;
 
         fragment = GLCreateShader(GL_FRAGMENT_SHADER);
 
@@ -217,29 +229,53 @@ namespace AbyssCore{
 
         GLCompileShader(fragment);
 
-        GLGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
-        if(!success){
-            GLGetShaderInfoLog(fragment, 512, NULL, info);
-            printf("Fragment shader compile error! %s\n", info);
-        }
+        if(!GetError(fragment, FSHADER))
+            return;
 
         ID = GLCreateProgram();
         GLAttachShader(ID, vertex);
         GLAttachShader(ID, fragment);
         GLLinkProgram(ID);
 
-        GLGetProgramiv(ID, GL_LINK_STATUS, &success);
-        if(!success){
-            GLGetProgramInfoLog(ID, 512, NULL, info);
-            printf("Some error in linking shader program! %s\n", info);
-        }
-
+        GetError(ID, PROGRAM);
         GLDeleteShader(vertex);
         GLDeleteShader(fragment);
     }
 
-    void Shader::Use(){
-        GLUseProgram(ID);
+    bool Shader::GetError(int proc, Uint32 type){
+        int success;
+        char infoLog[512];
+
+        switch(type){
+            case PROGRAM:
+                GLGetProgramiv(proc, GL_LINK_STATUS, &success);
+            break;
+            case VSHADER:
+            case FSHADER:
+                GLGetShaderiv(proc, GL_COMPILE_STATUS, &success);
+            break;
+        }
+
+        if(!success){
+            switch(type){
+                case PROGRAM:
+                    GLGetProgramInfoLog(proc, 512, NULL, infoLog);
+                    printf("Some error in linking shader program! %s\n", infoLog);
+                break;
+                case VSHADER:
+                    GLGetShaderInfoLog(proc, 512, NULL, infoLog);
+                    printf("Vertex shader compile error! %s\n", infoLog);
+                break;
+                case FSHADER:
+                    GLGetShaderInfoLog(proc, 512, NULL, infoLog);
+                    printf("Fragment shader compile error! %s\n", infoLog);
+                break;
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     void Shader::SetFloat(AString* name, float value){

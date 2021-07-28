@@ -18,6 +18,7 @@ namespace AbyssCore{
 
         public:
             AString& operator=(const char* astr);
+            AString& operator+(const char* str);
     };
 }
 

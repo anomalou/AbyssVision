@@ -7,7 +7,7 @@ namespace AbyssCore{
         widgetPull = vector<Widget*>();
 
         rect = SDL_Rect({0, 0, 100, 100});
-        style = Style{{WHITE}, {BLACK}, {OPAGUE_GRAY}, 5, {WHITE}, {BLACK}, {GRAY}, {WHITE}, {GRAY}, {WHITE}, {WHITE}};
+        style = Style{{WHITE}, {BLACK}, {OPAGUE_GRAY}, 5, {WHITE}, {BLACK}, {GRAY}, {LIGHT_GRAY}, {GRAY}, {WHITE}, {WHITE}};
 
         canMinimaze = true;
         canClose = true;

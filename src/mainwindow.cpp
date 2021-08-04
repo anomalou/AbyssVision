@@ -18,12 +18,12 @@ namespace AbyssCore{
     }
 
     void MoveAction(Widget* sender, ActionEvent event){
-        // EmptyWindow* empty = dynamic_cast<EmptyWindow*>(Core::GetInstance()->GetGroup()->Find(new AString("empty")));
+        EmptyWindow* empty = dynamic_cast<EmptyWindow*>(Core::GetGroup()->Find(new AString("empty")));
 
-        // if(empty != nullptr){
-        //     SDL_Point pos = empty->pos;
-        //     empty->pos = {pos.x + event.xrel, pos.y + event.yrel};
-        // }
+        if(empty != nullptr){
+            SDL_Point pos = empty->pos;
+            empty->pos = {pos.x + event.xrel, pos.y + event.yrel};
+        }
     }
 
     void FullAction(Widget* sender, ActionEvent event){
@@ -56,7 +56,7 @@ namespace AbyssCore{
         full->SetPos(240, 10);
         full->SetSize(50, 50);
 
-        full->style.background = SDL_Color({RED});
+        full->style.background = {RED};
 
         full->SetAction(Click, FullAction);
 

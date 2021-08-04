@@ -2,6 +2,7 @@
 #define WIDGET_H
 
 #include <SDL.h>
+#include <simplegl.h>
 #include <astring.h>
 #include <colors.h>
 #include <style.h>
@@ -68,19 +69,19 @@ namespace AbyssCore{
             /**
              * \brief void * parent ptr to parent window
              */
-            virtual void ProcessClick(SDL_MouseButtonEvent event, Window * parent);
+            virtual void ProcessClick(SDL_MouseButtonEvent event, Window * parent) = 0;
 
             /**
              * \brief void * parent ptr to parent window
              */
-            virtual void ProcessDrag(SDL_MouseMotionEvent event, Window * parent);
+            virtual void ProcessDrag(SDL_MouseMotionEvent event, Window * parent) = 0;
 
             /**
              * \brief void * parent ptr to parent window
              */
-            virtual void ProcessMove(SDL_MouseMotionEvent event, Window * parent);
+            virtual void ProcessMove(SDL_MouseMotionEvent event, Window * parent) = 0;
 
-            virtual void Paint(SDL_Renderer* render);
+            virtual void Paint(Anchor anchor) = 0;
     };
 }
 

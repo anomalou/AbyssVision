@@ -2,26 +2,30 @@
 #define STYLE_H
 
 #include <SDL.h>
+#include <agl.h>
 #include <colors.h>
 
-typedef struct{
-    SDL_Color background;
-    SDL_Color border;
-    SDL_Color shadow;
-    int shadow_size;
-    SDL_Color control;
-    SDL_Color enabled;
-    SDL_Color disabled;
-    SDL_Color focus;
-    SDL_Color nofocus;
-    SDL_Color selected;
-    SDL_Color hover;
-}Style;
+namespace AbyssCore{
+    typedef struct{
+        aColor background;
+        aColor border;
+        aColor shadow;
+        int shadow_size;
+        aColor control;
+        aColor enabled;
+        aColor disabled;
+        aColor focus;
+        aColor nofocus;
+        aColor selected;
+        aColor hover;
+    }Style;
 
-typedef enum{
-    Idle,
-    Pressed,
-    Hovered
-}State;
+    typedef enum{
+        Idle,
+        Pressed,
+        Hovered
+    }State;
+}
+
 
 #endif

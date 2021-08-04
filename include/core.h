@@ -15,7 +15,7 @@
 #include <astring.h>
 #include <colors.h>
 #include <wparams.h>
-#include <aogl.h>
+#include <agl.h>
 #include <application.h>
 
 using namespace std;
@@ -31,7 +31,16 @@ namespace AbyssCore{
 
             static thread* render;
 
+            static bool isResized;
+
             static SDL_GLContext glContext;
+
+            static unsigned int windowfb;
+            static unsigned int widgetfb;
+            static unsigned int windowTex;
+            static unsigned int widgetTex;
+            static unsigned int windowStencil;
+            static unsigned int widgetStencil;
 
         private:
             static bool CreateSDLWindow();
@@ -46,12 +55,14 @@ namespace AbyssCore{
             static void ProcessMouse(SDL_Event event);
             static void MoveMouse(SDL_Event event);
             static void DragMouse(SDL_Event event);
+            static void ProcessClick(Window* w, SDL_MouseButtonEvent event);
             static void ClickMouse(SDL_Event event);
 
             static bool InWindow(Window* w, int x, int y);
 
             static void Input();
             static void Render();
+            static bool CreateFrameBuffer(unsigned int &framebuffer, unsigned int &texColorBuffer, unsigned int &stencilBuffer);
 
         public:
             static bool Init();

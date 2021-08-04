@@ -5,7 +5,14 @@ namespace AbyssCore{
     SDL_Window* Core::window;
     IWindowsGroup* Core::group;
     thread* Core::render;
+    bool Core::isResized;
     SDL_GLContext Core::glContext;
+    unsigned int Core::windowfb;
+    unsigned int Core::widgetfb;
+    unsigned int Core::windowTex;
+    unsigned int Core::widgetTex;
+    unsigned int Core::windowStencil;
+    unsigned int Core::widgetStencil;
 
     bool Core::Init(){
         if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -15,6 +22,7 @@ namespace AbyssCore{
             return false;
 
         SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
         if(!CreateSDLWindow())
             return false;
@@ -67,6 +75,7 @@ namespace AbyssCore{
                 {
                     if(event.window.event == SDL_WINDOWEVENT_RESIZED){
                         SDL_GetWindowSize(window, &Application::screen_width, &Application::screen_height);
+                        isResized = true;
                     }
                 }
                 break;
@@ -100,17 +109,86 @@ namespace AbyssCore{
             return;
         }
 
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        isResized = true;
+
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClearStencil(0x00);
 
         while(isRunning){
-            glViewport(0, 0, Application::screen_width, Application::screen_height);
+            if(isResized){
+                glViewport(0, 0, Application::screen_width, Application::screen_height);
+                // if(!CreateFrameBuffer(windowfb, windowTex, windowStencil)){
+                //     isRunning = false;
+                //     return;
+                // }
+                // if(!CreateFrameBuffer(widgetfb, widgetTex, widgetStencil)){
+                //     isRunning = false;
+                //     return;
+                // }
+
+                isResized = false;
+            }
             
             glClear(GL_COLOR_BUFFER_BIT);
             glClear(GL_STENCIL_BUFFER_BIT);
 
+            // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+            // unsigned int VAO, VBO;
+
+            // GLBindFrameBuffer(windowfb);
+
+            // glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+            // glClear(GL_COLOR_BUFFER_BIT);
+
+            // glBegin(GL_QUADS);
+            // GLGetError();
+
+            // glColor3f(1.0, 0, 0);
+            // GLGetError();
+
+            // glVertex2f(-0.5, -0.5);
+            // GLGetError();
+            // glVertex2f(-0.5, 0.5);
+            // GLGetError();
+            // glVertex2f(0.5, 0.5);
+            // GLGetError();
+            // glVertex2f(0.5, -0.5);
+            // GLGetError();
+
+            // glEnd();
+            // GLGetError();
+
+            // defaultShader->Use();
+
+            // GLBind2DRect(SDL_Rect({10, 10, 100, 100}), aColor({RED}), VAO, VBO);
+            // GLGetError();
+            // GLDraw2DVertices(GL_QUADS, 4);
+            // GLGetError();
+
+            // GLUnbindVertices(VAO, VBO);
+            // GLGetError();
+
+            // GLUseProgram(0);
+            // GLBindFrameBuffer(0);
+
+            // glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+
+            // // glClear(GL_COLOR_BUFFER_BIT);
+
+            // clearShader->Use();
+            // GLBind2DRectTex(SDL_Rect({0, 0, Application::screen_width, Application::screen_height}), VAO, VBO);
+            // GLBind2DTexture(windowTex);
+            // GLDraw2DVertices(GL_QUADS, 4);
+
+            // GLUnbindVertices(VAO, VBO);
+
+
+            if(group->Background() != NULL)
+                DrawWindow(group->Background());
+
             for(Window* w : group->GetPull()){
-                if(w->IsVisible()){
+                if(w->IsVisible() && w != group->Background()){
                     DrawWindow(w);
                 }
             }
@@ -129,6 +207,39 @@ namespace AbyssCore{
 
             SDL_GL_SwapWindow(window);
         }
+    }
+
+    bool Core::CreateFrameBuffer(unsigned int &framebuffer, unsigned int &texColorBuffer, unsigned int &stencilBuffer){
+        GLGenFramebuffers(1, &framebuffer);
+
+        GLBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+        int width = Application::screen_width;
+        int height = Application::screen_height;
+        
+        glGenTextures(1, &texColorBuffer);
+        glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        GLFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
+
+        GLGenRenderbuffers(1, &stencilBuffer);
+        GLBindRenderbuffer(GL_RENDERBUFFER, stencilBuffer);
+        GLRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+        GLBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+        GLFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, stencilBuffer);
+
+        if(GLCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
+            printf("Framebuffer not done!\n");
+            return false;
+        }
+        GLBindFrameBuffer(0);
+
+        return true;
     }
 
     void Core::DrawWindow(Window* w){
@@ -150,12 +261,20 @@ namespace AbyssCore{
         // SDL_SetRenderTarget(render, windowTexture);
         // SDL_SetTextureBlendMode(windowTexture, SDL_BlendMode::SDL_BLENDMODE_BLEND);
 
+        GLBindFrameBuffer(windowfb);
+
         if(w->IsFull())
             DrawWindowHead(w);
         if(!w->IsMinimazed())
             DrawWindowBody(w);
         if(w->IsFull())
             DrawWindowControl(w);
+
+        GLBindFrameBuffer(0);
+
+        // GLBind2DRect(SDL_Rect({0, 0, Application::screen_width, Application::screen_height}), aColor({WHITE}));
+        // GLBind2DTexture(windowTex);
+        // GLDraw2DVertices(GL_QUADS, 4);
 
         // SDL_SetRenderTarget(render, NULL);
         // SDL_RenderCopy(render, windowTexture, NULL, &rect);
@@ -170,10 +289,10 @@ namespace AbyssCore{
         SDL_Rect rect = w->GetRect();
         rect.h = HEADER_HEIGHT;
 
-        SDL_Color focus = w->style.focus;
-        SDL_Color nofocus = w->style.nofocus;
+        aColor focus = w->style.focus;
+        aColor nofocus = w->style.nofocus;
 
-        SDL_Color border = w->style.border;
+        aColor border = w->style.border;
 
         clearShader->Use();
 
@@ -223,36 +342,60 @@ namespace AbyssCore{
         if(w->IsFull())
             rect.y += HEADER_HEIGHT;
 
-        SDL_Color background = w->style.background;
-        SDL_Color border = w->style.border;
+        aColor border = w->style.border;
 
         clearShader->Use();
 
         glEnable(GL_STENCIL_TEST);
 
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glStencilOp(GL_REPLACE, GL_KEEP, GL_INCR);
         glStencilMask(0xFF);
 
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilFunc(GL_NEVER, 1, 0xFF);
 
-        GLFill2DRect(rect, background);
+        GLFill2DRect(rect, aColor({WHITE}));
 
         glStencilFunc(GL_EQUAL, 1, 0xFF);
         glStencilMask(0);
 
-        for(Widget * w : w->GetPull()){
-            if(w->IsVisible()){
-                SDL_Rect wrect = w->GetRect();
+        Anchor anchor = {rect.x, rect.y, rect.w, rect.h};
+        w->Paint(anchor);
+
+        for(Widget * wg : w->GetPull()){
+            if(wg->IsVisible() && wg->GetRect().x <= w->GetRect().w && wg->GetRect().y <= w->GetRect().h){
+                glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
+                glStencilFunc(GL_EQUAL, 1, 0xFF);
+                glStencilMask(0xFF);
+
+                SDL_Rect wrect = wg->GetRect();
                 wrect.x += rect.x;
                 wrect.y += rect.y;
 
-                SDL_Color background = w->style.background;
-                SDL_Color border = w->style.border;
+                SDL_Rect mrect = wrect;
+                mrect.w -= 1;
+                mrect.h -= 1;
+
+                GLFill2DRect(mrect, aColor({WHITE}));
+
+                glStencilFunc(GL_EQUAL, 2, 0xFF);
+                glStencilMask(0);
+
+                Anchor anchor = {wrect.x, wrect.y, wrect.w, wrect.h};
+
+                wg->Paint(anchor);
+
+                aColor border = wg->style.border;
 
                 clearShader->Use();
 
-                GLFill2DRect(wrect, background);
+                glStencilFunc(GL_EQUAL, 1, 0xFF);
                 GLDraw2DRect(wrect, border);
+
+                glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
+                glStencilFunc(GL_NEVER, 1, 0xFF);
+                glStencilMask(0xFF);
+
+                GLFill2DRect(mrect, aColor({WHITE}));
             }
         }
 
@@ -312,11 +455,6 @@ namespace AbyssCore{
 
     void Core::DrawWindowControl(Window* w){
         SDL_Rect wRect = w->GetRect();
-        // wRect.x = 0;
-        // wRect.y = 0;
-
-        // int hmargin = (CBUTTON_WIDTH - CSIGN_SIZE) / 2;
-        // int vmargin = (HEADER_HEIGHT - CSIGN_SIZE) / 2;
 
         SDL_Rect closeHitBox = w->GetCloseHitBox();
         SDL_Rect minimazeHitBox = w->GetMinimazeHitBox();
@@ -327,10 +465,10 @@ namespace AbyssCore{
         SDL_Rect resRect = {wRect.x + resizeHitBox.x, wRect.y + resizeHitBox.y, resizeHitBox.w, resizeHitBox.h};
         SDL_Rect rects[2] = {crossRect, minRect};
 
-        SDL_Color control = w->style.control;
-        SDL_Color border = w->style.border;
-        SDL_Color enabled = w->style.enabled;
-        SDL_Color disabled = w->style.disabled;
+        aColor control = w->style.control;
+        aColor border = w->style.border;
+        aColor enabled = w->style.enabled;
+        aColor disabled = w->style.disabled;
 
         clearShader->Use();
 
@@ -345,40 +483,6 @@ namespace AbyssCore{
         if(!w->IsMinimazed() && w->CanResize()){
             GLDraw2DRect(resRect, border);
         }
-        // SDL_SetRenderDrawColor(render, control.r, control.g, control.b, control.a);
-        // SDL_RenderFillRects(render, rects, 2);
-
-        // SDL_SetRenderDrawColor(render, border.r, border.g, border.b, border.a);
-        // SDL_RenderDrawRects(render, rects, 2);
-
-        // //cross
-        // if(w->CanClose())
-        //     SDL_SetRenderDrawColor(render, enabled.r, enabled.g, enabled.b, enabled.a);
-        // else
-        //     SDL_SetRenderDrawColor(render, disabled.r, disabled.g, disabled.b, disabled.a);
-
-        // SDL_RenderDrawLine(render, crossRect.x + hmargin, crossRect.y + vmargin, crossRect.x + crossRect.w - hmargin, crossRect.y + crossRect.h - vmargin);
-        // SDL_RenderDrawLine(render, crossRect.x + hmargin, crossRect.y + crossRect.h - vmargin, crossRect.x + crossRect.w - hmargin, crossRect.y + vmargin);
-
-        // //minimize
-
-        // if(w->CanMinimaze())
-        //     SDL_SetRenderDrawColor(render, enabled.r, enabled.g, enabled.b, enabled.a);
-        // else
-        //     SDL_SetRenderDrawColor(render, disabled.r, disabled.g, disabled.b, disabled.a);
-
-        // SDL_RenderDrawLine(render, minRect.x + hmargin, minRect.y + HEADER_HEIGHT / 2, minRect.x + minRect.w - hmargin, minRect.y + HEADER_HEIGHT / 2);
-    
-        // //resize
-
-        // if(w->CanResize() && !w->IsMinimazed()){
-        //     SDL_SetRenderDrawColor(render, BLACK);
-
-        //     SDL_Point points[4] = {{resRect.x, resRect.y + resRect.h - 2}, {resRect.x + resRect.w - 1, resRect.y - 1},
-        //                            {resRect.x + resRect.w - 1, resRect.y + resRect.h - 2}, {resRect.x, resRect.y + resRect.h - 2}};
-            
-        //     SDL_RenderDrawLines(render, points, 4);
-        // }
     }
 
     void Core::ProcessMouse(SDL_Event event){
@@ -432,6 +536,19 @@ namespace AbyssCore{
         }        
     }
 
+    void Core::ProcessClick(Window* w, SDL_MouseButtonEvent event){
+        if(w != group->CurrentFocus()){
+            group->FocusWindow(w);
+        }
+
+        w->ProcessGlobalClick(event);
+
+        event.x -= w->GetRect().x;
+        event.y -= w->GetRect().y;
+
+        w->ProcessClick(event);
+    }
+
     void Core::ClickMouse(SDL_Event event){
         int x = event.button.x;
         int y = event.button.y;
@@ -445,20 +562,17 @@ namespace AbyssCore{
         }
 
         for(Window* w : invertPull){
-            if(w->IsVisible()){
+            if(w->IsVisible() && w != group->Background()){
                 if(InWindow(w, x, y)){
-                    if(w != group->CurrentFocus()){
-                        group->FocusWindow(w);
-                    }
-
-                    w->ProcessGlobalClick(event.button);
-
-                    event.button.x -= w->GetRect().x;
-                    event.button.y -= w->GetRect().y;
-
-                    w->ProcessClick(event.button);
-                    break;
+                    ProcessClick(w, event.button);
+                    return;
                 }
+            }
+        }
+
+        if(group->Background() != NULL){
+            if(InWindow(group->Background(), x, y)){
+                ProcessClick(group->Background(), event.button);
             }
         }
     }

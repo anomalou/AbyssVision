@@ -2,6 +2,7 @@
 #define WINDOW_H
 
 #include <SDL.h>
+#include <simplegl.h>
 #include <wparams.h>
 #include <astring.h>
 #include <colors.h>
@@ -18,6 +19,7 @@ namespace AbyssCore{
             bool beginGClick;
             bool beginGDrag;
             bool beginGResize;
+            bool beginWDrag;
 
             bool beginClick;
             bool beginDrag;
@@ -46,6 +48,7 @@ namespace AbyssCore{
 
         protected:
             vector<Widget*> widgetPull;
+            Widget* focusWidget;
 
         public:
             Style style;
@@ -97,7 +100,7 @@ namespace AbyssCore{
             virtual void MinimazeAction();
             virtual void ResizeAction(int w, int h);
 
-            virtual void Paint(SDL_Renderer* render);
+            virtual void Paint(Anchor anchor);
 
             virtual vector<Widget*> GetPull();
             virtual bool AssignWidget(Widget* w, AString* byName);
@@ -114,8 +117,6 @@ namespace AbyssCore{
             virtual bool CloseHit(int x, int y);
             virtual bool MinimazeHit(int x, int y);
             virtual bool ResizeHit(int x, int y);
-
-            
     };
 
     typedef struct{

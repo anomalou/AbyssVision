@@ -1,5 +1,4 @@
-#include <aogl.h>
-#include <core.h>
+#include <agl.h>
 
 namespace AbyssCore{
 
@@ -18,12 +17,22 @@ namespace AbyssCore{
     PFNGLUNIFORM1FPROC GLUniform1f;
     PFNGLGETUNIFORMLOCATIONPROC GLGetUniformLocation;
     PFNGLGENVERTEXARRAYSPROC GLGenVertexArrays;
+    PFNGLDELETEVERTEXARRAYSPROC GLDeleteVertexArrays;
     PFNGLGENBUFFERSPROC GLGenBuffers;
+    PFNGLDELETEBUFFERSPROC GLDeleteBuffers;
     PFNGLBINDVERTEXARRAYPROC GLBindVertexArray;
     PFNGLBINDBUFFERPROC GLBindBuffer;
     PFNGLBUFFERDATAPROC GLBufferData;
     PFNGLVERTEXATTRIBPOINTERPROC GLVertexAttribPointer;
     PFNGLENABLEVERTEXATTRIBARRAYPROC GLEnableVertexAttribArray;
+    PFNGLGENFRAMEBUFFERSPROC GLGenFramebuffers;
+    PFNGLBINDFRAMEBUFFERPROC GLBindFramebuffer;
+    PFNGLFRAMEBUFFERTEXTURE2DPROC GLFramebufferTexture2D;
+    PFNGLGENRENDERBUFFERSPROC GLGenRenderbuffers;
+    PFNGLBINDRENDERBUFFERPROC GLBindRenderbuffer;
+    PFNGLRENDERBUFFERSTORAGEPROC GLRenderbufferStorage;
+    PFNGLFRAMEBUFFERRENDERBUFFERPROC GLFramebufferRenderbuffer;
+    PFNGLCHECKFRAMEBUFFERSTATUSPROC GLCheckFramebufferStatus;
 
     Shader* defaultShader; 
     Shader* clearShader;
@@ -47,12 +56,22 @@ namespace AbyssCore{
         GLUniform1f = (PFNGLUNIFORM1FPROC)wglGetProcAddress("glUniform1f");
         GLGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation");
         GLGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)wglGetProcAddress("glGenVertexArrays");
+        GLDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)wglGetProcAddress("glDeleteVertexArrays");
         GLGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers");
+        GLDeleteBuffers = (PFNGLDELETEBUFFERSPROC)wglGetProcAddress("glDeleteBuffers");
         GLBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)wglGetProcAddress("glBindVertexArray");
         GLBindBuffer = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer");
         GLBufferData = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData");
         GLVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer");
         GLEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glEnableVertexAttribArray");
+        GLGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)wglGetProcAddress("glGenFramebuffers");
+        GLBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)wglGetProcAddress("glBindFramebuffer");
+        GLFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)wglGetProcAddress("glFramebufferTexture2D");
+        GLGenRenderbuffers = (PFNGLGENRENDERBUFFERSPROC)wglGetProcAddress("glGenRenderbuffers");
+        GLBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)wglGetProcAddress("glBindRenderbuffer");
+        GLRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)wglGetProcAddress("glRenderbufferStorage");
+        GLFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)wglGetProcAddress("glFramebufferRenderbuffer");
+        GLCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)wglGetProcAddress("glCheckFramebufferStatus");
 #endif
 
         defaultShader = new Shader();
@@ -93,19 +112,19 @@ namespace AbyssCore{
         return false;
     }
 
-    aFRect GLConvertToNormal(SDL_Rect rect){
+    aFPoint GLConvertToNormal(aPoint pos){
         float x_mid = Application::screen_width / 2;
         float y_mid = Application::screen_height / 2;
 
-        float l = (-(x_mid - rect.x)) / x_mid;
-        float r = -(x_mid - (rect.x + rect.w)) / x_mid;
-        float t = (y_mid - rect.y) / y_mid;
-        float b = (y_mid - (rect.y + rect.h)) / y_mid;
+        float x = (-(x_mid - pos.x)) / x_mid;
+        // float r = -(x_mid - (rect.x + rect.w)) / x_mid;
+        float y = (y_mid - pos.y) / y_mid;
+        // float b = (y_mid - (rect.y + rect.h)) / y_mid;
 
-        return aFRect({l, r, t, b});
+        return aFPoint({x, y});
     }
 
-    aFColor GLConvertColor(SDL_Color color){
+    aFColor GLConvertColor(aColor color){
         float r = (float)color.r / (float)255;
         float g = (float)color.g / (float)255;
         float b = (float)color.b / (float)255;
@@ -114,69 +133,113 @@ namespace AbyssCore{
         return aFColor({r, g, b, a});
     }
 
-    void GLDraw2DRect(SDL_Rect rect, SDL_Color color){
-        aFRect frect = GLConvertToNormal(rect);
-        aFColor fcolor = GLConvertColor(color);
+    void GLDraw2DRect(SDL_Rect rect, aColor color){
+        unsigned int VAO, VBO;
 
-        float vertices[] = {
-            frect.left, frect.bottom, fcolor.r, fcolor.g, fcolor.b, fcolor.a,
-            frect.left, frect.top, fcolor.r, fcolor.g, fcolor.b, fcolor.a,
-            frect.right, frect.top, fcolor.r, fcolor.g, fcolor.b, fcolor.a,
-            frect.right, frect.bottom, fcolor.r, fcolor.g, fcolor.b, fcolor.a
-        };
-
-        GLBind2DVertices(vertices, 24);
+        GLBind2DRect(rect, color, VAO, VBO);
 
         GLDraw2DVertices(GL_LINE_LOOP, 4);
 
-        GLUnbindVertices();
+        GLUnbindVertices(VAO, VBO);
     }
 
-    void GLFill2DRect(SDL_Rect rect, SDL_Color color){
-        aFRect frect = GLConvertToNormal(rect);
-        aFColor fcolor = GLConvertColor(color);
+    void GLFill2DRect(SDL_Rect rect, aColor color){
+        unsigned int VAO, VBO;
 
-        float vertices[] = {
-            frect.left, frect.bottom, fcolor.r, fcolor.g, fcolor.b, fcolor.a,
-            frect.left, frect.top, fcolor.r, fcolor.g, fcolor.b, fcolor.a,
-            frect.right, frect.top, fcolor.r, fcolor.g, fcolor.b, fcolor.a,
-            frect.right, frect.bottom, fcolor.r, fcolor.g, fcolor.b, fcolor.a
-        };
+        GLBind2DRect(rect, color, VAO, VBO);
 
-        GLBind2DVertices(vertices, 24);
+        GLDraw2DVertices(GL_TRIANGLE_FAN, 4);
 
-        GLDraw2DVertices(GL_QUADS, 4);
-
-        GLUnbindVertices();
+        GLUnbindVertices(VAO, VBO);
     }
 
-    void GLBind2DVertices(float* vertices, int size){
-        // float fvertices[] = {vertices};
+    void GLBind2DRect(SDL_Rect rect, aColor color, unsigned int &VAO, unsigned int &VBO){
+        Vertex* vertices = (Vertex*)malloc(sizeof(Vertex) * 4);
+        vertices[0].pos = {0, rect.h};
+        vertices[0].color = color;
+        vertices[1].pos = {0, 0};
+        vertices[1].color = color;
+        vertices[2].pos = {rect.w, 0};
+        vertices[2].color = color;
+        vertices[3].pos = {rect.w, rect.h};
+        vertices[3].color = color;
 
-        unsigned int VBO, VAO;
+        GLBind2DVertices(Vertex2DArray({rect.x, rect.y, 4, vertices}), VAO, VBO);
+    }
 
+    void GLBind2DRectTex(SDL_Rect rect, unsigned int &VAO, unsigned int &VBO){
+        Vertex* vertices = (Vertex*)malloc(sizeof(Vertex) * 4);
+        vertices[0].pos = {0, rect.h};
+        vertices[0].texPos = {0, 0};
+        vertices[1].pos = {0, 0};
+        vertices[1].texPos = {0, 1.0};
+        vertices[2].pos = {rect.w, 0};
+        vertices[2].texPos = {1.0, 1.0};
+        vertices[3].pos = {rect.w, rect.h};
+        vertices[3].texPos = {1.0, 0};
+
+        GLBind2DVertices(Vertex2DArray({rect.x, rect.y, 4, vertices}), VAO, VBO);
+    }
+
+    void GLBind2DVertices(Vertex2DArray array, unsigned int &VAO, unsigned int &VBO){
         GLGenVertexArrays(1, &VAO);
         GLGenBuffers(1, &VBO);
 
         GLBindVertexArray(VAO);
 
         GLBindBuffer(GL_ARRAY_BUFFER, VBO);
-        GLBufferData(GL_ARRAY_BUFFER, sizeof(float) * size, vertices, GL_STATIC_DRAW);
 
-        GLVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+        Vertex *arrayPtr = array.vertices;
+
+        float* vertices = (float*)malloc(sizeof(float) * array.size * 8);
+
+        for(int i = 0; i < array.size; i++){
+            aPoint globPos = {arrayPtr[i].pos.x + array.x, arrayPtr[i].pos.y + array.y};
+
+            aFPoint normalCoord = GLConvertToNormal(globPos);
+            aFColor normalColor = GLConvertColor(arrayPtr[i].color);
+
+            vertices[0 + i * 8] = normalCoord.x;
+            vertices[1 + i * 8] = normalCoord.y;
+            vertices[2 + i * 8] = arrayPtr->texPos.x;
+            vertices[3 + i * 8] = arrayPtr->texPos.y;
+            vertices[4 + i * 8] = normalColor.r;
+            vertices[5 + i * 8] = normalColor.g;
+            vertices[6 + i * 8] = normalColor.b;
+            vertices[7 + i * 8] = normalColor.a;
+        }
+
+        GLBufferData(GL_ARRAY_BUFFER, sizeof(float) * array.size * 8, vertices, GL_STATIC_DRAW);
+
+        GLVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
         GLEnableVertexAttribArray(0);
 
-        GLVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(2 * sizeof(float)));
+        GLVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(2 * sizeof(float)));
         GLEnableVertexAttribArray(1);
+
+        GLVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(4 * sizeof(float)));
+        GLEnableVertexAttribArray(2);
     }
 
     void GLDraw2DVertices(GLenum mode, int vnumber){
         glDrawArrays(mode, 0, vnumber);
     }
 
-    void GLUnbindVertices(){
+    void GLUnbindVertices(unsigned int VAO, unsigned int VBO){
         GLBindBuffer(GL_ARRAY_BUFFER, 0);
         GLBindVertexArray(0);
+
+        GLDeleteVertexArrays(1, &VAO);
+        GLDeleteBuffers(1, &VBO);
+    }
+
+    void GLBind2DTexture(unsigned int texture){
+        glBindTexture(GL_TEXTURE_2D, texture);
+        GLGetError();
+    }
+
+    void GLBindFrameBuffer(unsigned int framebuffer){
+        GLBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     }
 
     Shader::Shader(){

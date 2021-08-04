@@ -11,10 +11,12 @@ int main(int argc, char* args[]){
 
     MainWindow* mw = new MainWindow();
     mw->AllowClose(false);
+    mw->SetSize(RESOLUTION_X, RESOLUTION_Y - 100);
 
     Core::Init();
 
     Core::GetGroup()->Create(mw, new AString("main window"));
+    Core::GetGroup()->SetBackground(mw);
 
     Core::Start();
 

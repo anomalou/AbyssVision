@@ -65,63 +65,64 @@ namespace AbyssCore{
         }
     }
 
-    void Widget::ProcessClick(SDL_MouseButtonEvent event, Window * parent){
-        if(actions.count(Click) != 0){
-            ActionEvent aevent = {
-                parent,
-                event.x,
-                event.y,
-                0,
-                0,
-                event.button
-            };
-            actions[Click](this, aevent);
-        }
-    }
+    // void Widget::ProcessClick(SDL_MouseButtonEvent event, Window * parent){
+    //     if(actions.count(Click) != 0){
+    //         ActionEvent aevent = {
+    //             parent,
+    //             event.x,
+    //             event.y,
+    //             0,
+    //             0,
+    //             event.button
+    //         };
+    //         actions[Click](this, aevent);
+    //     }
+    // }
 
-    void Widget::ProcessDrag(SDL_MouseMotionEvent event, Window * parent){
-        if(actions.count(Drag) != 0){
-            ActionEvent aevent = {
-                parent,
-                event.x,
-                event.y,
-                event.xrel,
-                event.yrel,
-                event.state
-            };
-            actions[Drag](this, aevent);
-        }
-    }
+    // void Widget::ProcessDrag(SDL_MouseMotionEvent event, Window * parent){
+    //     if(actions.count(Drag) != 0){
+    //         ActionEvent aevent = {
+    //             parent,
+    //             event.x,
+    //             event.y,
+    //             event.xrel,
+    //             event.yrel,
+    //             event.state
+    //         };
+    //         actions[Drag](this, aevent);
+    //     }
+    // }
 
-    void Widget::ProcessMove(SDL_MouseMotionEvent event, Window * parent){
-        if(actions.count(Move) != 0){
-            ActionEvent aevent = {
-                parent,
-                event.x,
-                event.y,
-                event.xrel,
-                event.yrel,
-                event.state
-            };
-            actions[Move](this, aevent);
-        }
-    }
+    // void Widget::ProcessMove(SDL_MouseMotionEvent event, Window * parent){
+    //     if(actions.count(Move) != 0){
+    //         ActionEvent aevent = {
+    //             parent,
+    //             event.x,
+    //             event.y,
+    //             event.xrel,
+    //             event.yrel,
+    //             event.state
+    //         };
+    //         actions[Move](this, aevent);
+    //     }
+    // }
 
-    void Widget::Paint(SDL_Renderer* render){
-        if(state == Idle)
-            SDL_SetRenderDrawColor(render, style.background.r, style.background.g, style.background.b, style.background.a);
-        else if(state == Pressed)
-            SDL_SetRenderDrawColor(render, style.selected.r, style.selected.g, style.selected.b, style.selected.a);
-        else if(state == Hovered)
-            SDL_SetRenderDrawColor(render, style.hover.r, style.hover.g, style.hover.b, style.hover.a);
+    // void Widget::Paint(Anchor anchor){
+    //     // Clear(anchor, style.background);
+    //     if(state == Idle)
+    //         Clear(anchor, style.background);
+    //     else if(state == Pressed)
+    //         Clear(anchor, style.selected);
+    //     else if(state == Hovered)
+    //         Clear(anchor, style.hover);
         
-        SDL_RenderClear(render);
+    //     // SDL_RenderClear(render);
 
-        SDL_SetRenderDrawColor(render, style.border.r, style.border.g, style.border.b, style.border.a);
-        SDL_Rect rect = this->rect;
-        rect.x = 0;
-        rect.y = 0;
+    //     // SDL_SetRenderDrawColor(render, style.border.r, style.border.g, style.border.b, style.border.a);
+    //     // SDL_Rect rect = this->rect;
+    //     // rect.x = 0;
+    //     // rect.y = 0;
 
-        SDL_RenderDrawRect(render, &rect);
-    }
+    //     // SDL_RenderDrawRect(render, &rect);
+    // }
 }

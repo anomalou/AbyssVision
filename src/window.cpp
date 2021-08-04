@@ -23,9 +23,12 @@ namespace AbyssCore{
         beginGClick = false;
         beginGDrag = false;
         beginGResize = false;
+        beginWDrag = false;
 
         beginClick = false;
         beginGDrag = false;
+
+        focusWidget = NULL;
 
         CalculateControlHitBox();
 
@@ -163,6 +166,8 @@ namespace AbyssCore{
             beginGClick = false;
             beginGDrag = false;
             beginGResize = false;
+            beginWDrag = false;
+            focusWidget = NULL;
         }
     }
 
@@ -229,6 +234,9 @@ namespace AbyssCore{
 
         if(beginGResize)
             ResizeAction(rect.w + (x - rect.w - rect.x) + HEADER_HEIGHT / 2, rect.h + (y - rect.h - rect.y - HEADER_HEIGHT / 2));
+    
+        if(beginWDrag && focusWidget != NULL)
+            focusWidget->ProcessDrag(event, this);
     }
 
     void Window::ProcessClick(SDL_MouseButtonEvent event){
@@ -259,24 +267,38 @@ namespace AbyssCore{
         int x = event.x;
         int y = event.y;
 
-        for(Widget* w : widgetPull){
-            if(w->IsVisible() && !w->IsDisabled()){
-                if(event.button == SDL_BUTTON_LEFT){
-
-                    if(w->GetState() == Pressed){
-                        w->SetState(Idle);
-                    }
-
+        if(event.button == SDL_BUTTON_LEFT){
+            for(Widget* w : widgetPull){
+                if(w->IsVisible() && !w->IsDisabled()){
                     if(InWidget(w, x, y)){
                         if(event.type == SDL_MOUSEBUTTONDOWN){
+                            beginWDrag = true;
                             beginClick = true;
-                            w->SetState(Pressed);
+                            focusWidget = w;
                         }
-                        if(beginClick && event.type == SDL_MOUSEBUTTONUP){
-                            w->SetState(Hovered);
+
+                        if(event.type == SDL_MOUSEBUTTONUP && beginClick){
                             w->ProcessClick(event, this);
                         }
+
+                        break;
                     }
+                        
+
+                    // if(w->GetState() == Pressed){
+                    //     w->SetState(Idle);
+                    // }
+
+                    // if(InWidget(w, x, y)){
+                    //     if(event.type == SDL_MOUSEBUTTONDOWN){
+                    //         beginClick = true;
+                    //         w->SetState(Pressed);
+                    //     }
+                    //     if(beginClick && event.type == SDL_MOUSEBUTTONUP){
+                    //         w->SetState(Hovered);
+                    //         w->ProcessClick(event, this);
+                    //     }
+                    // }
                 }
             }
         }
@@ -288,30 +310,34 @@ namespace AbyssCore{
 
         for(Widget* w : widgetPull){
             if(w->IsVisible() && !w->IsDisabled()){
-                if(w->GetState() == Hovered)
-                    w->SetState(Idle);
-
-                if(w->GetState() == Idle){
-                    if(InWidget(w, x, y)){
-                        w->SetState(Hovered);
-                        w->ProcessMove(event, this);
-                    }
+                if(InWidget(w, x, y)){
+                    w->ProcessMove(event, this);
                 }
+                break;
+                // if(w->GetState() == Hovered)
+                //     w->SetState(Idle);
+
+                // if(w->GetState() == Idle){
+                //     if(InWidget(w, x, y)){
+                //         w->SetState(Hovered);
+                //         w->ProcessMove(event, this);
+                //     }
+                // }
             }
         }
     }
 
     void Window::ProcessDrag(SDL_MouseMotionEvent event){
-        int x = event.x;
-        int y = event.y;
+        // int x = event.x;
+        // int y = event.y;
 
-        for(Widget* w : widgetPull){
-            if(w->IsVisible() && !w->IsDisabled()){
-                if(InWidget(w, x, y)){
-                    w->ProcessDrag(event, this);
-                }
-            }
-        }
+        // for(Widget* w : widgetPull){
+        //     if(w->IsVisible() && !w->IsDisabled()){
+        //         if(InWidget(w, x, y)){
+        //             w->ProcessDrag(event, this);
+        //         }
+        //     }
+        // }
     }
 
     void Window::CloseAction(){
@@ -326,17 +352,8 @@ namespace AbyssCore{
         SetSize(w, h);
     }
 
-    void Window::Paint(SDL_Renderer* render){
-        SDL_SetRenderDrawColor(render, style.background.r, style.background.g, style.background.b, style.background.a);
-        SDL_RenderClear(render);
-
-        SDL_SetRenderDrawColor(render, style.border.r, style.border.g, style.border.b, style.border.a);
-        
-        SDL_Rect rect = this->rect;
-        rect.x = 0;
-        rect.y = 0;
-        
-        SDL_RenderDrawRect(render, &rect);
+    void Window::Paint(Anchor anchor){
+        Clear(anchor, aColor({RED}));
     }
 
     vector<Widget*> Window::GetPull(){

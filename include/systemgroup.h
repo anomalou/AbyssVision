@@ -10,6 +10,7 @@ namespace AbyssCore{
     class SystemGroup : public IWindowsGroup{
         private:
             list<Window*> windowsPull;
+            Window* background;
 
         protected:
             virtual int FreeID();
@@ -22,7 +23,9 @@ namespace AbyssCore{
             virtual Window* Find(AString* byName);
             virtual Window* Find(int byID);
             virtual void FocusWindow(Window* window);
+            virtual void SetBackground(Window* window);
             virtual Window* CurrentFocus();
+            virtual Window* Background();
             virtual void ProcessWindows();
     };
 }

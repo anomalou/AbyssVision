@@ -21,7 +21,9 @@ namespace AbyssCore{
             virtual Window* Find(AString* byName) = 0;
             virtual Window* Find(int byID) = 0;
             virtual void FocusWindow(Window* window) = 0;
+            virtual void SetBackground(Window* window) = 0;
             virtual Window* CurrentFocus() = 0;
+            virtual Window* Background() = 0;
             virtual void ProcessWindows() = 0;
     };
 }

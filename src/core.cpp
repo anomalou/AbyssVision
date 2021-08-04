@@ -261,16 +261,12 @@ namespace AbyssCore{
         // SDL_SetRenderTarget(render, windowTexture);
         // SDL_SetTextureBlendMode(windowTexture, SDL_BlendMode::SDL_BLENDMODE_BLEND);
 
-        GLBindFrameBuffer(windowfb);
-
         if(w->IsFull())
             DrawWindowHead(w);
         if(!w->IsMinimazed())
             DrawWindowBody(w);
         if(w->IsFull())
             DrawWindowControl(w);
-
-        GLBindFrameBuffer(0);
 
         // GLBind2DRect(SDL_Rect({0, 0, Application::screen_width, Application::screen_height}), aColor({WHITE}));
         // GLBind2DTexture(windowTex);
@@ -486,14 +482,57 @@ namespace AbyssCore{
     }
 
     void Core::ProcessMouse(SDL_Event event){
-        if(event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP){
-            ClickMouse(event);
-        }else if(event.type == SDL_MOUSEMOTION){
-            if(event.motion.state == SDL_BUTTON_LMASK)
-                DragMouse(event);
-            else
-                MoveMouse(event);
+        switch(event.type){
+            case SDL_MOUSEBUTTONDOWN:
+                OnMouseDown(event.button);
+            break;
+            case SDL_MOUSEBUTTONUP:
+                OnMouseUp(event.button);
+            break;
+            case SDL_MOUSEMOTION:
+                OnMouseMove(event.motion);
+            break;
+            case SDL_MOUSEWHEEL:
+                OnMouseWheel(event.wheel);
+            break;
         }
+    }
+
+    void Core::OnMouseDown(SDL_MouseButtonEvent event){
+        int x = event.x;
+        int y = event.y;
+
+        for(Window* w : group->GetInvertedPull()){
+            if(w->IsVisible()){
+                if(InWindow(w, x, y) && w != group->Background()){
+                    if(w != group->CurrentFocus())
+                        group->FocusWindow(w);
+                    w->OnMouseDown(event);
+                    return;
+                }
+            }
+        }
+
+        if(group->Background() != NULL){
+            if(InWindow(group->Background(), x, y)){
+                if(group->CurrentFocus() != group->Background()){
+                    group->FocusWindow(group->Background());
+                }
+                group->Background()->OnMouseDown(event);
+            }
+        }
+    }
+
+    void Core::OnMouseUp(SDL_MouseButtonEvent event){
+        group->CurrentFocus()->OnMouseUp(event);
+    }
+
+    void Core::OnMouseMove(SDL_MouseMotionEvent event){
+        group->CurrentFocus()->OnMouseMove(event);
+    }
+
+    void Core::OnMouseWheel(SDL_MouseWheelEvent event){
+        group->CurrentFocus()->OnMouseWheel(event);
     }
 
     void Core::MoveMouse(SDL_Event event){

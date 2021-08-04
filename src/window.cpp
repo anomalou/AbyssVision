@@ -150,6 +150,22 @@ namespace AbyssCore{
         resizeHitBox = {rect.w - CBUTTON_WIDTH, rect.h + HEADER_HEIGHT - CBUTTON_WIDTH, CBUTTON_WIDTH, CBUTTON_WIDTH};
     }
 
+    void Window::OnMouseDown(SDL_MouseButtonEvent event){
+        printf("%s: mouse down\n", name->ToChars());
+    }
+
+    void Window::OnMouseUp(SDL_MouseButtonEvent event){
+        printf("%s: mouse up\n", name->ToChars());
+    }
+
+    void Window::OnMouseMove(SDL_MouseMotionEvent event){
+        printf("%s: mouse move\n", name->ToChars());
+    }
+
+    void Window::OnMouseWheel(SDL_MouseWheelEvent event){
+        printf("%s: mouse wwheel\n", name->ToChars());
+    }
+
     void Window::ProcessGlobalClick(SDL_MouseButtonEvent event){
         int x = event.x;
         int y = event.y;

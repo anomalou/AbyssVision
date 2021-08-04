@@ -26,6 +26,18 @@ namespace AbyssCore{
         return pull;
     }
 
+    vector<Window*> SystemGroup::GetInvertedPull(){
+        vector<Window*> windowPull = GetPull();
+        vector<Window*> invertPull = vector<Window*>();
+
+        while(windowPull.size() != 0){
+            invertPull.push_back(windowPull.back());
+            windowPull.pop_back();
+        }
+
+        return invertPull;
+    }
+
     bool SystemGroup::Create(Window* window, AString* byName){
         if(window == nullptr)
             return false;
@@ -60,7 +72,7 @@ namespace AbyssCore{
             }
         }
 
-        return nullptr;
+        return NULL;
     }
 
     Window* SystemGroup::Find(int byID){
@@ -70,7 +82,7 @@ namespace AbyssCore{
             }
         }
 
-        return nullptr;
+        return NULL;
     }
 
     void SystemGroup::FocusWindow(Window* window){
@@ -87,7 +99,7 @@ namespace AbyssCore{
     void SystemGroup::SetBackground(Window* window){
         if(window != NULL)
             window->SetFull(false);
-        background = window;
+        background = window;        
     }
 
     Window* SystemGroup::CurrentFocus(){

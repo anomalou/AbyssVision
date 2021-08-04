@@ -16,6 +16,7 @@ namespace AbyssCore{
 
         public:
             virtual vector<Window*> GetPull() = 0;
+            virtual vector<Window*> GetInvertedPull() = 0;
             virtual bool Create(Window* window, AString* byName) = 0;
             virtual bool Destroy(Window* window) = 0;
             virtual Window* Find(AString* byName) = 0;

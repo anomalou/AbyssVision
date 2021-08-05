@@ -56,6 +56,8 @@ namespace AbyssCore{
     bool SystemGroup::Destroy(Window* window){
         for(auto w = windowsPull.begin(); w != windowsPull.end(); w++){
             if(*w == window){
+                if(window == background)
+                    background = NULL;
                 windowsPull.erase(w);
                 // if(window == focus)
                 //     focus = windowsPull.back();

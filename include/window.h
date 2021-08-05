@@ -21,8 +21,9 @@ namespace AbyssCore{
             bool beginGResize;
             bool beginWDrag;
 
-            bool beginClick;
             bool beginDrag;
+
+            
 
         protected:
             bool canMinimaze;
@@ -31,6 +32,14 @@ namespace AbyssCore{
             bool canMove;
 
             bool needDestroy;
+
+            bool beginLMove;
+            bool beginRMove;
+            bool beginLClick;
+            bool beginRClick;
+            bool beginLClose;
+            bool beginLMinimize;
+            bool beginLResize;
             
 
         protected:
@@ -38,12 +47,12 @@ namespace AbyssCore{
             AString* name;
             SDL_Rect rect;
             bool isVisible;
-            bool isMinimazied;
+            bool isMinimized;
             bool isFull;
 
         protected:
             SDL_Rect closeHitBox;
-            SDL_Rect minimazeHitBox;
+            SDL_Rect minimizeHitBox;
             SDL_Rect resizeHitBox;
 
         protected:
@@ -60,14 +69,14 @@ namespace AbyssCore{
             virtual AString* GetName();
             virtual SDL_Rect GetRect();
             virtual bool IsVisible();
-            virtual bool IsMinimazed();
+            virtual bool IsMinimized();
             virtual bool IsFull();
-            virtual bool CanMinimaze();
+            virtual bool CanMinimize();
             virtual bool CanClose();
             virtual bool CanResize();
             virtual bool CanMoving();
             virtual SDL_Rect GetCloseHitBox();
-            virtual SDL_Rect GetMinimazeHitBox();
+            virtual SDL_Rect GetMinimizeHitBox();
             virtual SDL_Rect GetResizeHitBox();
             virtual bool NeedDestroy();
 
@@ -77,9 +86,9 @@ namespace AbyssCore{
             virtual void SetSize(int w, int h);
             virtual void SetRect(SDL_Rect rect);
             virtual void SetVisible(bool v);
-            virtual void SetMinimaze(bool m);
+            virtual void SetMinimize(bool m);
             virtual void SetFull(bool f);
-            virtual void AllowMinimaze(bool b);
+            virtual void AllowMinimize(bool b);
             virtual void AllowClose(bool b);
             virtual void AllowResize(bool b);
             virtual void AllowMoving(bool m);
@@ -89,21 +98,9 @@ namespace AbyssCore{
             virtual void OnMouseMove(SDL_MouseMotionEvent event);
             virtual void OnMouseWheel(SDL_MouseWheelEvent event);
 
-            virtual void ProcessGlobalClick(SDL_MouseButtonEvent event);
-            virtual void ProcessGlobalHeaderClick(SDL_MouseButtonEvent event);
-            virtual void ProcessGlobalBodyClick(SDL_MouseButtonEvent event);
-            virtual void ProcessGlobalMove(SDL_MouseMotionEvent event);
-            virtual void ProcessGlobalDrag(SDL_MouseMotionEvent event);
-
-            virtual void ProcessClick(SDL_MouseButtonEvent event);
-            virtual void ProcessHeaderClick(SDL_MouseButtonEvent event);
-            virtual void ProcessBodyClick(SDL_MouseButtonEvent event);
-            virtual void ProcessMove(SDL_MouseMotionEvent event);
-            virtual void ProcessDrag(SDL_MouseMotionEvent event);
-
-            virtual void CloseAction();
-            virtual void MinimazeAction();
-            virtual void ResizeAction(int w, int h);
+            // virtual void CloseAction();
+            // virtual void MinimazeAction();
+            // virtual void ResizeAction(int w, int h);
 
             virtual void Paint(Anchor anchor);
 
@@ -115,12 +112,15 @@ namespace AbyssCore{
         protected:
             virtual void CalculateControlHitBox();
 
+            virtual bool WindowHit(int x, int y);
+            virtual bool HeaderHit(int x, int y);
+
             virtual bool InHeader(int x, int y);
             virtual bool InBody(int x, int y);
             virtual bool InWidget(Widget* w, int x, int y);
 
             virtual bool CloseHit(int x, int y);
-            virtual bool MinimazeHit(int x, int y);
+            virtual bool MinimizeHit(int x, int y);
             virtual bool ResizeHit(int x, int y);
     };
 

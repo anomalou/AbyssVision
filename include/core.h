@@ -58,12 +58,12 @@ namespace AbyssCore{
             static void OnMouseMove(SDL_MouseMotionEvent event);
             static void OnMouseWheel(SDL_MouseWheelEvent event);
 
-            static void MoveMouse(SDL_Event event);
-            static void DragMouse(SDL_Event event);
-            static void ProcessClick(Window* w, SDL_MouseButtonEvent event);
-            static void ClickMouse(SDL_Event event);
+            // static void MoveMouse(SDL_Event event);
+            // static void DragMouse(SDL_Event event);
+            // static void ProcessClick(Window* w, SDL_MouseButtonEvent event);
+            // static void ClickMouse(SDL_Event event);
 
-            static bool InWindow(Window* w, int x, int y);
+            static bool WindowHit(Window* w, int x, int y);
 
             static void Input();
             static void Render();

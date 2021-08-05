@@ -5,11 +5,20 @@
 
 namespace AbyssCore{
     class Button : public Widget{
+        private:
+            bool beginClick;
+            State state;
+
         public:
-            void ProcessClick(SDL_MouseButtonEvent event, Window * parent);
-            void ProcessDrag(SDL_MouseMotionEvent event, Window * parent);
-            void ProcessMove(SDL_MouseMotionEvent event, Window * parent);
+            Action clickAction;
+
+        public:
+            Button(Window* parent);
             void Paint(Anchor anchor);
+            void OnMouseDown(SDL_MouseButtonEvent event);
+            void OnMouseUp(SDL_MouseButtonEvent event);
+            void OnMouseMove(SDL_MouseMotionEvent event);
+            void OnMouseWheel(SDL_MouseWheelEvent event);
     };
 }
 

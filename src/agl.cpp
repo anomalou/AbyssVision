@@ -148,7 +148,7 @@ namespace AbyssCore{
 
         GLBind2DRect(rect, color, VAO, VBO);
 
-        GLDraw2DVertices(GL_TRIANGLE_FAN, 4);
+        GLDraw2DVertices(GL_QUADS, 4);
 
         GLUnbindVertices(VAO, VBO);
     }

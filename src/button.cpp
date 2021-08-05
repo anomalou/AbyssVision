@@ -1,19 +1,78 @@
 #include <button.h>
 
 namespace AbyssCore{
-    void Button::ProcessClick(SDL_MouseButtonEvent event, Window * parent){
-
-    }
-
-    void Button::ProcessDrag(SDL_MouseMotionEvent event, Window * parent){
-
-    }
-
-    void Button::ProcessMove(SDL_MouseMotionEvent event, Window * parent){
-
+    Button::Button(Window* parent) : Widget(parent){
+        beginClick = false;
+        state = Idle;
     }
 
     void Button::Paint(Anchor anchor){
-        DrawRect(anchor, SDL_Rect({40, 40, 50, 50}), aColor({BLACK}));
+        switch(state){
+            case Idle:
+                Clear(anchor, style.background);
+            break;
+            case Pressed:
+                Clear(anchor, style.selected);
+            break;
+            case Hovered:
+                Clear(anchor, style.hover);
+            break;
+        }
+    }
+
+    void Button::OnMouseDown(SDL_MouseButtonEvent event){
+        int x = event.x;
+        int y = event.y;
+
+        if(WidgetHit(x, y)){
+            if(event.button == SDL_BUTTON_LEFT){
+                beginClick = true;
+                state = Pressed;
+            }
+        }
+    }
+
+    void Button::OnMouseUp(SDL_MouseButtonEvent event){
+        int x = event.x;
+        int y = event.y;
+
+        if(event.button == SDL_BUTTON_LEFT){
+            if(beginClick){
+                if(WidgetHit(x, y)){
+                    if(clickAction != NULL){
+                        ActionEvent aevent = {
+                            parent,
+                            x,
+                            y,
+                            0,
+                            0,
+                            event.button
+                        };
+
+                        clickAction(this, aevent);
+                    }
+                }
+
+                beginClick = false;
+                state = Idle;
+            }
+        }
+    }
+
+    void Button::OnMouseMove(SDL_MouseMotionEvent event){
+        int x = event.x;
+        int y = event.y;
+
+        if(!beginClick){
+            if(WidgetHit(x, y)){
+                state = Hovered;
+            }else{
+                state = Idle;
+            }
+        }
+    }
+
+    void Button::OnMouseWheel(SDL_MouseWheelEvent event){
+
     }
 }

@@ -33,36 +33,36 @@ namespace AbyssCore{
     }
 
     MainWindow::MainWindow() : Window(){
-        open = new Button();
-        hide = new Button();
-        slide = new Button();
-        full = new Button();
+        // open = new Button();
+        // hide = new Button();
+        // slide = new Button();
+        full = new Button(this);
 
-        open->SetPos(10, 10);
-        open->SetSize(50, 50);
+        // open->SetPos(10, 10);
+        // open->SetSize(50, 50);
 
-        open->SetAction(Click, Open);
+        // open->SetAction(Click, Open);
 
-        hide->SetPos(70, 10);
-        hide->SetSize(50, 50);
+        // hide->SetPos(70, 10);
+        // hide->SetSize(50, 50);
 
-        hide->SetAction(Click, Hide);
+        // hide->SetAction(Click, Hide);
 
-        slide->SetPos(130, 10);
-        slide->SetSize(100, 100);
+        // slide->SetPos(130, 10);
+        // slide->SetSize(100, 100);
 
-        slide->SetAction(Drag, MoveAction);
+        // slide->SetAction(Drag, MoveAction);
 
         full->SetPos(240, 10);
         full->SetSize(50, 50);
 
         full->style.background = {RED};
 
-        full->SetAction(Click, FullAction);
+        full->clickAction = FullAction;
 
-        AssignWidget(open, new AString("open"));
-        AssignWidget(hide, new AString("hide"));
-        AssignWidget(slide, new AString("move"));
+        // AssignWidget(open, new AString("open"));
+        // AssignWidget(hide, new AString("hide"));
+        // AssignWidget(slide, new AString("move"));
         AssignWidget(full, new AString("full"));
     }
 }

@@ -251,7 +251,7 @@ namespace AbyssCore{
         // rect.w += w->style.shadow_size;
         // rect.h += w->style.shadow_size;
 
-        if(w->IsMinimazed())
+        if(w->IsMinimized())
             rect.h -= height;
 
         if(w->IsFull())
@@ -263,7 +263,7 @@ namespace AbyssCore{
 
         if(w->IsFull())
             DrawWindowHead(w);
-        if(!w->IsMinimazed())
+        if(!w->IsMinimized())
             DrawWindowBody(w);
         if(w->IsFull())
             DrawWindowControl(w);
@@ -371,7 +371,7 @@ namespace AbyssCore{
                 mrect.w -= 1;
                 mrect.h -= 1;
 
-                GLFill2DRect(mrect, aColor({WHITE}));
+                GLFill2DRect(mrect, aColor({BLACK}));
 
                 glStencilFunc(GL_EQUAL, 2, 0xFF);
                 glStencilMask(0);
@@ -453,7 +453,7 @@ namespace AbyssCore{
         SDL_Rect wRect = w->GetRect();
 
         SDL_Rect closeHitBox = w->GetCloseHitBox();
-        SDL_Rect minimazeHitBox = w->GetMinimazeHitBox();
+        SDL_Rect minimazeHitBox = w->GetMinimizeHitBox();
         SDL_Rect resizeHitBox = w->GetResizeHitBox();
 
         SDL_Rect crossRect = {wRect.x + closeHitBox.x, wRect.y + closeHitBox.y, closeHitBox.w, closeHitBox.h};
@@ -476,7 +476,7 @@ namespace AbyssCore{
         GLDraw2DRect(rects[0], border);
         GLDraw2DRect(rects[1], border);
 
-        if(!w->IsMinimazed() && w->CanResize()){
+        if(!w->IsMinimized() && w->CanResize()){
             GLDraw2DRect(resRect, border);
         }
     }
@@ -502,25 +502,28 @@ namespace AbyssCore{
         int x = event.x;
         int y = event.y;
 
+        bool inWindow = false;
+
         for(Window* w : group->GetInvertedPull()){
             if(w->IsVisible()){
-                if(InWindow(w, x, y) && w != group->Background()){
+                if(WindowHit(w, x, y) && w != group->Background()){
                     if(w != group->CurrentFocus())
                         group->FocusWindow(w);
-                    w->OnMouseDown(event);
-                    return;
+                    inWindow = true;
+                    break;
                 }
             }
         }
 
-        if(group->Background() != NULL){
-            if(InWindow(group->Background(), x, y)){
+        if(group->Background() != NULL && inWindow == false){
+            if(WindowHit(group->Background(), x, y)){
                 if(group->CurrentFocus() != group->Background()){
                     group->FocusWindow(group->Background());
                 }
-                group->Background()->OnMouseDown(event);
             }
         }
+
+        group->CurrentFocus()->OnMouseDown(event);
     }
 
     void Core::OnMouseUp(SDL_MouseButtonEvent event){
@@ -535,86 +538,86 @@ namespace AbyssCore{
         group->CurrentFocus()->OnMouseWheel(event);
     }
 
-    void Core::MoveMouse(SDL_Event event){
-        Window* currentFocus = group->CurrentFocus();
+    // void Core::MoveMouse(SDL_Event event){
+    //     Window* currentFocus = group->CurrentFocus();
 
-        int x = event.motion.x;
-        int y = event.motion.y;
+    //     int x = event.motion.x;
+    //     int y = event.motion.y;
 
-        Application::mousePosition = {x, y};
+    //     Application::mousePosition = {x, y};
 
-        if(currentFocus->IsVisible()){
-            currentFocus->ProcessGlobalMove(event.motion);
-        }
+    //     if(currentFocus->IsVisible()){
+    //         currentFocus->ProcessGlobalMove(event.motion);
+    //     }
 
-        if(InWindow(currentFocus, x, y) && currentFocus->IsVisible()){
-            event.motion.x -= currentFocus->GetRect().x;
-            event.motion.y -= currentFocus->GetRect().y;
+    //     if(InWindow(currentFocus, x, y) && currentFocus->IsVisible()){
+    //         event.motion.x -= currentFocus->GetRect().x;
+    //         event.motion.y -= currentFocus->GetRect().y;
 
-            currentFocus->ProcessMove(event.motion);
-        }
-    }
+    //         currentFocus->ProcessMove(event.motion);
+    //     }
+    // }
 
-    void Core::DragMouse(SDL_Event event){
-        Window* currentFocus = group->CurrentFocus();
+    // void Core::DragMouse(SDL_Event event){
+    //     Window* currentFocus = group->CurrentFocus();
 
-        int x = event.motion.x;
-        int y = event.motion.y;
+    //     int x = event.motion.x;
+    //     int y = event.motion.y;
 
-        Application::mousePosition = {x, y};
+    //     Application::mousePosition = {x, y};
 
-        if(currentFocus->IsVisible()){
-            currentFocus->ProcessGlobalDrag(event.motion);
-        }
+    //     if(currentFocus->IsVisible()){
+    //         currentFocus->ProcessGlobalDrag(event.motion);
+    //     }
 
-        if(InWindow(currentFocus, x, y) && currentFocus->IsVisible()){
-            event.motion.x -= currentFocus->GetRect().x;
-            event.motion.y -= currentFocus->GetRect().y;
+    //     if(InWindow(currentFocus, x, y) && currentFocus->IsVisible()){
+    //         event.motion.x -= currentFocus->GetRect().x;
+    //         event.motion.y -= currentFocus->GetRect().y;
 
-            currentFocus->ProcessDrag(event.motion);
-        }        
-    }
+    //         currentFocus->ProcessDrag(event.motion);
+    //     }        
+    // }
 
-    void Core::ProcessClick(Window* w, SDL_MouseButtonEvent event){
-        if(w != group->CurrentFocus()){
-            group->FocusWindow(w);
-        }
+    // void Core::ProcessClick(Window* w, SDL_MouseButtonEvent event){
+    //     if(w != group->CurrentFocus()){
+    //         group->FocusWindow(w);
+    //     }
 
-        w->ProcessGlobalClick(event);
+    //     w->ProcessGlobalClick(event);
 
-        event.x -= w->GetRect().x;
-        event.y -= w->GetRect().y;
+    //     event.x -= w->GetRect().x;
+    //     event.y -= w->GetRect().y;
 
-        w->ProcessClick(event);
-    }
+    //     w->ProcessClick(event);
+    // }
 
-    void Core::ClickMouse(SDL_Event event){
-        int x = event.button.x;
-        int y = event.button.y;
+    // void Core::ClickMouse(SDL_Event event){
+    //     int x = event.button.x;
+    //     int y = event.button.y;
 
-        vector<Window*> windowPull = group->GetPull();
-        vector<Window*> invertPull = vector<Window*>();
+    //     vector<Window*> windowPull = group->GetPull();
+    //     vector<Window*> invertPull = vector<Window*>();
 
-        while(windowPull.size() != 0){
-            invertPull.push_back(windowPull.back());
-            windowPull.pop_back();
-        }
+    //     while(windowPull.size() != 0){
+    //         invertPull.push_back(windowPull.back());
+    //         windowPull.pop_back();
+    //     }
 
-        for(Window* w : invertPull){
-            if(w->IsVisible() && w != group->Background()){
-                if(InWindow(w, x, y)){
-                    ProcessClick(w, event.button);
-                    return;
-                }
-            }
-        }
+    //     for(Window* w : invertPull){
+    //         if(w->IsVisible() && w != group->Background()){
+    //             if(InWindow(w, x, y)){
+    //                 ProcessClick(w, event.button);
+    //                 return;
+    //             }
+    //         }
+    //     }
 
-        if(group->Background() != NULL){
-            if(InWindow(group->Background(), x, y)){
-                ProcessClick(group->Background(), event.button);
-            }
-        }
-    }
+    //     if(group->Background() != NULL){
+    //         if(InWindow(group->Background(), x, y)){
+    //             ProcessClick(group->Background(), event.button);
+    //         }
+    //     }
+    // }
 
     IWindowsGroup* Core::GetGroup(){
         return group;
@@ -628,14 +631,14 @@ namespace AbyssCore{
         isRunning = false;
     }
 
-    bool Core::InWindow(Window* w, int x, int y){
+    bool Core::WindowHit(Window* w, int x, int y){
         SDL_Rect rect = w->GetRect();
         int left = rect.x;
         int right = rect.x + rect.w;
         int top = rect.y;
         int bottom = rect.y + rect.h + HEADER_HEIGHT;
 
-        if(w->IsMinimazed()){
+        if(w->IsMinimized()){
             if(w->IsFull())
                 bottom = rect.y + HEADER_HEIGHT;
             else

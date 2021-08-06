@@ -6,6 +6,7 @@ namespace AbyssCore{
         style = Style{{LIGHT_GRAY}, {GRAY}, {WHITE}, 0, {WHITE}, {BLACK}, {GRAY}, {WHITE}, {GRAY}, {GRAY}, {WHITE}};
         this->parent = parent;
         isVisible = true;
+        isDisabled = false;
     }
 
     AString* Widget::GetName(){

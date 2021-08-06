@@ -18,14 +18,15 @@ namespace AbyssCore{
         isMinimized = false;
         isFull = true;
 
+        beginLMove = false;
+        beginRMove = false;
+        beginLClick = false;
+        beginRClick = false;
+        beginLClose = false;
+        beginLMinimize = false;
+        beginLResize = false;
+
         needDestroy = false;
-
-        beginGClick = false;
-        beginGDrag = false;
-        beginGResize = false;
-        beginWDrag = false;
-
-        beginGDrag = false;
 
         focusWidget = NULL;
 

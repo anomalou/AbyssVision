@@ -3,7 +3,6 @@
 namespace AbyssCore{
     SystemGroup::SystemGroup(){
         windowsPull = list<Window*>();
-        background = NULL;
     }
 
     int SystemGroup::FreeID(){
@@ -56,11 +55,7 @@ namespace AbyssCore{
     bool SystemGroup::Destroy(Window* window){
         for(auto w = windowsPull.begin(); w != windowsPull.end(); w++){
             if(*w == window){
-                if(window == background)
-                    background = NULL;
                 windowsPull.erase(w);
-                // if(window == focus)
-                //     focus = windowsPull.back();
                 return true;
             }
         }
@@ -98,11 +93,11 @@ namespace AbyssCore{
         }
     }
 
-    void SystemGroup::SetBackground(Window* window){
-        if(window != NULL)
-            window->SetFull(false);
-        background = window;        
-    }
+    // void SystemGroup::SetBackground(Window* window){
+    //     if(window != NULL)
+    //         window->SetFull(false);
+    //     background = window;        
+    // }
 
     Window* SystemGroup::CurrentFocus(){
         if(windowsPull.size() > 0)
@@ -110,9 +105,9 @@ namespace AbyssCore{
         return NULL;
     }
 
-    Window* SystemGroup::Background(){
-        return background;
-    }
+    // Window* SystemGroup::Background(){
+    //     return background;
+    // }
 
     void SystemGroup::ProcessWindows(){
         for(auto i = windowsPull.begin(); i != windowsPull.end() && windowsPull.size() > 1; i++){

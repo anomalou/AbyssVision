@@ -15,16 +15,6 @@ using namespace std;
 
 namespace AbyssCore{
     class Window{
-        private:
-            bool beginGClick;
-            bool beginGDrag;
-            bool beginGResize;
-            bool beginWDrag;
-
-            bool beginDrag;
-
-            
-
         protected:
             bool canMinimaze;
             bool canClose;

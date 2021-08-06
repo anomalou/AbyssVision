@@ -183,12 +183,8 @@ namespace AbyssCore{
 
             // GLUnbindVertices(VAO, VBO);
 
-
-            if(group->Background() != NULL)
-                DrawWindow(group->Background());
-
             for(Window* w : group->GetPull()){
-                if(w->IsVisible() && w != group->Background()){
+                if(w->IsVisible()){
                     DrawWindow(w);
                 }
             }
@@ -506,7 +502,7 @@ namespace AbyssCore{
 
         for(Window* w : group->GetInvertedPull()){
             if(w->IsVisible()){
-                if(WindowHit(w, x, y) && w != group->Background()){
+                if(WindowHit(w, x, y)){
                     if(w != group->CurrentFocus())
                         group->FocusWindow(w);
                     inWindow = true;
@@ -515,13 +511,13 @@ namespace AbyssCore{
             }
         }
 
-        if(group->Background() != NULL && inWindow == false){
-            if(WindowHit(group->Background(), x, y)){
-                if(group->CurrentFocus() != group->Background()){
-                    group->FocusWindow(group->Background());
-                }
-            }
-        }
+        // if(group->Background() != NULL && inWindow == false){
+        //     if(WindowHit(group->Background(), x, y)){
+        //         if(group->CurrentFocus() != group->Background()){
+        //             group->FocusWindow(group->Background());
+        //         }
+        //     }
+        // }
 
         group->CurrentFocus()->OnMouseDown(event);
     }

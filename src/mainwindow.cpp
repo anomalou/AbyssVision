@@ -37,6 +37,7 @@ namespace AbyssCore{
         // hide = new Button();
         // slide = new Button();
         full = new Button(this);
+        trackbar = new Trackbar(this);
 
         // open->SetPos(10, 10);
         // open->SetSize(50, 50);
@@ -60,9 +61,13 @@ namespace AbyssCore{
 
         full->clickAction = FullAction;
 
+        trackbar->SetPos(10, 10);
+        trackbar->SetSize(200, 50);
+
         // AssignWidget(open, new AString("open"));
         // AssignWidget(hide, new AString("hide"));
         // AssignWidget(slide, new AString("move"));
-        AssignWidget(full, new AString("full"));
+        // AssignWidget(full, new AString("full"));
+        AssignWidget(trackbar, new AString("trackbar"));
     }
 }

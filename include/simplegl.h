@@ -14,6 +14,7 @@ namespace AbyssCore{
     }Anchor;
 
     void Clear(Anchor anchor, aColor color);
+    void DrawLine(Anchor anchor, aPair rect, aColor color);
     void DrawRect(Anchor anchor, SDL_Rect rect, aColor color);
     void FillRect(Anchor anchor, SDL_Rect rect, aColor color);
 }

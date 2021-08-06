@@ -7,5 +7,6 @@
 #define OPAGUE_GRAY 100, 100, 100, 100
 #define LIGHT_GRAY 240, 240, 240, 255
 #define RED 255, 100, 100, 255
+#define BLUE 150, 150, 250, 255
 
 #endif

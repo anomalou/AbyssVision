@@ -23,9 +23,9 @@ int main(int argc, char* args[]){
     Core::Init();
 
     Core::GetGroup()->Create(mw, new AString("main window"));
-    Core::GetGroup()->Create(ew1, new AString("empty window 1"));
-    Core::GetGroup()->Create(ew2, new AString("empty window 2"));
-    Core::GetGroup()->Create(ew3, new AString("empty window 3"));
+    // Core::GetGroup()->Create(ew1, new AString("empty window 1"));
+    // Core::GetGroup()->Create(ew2, new AString("empty window 2"));
+    // Core::GetGroup()->Create(ew3, new AString("empty window 3"));
 
     Core::GetGroup()->SetBackground(mw);
 

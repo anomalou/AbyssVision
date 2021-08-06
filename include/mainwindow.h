@@ -3,7 +3,8 @@
 
 #include <window.h>
 #include <emptywindow.h>
-#include <button.h>
+#include <widgets/button.h>
+#include <widgets/trackbar.h>
 
 namespace AbyssCore{
     /**
@@ -15,6 +16,7 @@ namespace AbyssCore{
             Button* hide;
             Button* slide;
             Button* full;
+            Trackbar* trackbar;
 
         private:
             EmptyWindow* window;

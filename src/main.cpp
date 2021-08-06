@@ -1,6 +1,6 @@
 #include <iostream>
 #include <SDL.h>
-#include "core.h"
+#include <application.h>
 
 using namespace AbyssCore;
 
@@ -20,16 +20,16 @@ int main(int argc, char* args[]){
     mw->AllowClose(false);
     mw->SetSize(RESOLUTION_X - 100, RESOLUTION_Y - 100);
 
-    Core::Init();
+    Application::Init();
 
-    Core::GetGroup()->Create(mw, new AString("main window"));
-    // Core::GetGroup()->Create(ew1, new AString("empty window 1"));
-    // Core::GetGroup()->Create(ew2, new AString("empty window 2"));
-    // Core::GetGroup()->Create(ew3, new AString("empty window 3"));
+    Application::GetGroup()->Create(mw, new AString("main window"));
+    // UICore::GetGroup()->Create(ew1, new AString("empty window 1"));
+    // UICore::GetGroup()->Create(ew2, new AString("empty window 2"));
+    // UICore::GetGroup()->Create(ew3, new AString("empty window 3"));
 
-    Core::Start();
+    Application::Start();
 
-    Core::Dispose();
+    Application::Dispose();
 
     // AssignMainWindow(mw);
 

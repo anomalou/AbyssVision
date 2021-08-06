@@ -125,31 +125,18 @@ namespace AbyssCore{
         int x_mouse = event.x - rect.x - HANDLE_OFFSET;
 
         if(beginLMove){
+            if(event.state != SDL_BUTTON_LMASK){
+                beginLMove = false;
+                handleState = Idle;
+                return;
+            }
+
             double step = CalculateHandleStep();
 
             double fnewValue = (double)x_mouse / step;
             int value = (int)round(fnewValue) + minValue;
 
             SetValue(value);
-
-            // if(x_mouse <= 0)
-            //     value = minValue;
-
-            // if(x_mouse >= (step * (maxValue - minValue)))
-            //     value = maxValue;
-
-            // if(valueChanged != NULL){
-            //     ActionEvent aevent = {
-            //         parent,
-            //         event.x,
-            //         event.x,
-            //         0,
-            //         0,
-            //         event.state
-            //     };
-
-            //     valueChanged(this, aevent);
-            // }
         }
     }
 

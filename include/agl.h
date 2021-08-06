@@ -10,7 +10,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <application.h>
+#include <aparams.h>
 #include <astring.h>
 
 #define VSHADER 0

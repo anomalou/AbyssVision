@@ -5,8 +5,8 @@
 #define CBUTTON_WIDTH 25
 #define CSIGN_SIZE 5
 
-#define MIN_WIDTH CBUTTON_WIDTH
-#define MIN_HEIGHT CBUTTON_WIDTH
+#define MIN_WIDTH 100
+#define MIN_HEIGHT 100
 
 #define FONT_FAMILY "Gravity.otf"
 #define FSIGN_WIDTH 10

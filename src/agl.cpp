@@ -113,8 +113,8 @@ namespace AbyssCore{
     }
 
     aFPoint GLConvertToNormal(aPoint pos){
-        float x_mid = Application::screen_width / 2;
-        float y_mid = Application::screen_height / 2;
+        float x_mid = screen_width / 2;
+        float y_mid = screen_height / 2;
 
         float x = (-(x_mid - pos.x)) / x_mid;
         // float r = -(x_mid - (rect.x + rect.w)) / x_mid;

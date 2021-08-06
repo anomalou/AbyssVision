@@ -3,7 +3,7 @@
 namespace AbyssCore{
     Trackbar::Trackbar(Window* parent) : Widget(parent){
         minValue = 0;
-        maxValue = 1000;
+        maxValue = 10;
         value = 0;
 
         style.selected = {BLUE};
@@ -17,7 +17,7 @@ namespace AbyssCore{
     int Trackbar::CalculateHandlePosition(){
         double step = CalculateHandleStep();
 
-        int x_value = step * value;
+        int x_value = step * (value - minValue);
 
         return x_value;
     }
@@ -51,6 +51,32 @@ namespace AbyssCore{
         }
 
         return false;
+    }
+
+    void Trackbar::SetValue(int value){
+        if(value > maxValue)
+            this->value = maxValue;
+        else if(value < minValue)
+            this->value = minValue;
+        else
+            this->value = value;
+
+        if(valueChanged != NULL){
+            ActionEvent aevent = {
+                parent,
+                0,
+                0,
+                0,
+                0,
+                0
+            };
+
+            valueChanged(this, aevent);
+        }
+    }
+
+    int Trackbar::GetValue(){
+        return value;
     }
 
     void Trackbar::Paint(Anchor anchor){
@@ -102,30 +128,40 @@ namespace AbyssCore{
             double step = CalculateHandleStep();
 
             double fnewValue = (double)x_mouse / step;
-            value = (int)round(fnewValue);
+            int value = (int)round(fnewValue) + minValue;
 
-            if(x_mouse <= 0)
-                value = minValue;
+            SetValue(value);
 
-            if(x_mouse >= (step * (maxValue - minValue)))
-                value = maxValue;
+            // if(x_mouse <= 0)
+            //     value = minValue;
 
-            if(valueChanged != NULL){
-                ActionEvent aevent = {
-                    parent,
-                    event.x,
-                    event.x,
-                    0,
-                    0,
-                    event.state
-                };
+            // if(x_mouse >= (step * (maxValue - minValue)))
+            //     value = maxValue;
 
-                valueChanged(this, aevent);
-            }
+            // if(valueChanged != NULL){
+            //     ActionEvent aevent = {
+            //         parent,
+            //         event.x,
+            //         event.x,
+            //         0,
+            //         0,
+            //         event.state
+            //     };
+
+            //     valueChanged(this, aevent);
+            // }
         }
     }
 
-    void Trackbar::OnMouseWheel(SDL_MouseWheelEvent event){
+    void Trackbar::OnMouseWheel(SDL_MouseWheelEvent event, aPoint pos){
+        int x = pos.x;
+        int y = pos.y;
 
+        if(WidgetHit(x, y)){
+            if(event.y > 0)
+                SetValue(value + 1);
+            if(event.y < 0)
+                SetValue(value - 1);
+        }
     }
 }

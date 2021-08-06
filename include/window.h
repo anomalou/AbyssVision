@@ -86,7 +86,7 @@ namespace AbyssCore{
             virtual void OnMouseDown(SDL_MouseButtonEvent event);
             virtual void OnMouseUp(SDL_MouseButtonEvent event);
             virtual void OnMouseMove(SDL_MouseMotionEvent event);
-            virtual void OnMouseWheel(SDL_MouseWheelEvent event);
+            virtual void OnMouseWheel(SDL_MouseWheelEvent event, aPoint pos);
 
             // virtual void CloseAction();
             // virtual void MinimazeAction();

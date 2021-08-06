@@ -60,7 +60,7 @@ namespace AbyssCore{
             virtual void OnMouseDown(SDL_MouseButtonEvent event) = 0;
             virtual void OnMouseUp(SDL_MouseButtonEvent event) = 0;
             virtual void OnMouseMove(SDL_MouseMotionEvent event) = 0;
-            virtual void OnMouseWheel(SDL_MouseWheelEvent event) = 0;
+            virtual void OnMouseWheel(SDL_MouseWheelEvent event, aPoint pos) = 0;
 
             virtual void Paint(Anchor anchor) = 0;
     };

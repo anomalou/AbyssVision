@@ -277,21 +277,21 @@ namespace AbyssCore{
         }
     }
 
-    void Window::OnMouseWheel(SDL_MouseWheelEvent event){
-        int x = event.x;
-        int y = event.y;
+    void Window::OnMouseWheel(SDL_MouseWheelEvent event, aPoint pos){
+        int x = pos.x;
+        int y = pos.y;
 
         if(WindowHit(x, y)){
-            event.x -= rect.x;
+            pos.x -= rect.x;
             
             if(isFull)
-                event.y -= (rect.y + HEADER_HEIGHT);
+                pos.y -= (rect.y + HEADER_HEIGHT);
             else
-                event.y -= rect.y;
+                pos.y -= rect.y;
 
             for(Widget* w : widgetPull){
                 if(!w->IsDisabled())
-                    w->OnMouseWheel(event);
+                    w->OnMouseWheel(event, pos);
             }
         }
     }

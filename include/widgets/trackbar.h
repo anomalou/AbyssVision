@@ -35,7 +35,10 @@ namespace AbyssCore{
             void OnMouseDown(SDL_MouseButtonEvent event);
             void OnMouseUp(SDL_MouseButtonEvent event);
             void OnMouseMove(SDL_MouseMotionEvent event);
-            void OnMouseWheel(SDL_MouseWheelEvent event);
+            void OnMouseWheel(SDL_MouseWheelEvent event, aPoint pos);
+
+            void SetValue(int value);
+            int GetValue();
     };
 }
 

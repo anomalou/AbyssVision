@@ -489,7 +489,9 @@ namespace AbyssCore{
                 OnMouseMove(event.motion);
             break;
             case SDL_MOUSEWHEEL:
-                OnMouseWheel(event.wheel);
+                aPoint pos;
+                SDL_GetMouseState(&pos.x, &pos.y);
+                OnMouseWheel(event.wheel, pos);
             break;
         }
     }
@@ -530,8 +532,8 @@ namespace AbyssCore{
         group->CurrentFocus()->OnMouseMove(event);
     }
 
-    void Core::OnMouseWheel(SDL_MouseWheelEvent event){
-        group->CurrentFocus()->OnMouseWheel(event);
+    void Core::OnMouseWheel(SDL_MouseWheelEvent event, aPoint pos){
+        group->CurrentFocus()->OnMouseWheel(event, pos);
     }
 
     // void Core::MoveMouse(SDL_Event event){

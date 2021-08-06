@@ -72,7 +72,7 @@ namespace AbyssCore{
         }
     }
 
-    void Button::OnMouseWheel(SDL_MouseWheelEvent event){
+    void Button::OnMouseWheel(SDL_MouseWheelEvent event, aPoint pos){
 
     }
 }

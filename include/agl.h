@@ -17,6 +17,8 @@
 #define FSHADER 1
 #define PROGRAM 2
 
+#define VERTEX_PARAMS 9
+
 using namespace std;
 
 namespace AbyssCore{
@@ -48,9 +50,21 @@ namespace AbyssCore{
     }aPoint;
 
     typedef struct{
+        int x;
+        int y;
+        int z;
+    }aPoint3;
+
+    typedef struct{
         float x;
         float y;
     }aFPoint;
+
+    typedef struct{
+        float x;
+        float y;
+        float z;
+    }aFPoint3;
 
     typedef struct{
         int width;
@@ -72,17 +86,15 @@ namespace AbyssCore{
     }aFColor;
 
     typedef struct{
-        aPoint pos;
+        aFPoint3 pos;
+        aFColor color;
         aFPoint texPos;
-        aColor color;
     }Vertex;
 
-    typedef struct{
-        int x;
-        int y;
-        int size;
-        Vertex* vertices;
-    }Vertex2DArray;
+    // typedef struct{
+    //     int size;
+    //     Vertex* vertices;
+    // }VertexArray;
 
     extern PFNGLCREATESHADERPROC GLCreateShader;
     extern PFNGLCREATEPROGRAMPROC GLCreateProgram;
@@ -119,17 +131,13 @@ namespace AbyssCore{
 
     bool GLGetError();
 
-    aFPoint GLConvertToNormal(aPoint pos);
+    aFPoint3 GLScreenToNormal(aPoint3 pos);
     aFColor GLConvertColor(aColor color);
-    void GLDraw2DRect(SDL_Rect rect, aColor color);
-    void GLFill2DRect(SDL_Rect rect, aColor color);
-    void GLBind2DRect(SDL_Rect rect, aColor color, unsigned int &VAO, unsigned int &VBO);
-    void GLBind2DRectTex(SDL_Rect rect, unsigned int &VAO, unsigned int &VBO);
-    void GLBind2DVertices(Vertex2DArray array, unsigned int &VAO, unsigned int &VBO);
-    void GLDraw2DVertices(GLenum mode, int vnumber);
+    Vertex* GLCreateRectArray(SDL_Rect rect, aColor color);
+    Vertex* GLCreateLineArray(aPair pairs, aColor color);
+    void GLBindVertices(Vertex* array, int size, unsigned int &VAO, unsigned int &VBO);
     void GLUnbindVertices(unsigned int VAO, unsigned int VBO);
     void GLBind2DTexture(unsigned int texture);
-    void GLBindFrameBuffer(unsigned int framebuffer);
 
     class Shader{
         private:

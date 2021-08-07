@@ -35,6 +35,9 @@ namespace AbyssCore{
 
             static SDL_GLContext glContext;
 
+            static unsigned int globalVAO;
+            static unsigned int globalVBO;
+
             static unsigned int windowfb;
             static unsigned int widgetfb;
             static unsigned int windowTex;
@@ -62,7 +65,6 @@ namespace AbyssCore{
 
             static void Input();
             static void Render();
-            static bool CreateFrameBuffer(unsigned int &framebuffer, unsigned int &texColorBuffer, unsigned int &stencilBuffer);
 
         public:
             static bool Init();

@@ -110,9 +110,14 @@ namespace AbyssCore{
     // }
 
     void SystemGroup::ProcessWindows(){
-        for(auto i = windowsPull.begin(); i != windowsPull.end() && windowsPull.size() > 1; i++){
+        vector<Window*> toDestroy = vector<Window*>();
+        for(auto i = windowsPull.begin(); i != windowsPull.end(); i++){
             if((*i)->NeedDestroy())
-                Destroy(*i);
+                toDestroy.push_back(*i);
+        }
+
+        for(Window* w : toDestroy){
+            Destroy(w);
         }
     }
 }

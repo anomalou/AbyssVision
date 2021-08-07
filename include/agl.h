@@ -108,6 +108,7 @@ namespace AbyssCore{
     extern PFNGLDELETESHADERPROC GLDeleteShader;
     extern PFNGLUSEPROGRAMPROC GLUseProgram;
     extern PFNGLUNIFORM1FPROC GLUniform1f;
+    extern PFNGLUNIFORM4FPROC GLUniform4f;
     extern PFNGLGETUNIFORMLOCATIONPROC GLGetUniformLocation;
     extern PFNGLGENVERTEXARRAYSPROC GLGenVertexArrays;
     extern PFNGLDELETEVERTEXARRAYSPROC GLDeleteVertexArrays;
@@ -126,6 +127,7 @@ namespace AbyssCore{
     extern PFNGLRENDERBUFFERSTORAGEPROC GLRenderbufferStorage;
     extern PFNGLFRAMEBUFFERRENDERBUFFERPROC GLFramebufferRenderbuffer;
     extern PFNGLCHECKFRAMEBUFFERSTATUSPROC GLCheckFramebufferStatus;
+    extern PFNGLGENERATEMIPMAPPROC GLGenerateMipmap;
 
     bool GLInit(SDL_GLContext& context, SDL_Window* window);
 
@@ -137,6 +139,7 @@ namespace AbyssCore{
     Vertex* GLCreateLineArray(aPair pairs, aColor color);
     void GLBindVertices(Vertex* array, int size, unsigned int &VAO, unsigned int &VBO);
     void GLUnbindVertices(unsigned int VAO, unsigned int VBO);
+    unsigned int GLCreate2DTextureRGB(void* data, int width, int height);
     void GLBind2DTexture(unsigned int texture);
 
     class Shader{
@@ -153,11 +156,12 @@ namespace AbyssCore{
 
             bool GetError(int proc, Uint32 type);
 
-            void SetFloat(AString* name, float value);
+            void SetFloat4(AString* name, float x, float y, float z, float w);
     };
 
-    extern Shader* defaultShader; 
-    extern Shader* clearShader;
+    extern Shader* controlShader;
+    extern Shader* textureShader; 
+    extern Shader* colorShader;
 }
 
 #endif

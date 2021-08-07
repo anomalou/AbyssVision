@@ -2,7 +2,7 @@
 #define WPARAMS_H
 
 #define HEADER_HEIGHT 30
-#define CBUTTON_WIDTH 25
+#define CBUTTON_WIDTH 30
 #define CSIGN_SIZE 5
 
 #define MIN_WIDTH 100

@@ -9,6 +9,9 @@ namespace AbyssCore{
     SDL_GLContext Application::glContext;
     unsigned int Application::globalVAO;
     unsigned int Application::globalVBO;
+    unsigned int Application::closeTexture;
+    unsigned int Application::minimizeTexture;
+    unsigned int Application::resizeTexture;
     unsigned int Application::windowfb;
     unsigned int Application::widgetfb;
     unsigned int Application::windowTex;
@@ -113,6 +116,8 @@ namespace AbyssCore{
 
         isResized = true;
 
+        CreateWindowControlTextures();
+
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClearStencil(0x00);
 
@@ -136,15 +141,31 @@ namespace AbyssCore{
 
             // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-            // unsigned int VAO, VBO;
+            // unsigned int VAO, VBO, texture;
 
             // defaultShader->Use();
 
-            // Vertex* rect = GLCreateRectArray(SDL_Rect({10, 10, 100, 100}), aColor({RED}));
+            // Vertex* rect = GLCreateRectArray(SDL_Rect({10, 10, 100, 100}), aColor({WHITE}));
             // GLBindVertices(rect, 4, VAO, VBO);
+
+            // unsigned char data[] = {
+            //     255, 255, 255, 0, 0, 0, 255, 255, 255, 0, 0, 0,
+            //     255, 255, 255, 0, 0, 0, 255, 255, 255, 0, 0, 0,
+            //     255, 255, 255, 0, 0, 0, 255, 255, 255, 0, 0, 0,
+            //     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
+            // };
+
+            // glGenTextures(1, &texture);
+            // GLBind2DTexture(texture);
+
+            // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+            // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            // GLGenerateMipmap(GL_TEXTURE_2D);
+
             // glDrawArrays(GL_QUADS, 0, 4);
             // GLUnbindVertices(VAO, VBO);
-
 
             for(Window* w : group->GetPull()){
                 if(w->IsVisible()){
@@ -154,6 +175,10 @@ namespace AbyssCore{
 
             SDL_GL_SwapWindow(window);
         }
+
+        glDeleteTextures(1, &closeTexture);
+        glDeleteTextures(1, &minimizeTexture);
+        glDeleteTextures(1, &resizeTexture);
     }
 
     void Application::DrawWindow(Window* w){
@@ -192,7 +217,7 @@ namespace AbyssCore{
 
         aColor border = w->style.border;
 
-        clearShader->Use();
+        colorShader->Use();
 
         Vertex* headFillRectArray;
         Vertex* headBorderRectArray = GLCreateRectArray(rect, border);
@@ -206,7 +231,7 @@ namespace AbyssCore{
         glDrawArrays(GL_QUADS, 0, 4);
         GLUnbindVertices(globalVAO, globalVBO);
 
-        defaultShader->Use();
+        colorShader->Use();
 
         GLBindVertices(headBorderRectArray, 4, globalVAO, globalVBO);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
@@ -251,7 +276,7 @@ namespace AbyssCore{
 
         aColor border = w->style.border;
 
-        clearShader->Use();
+        colorShader->Use();
 
         glEnable(GL_STENCIL_TEST);
 
@@ -297,7 +322,7 @@ namespace AbyssCore{
 
                 aColor border = wg->style.border;
 
-                clearShader->Use();
+                colorShader->Use();
 
                 glStencilFunc(GL_EQUAL, 1, 0xFF);
                 
@@ -318,7 +343,7 @@ namespace AbyssCore{
         glDisable(GL_STENCIL_TEST);
         glStencilMask(0xFF);
 
-        defaultShader->Use();
+        colorShader->Use();
 
         GLBindVertices(GLCreateRectArray(rect, border), 4, globalVAO, globalVBO);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
@@ -371,6 +396,45 @@ namespace AbyssCore{
         // SDL_RenderFillRects(render, shadows, 2);
     }
 
+    void Application::CreateWindowControlTextures(){
+        unsigned char close[] = {
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 0, 0, 0, 255, 255, 255, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 0, 0, 0, 255, 255, 255, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
+        };
+
+        unsigned char minimize[] = {
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
+        };
+
+        unsigned char resize[] = {
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 200, 200, 200, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 200, 200, 200, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 200, 200, 200, 200, 200, 200, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 200, 200, 200, 200, 200, 200, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 200, 200, 200, 200, 200, 200, 200, 200, 200, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 255, 255, 255,
+            200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
+        };
+
+        closeTexture = GLCreate2DTextureRGB(close, 7, 7);
+        minimizeTexture = GLCreate2DTextureRGB(minimize, 7, 7);
+        resizeTexture = GLCreate2DTextureRGB(resize, 7, 7);
+    }
+
     void Application::DrawWindowControl(Window* w){
         SDL_Rect wRect = w->GetRect();
 
@@ -380,25 +444,41 @@ namespace AbyssCore{
 
         SDL_Rect crossRect = {wRect.x + closeHitBox.x, wRect.y + closeHitBox.y, closeHitBox.w, closeHitBox.h};
         SDL_Rect minRect = {wRect.x + minimazeHitBox.x - 1, wRect.y + minimazeHitBox.y, minimazeHitBox.w, minimazeHitBox.h};
-        SDL_Rect resRect = {wRect.x + resizeHitBox.x, wRect.y + resizeHitBox.y, resizeHitBox.w, resizeHitBox.h};
+        SDL_Rect resRect = {wRect.x + resizeHitBox.x - 1, wRect.y + resizeHitBox.y - 1, resizeHitBox.w, resizeHitBox.h};
         SDL_Rect rects[2] = {crossRect, minRect};
 
         aColor control = w->style.control;
         aColor border = w->style.border;
-        aColor enabled = w->style.enabled;
-        aColor disabled = w->style.disabled;
+        aFColor enabled = GLConvertColor(w->style.enabled);
+        aFColor disabled = GLConvertColor(w->style.disabled);
 
-        clearShader->Use();
+        AString* uniformName = new AString("colorModificator");
+
+        controlShader->Use();
+
+        GLBind2DTexture(closeTexture);
+
+        if(w->CanClose())
+            controlShader->SetFloat4(uniformName, enabled.r, enabled.g, enabled.b, enabled.a);
+        else
+            controlShader->SetFloat4(uniformName, disabled.r, disabled.g, disabled.b, disabled.a);
 
         GLBindVertices(GLCreateRectArray(rects[0], control), 4, globalVAO, globalVBO);
         glDrawArrays(GL_QUADS, 0, 4);
         GLUnbindVertices(globalVAO, globalVBO);
 
+        GLBind2DTexture(minimizeTexture);
+
+        if(w->CanMinimize())
+            controlShader->SetFloat4(uniformName, enabled.r, enabled.g, enabled.b, enabled.a);
+        else
+            controlShader->SetFloat4(uniformName, disabled.r, disabled.g, disabled.b, disabled.a);
+
         GLBindVertices(GLCreateRectArray(rects[1], control), 4, globalVAO, globalVBO);
         glDrawArrays(GL_QUADS, 0, 4);
         GLUnbindVertices(globalVAO, globalVBO);
 
-        defaultShader->Use();
+        colorShader->Use();
 
         GLBindVertices(GLCreateRectArray(rects[0], border), 4, globalVAO, globalVBO);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
@@ -409,8 +489,14 @@ namespace AbyssCore{
         GLUnbindVertices(globalVAO, globalVBO);
 
         if(!w->IsMinimized() && w->CanResize()){
-            GLBindVertices(GLCreateRectArray(resRect, border), 4, globalVAO, globalVBO);
-            glDrawArrays(GL_LINE_LOOP, 0, 4);
+            controlShader->Use();
+
+            controlShader->SetFloat4(uniformName, enabled.r, enabled.g, enabled.b, enabled.a);
+
+            GLBind2DTexture(resizeTexture);
+
+            GLBindVertices(GLCreateRectArray(resRect, control), 4, globalVAO, globalVBO);
+            glDrawArrays(GL_QUADS, 0, 4);
             GLUnbindVertices(globalVAO, globalVBO);
         }
     }
@@ -458,20 +544,27 @@ namespace AbyssCore{
         //         }
         //     }
         // }
-
-        group->CurrentFocus()->OnMouseDown(event);
+        Window* focus = group->CurrentFocus();
+        if(focus != NULL)
+            focus->OnMouseDown(event);
     }
 
     void Application::OnMouseUp(SDL_MouseButtonEvent event){
-        group->CurrentFocus()->OnMouseUp(event);
+        Window* focus = group->CurrentFocus();
+        if(focus != NULL)
+            focus->OnMouseUp(event);
     }
 
     void Application::OnMouseMove(SDL_MouseMotionEvent event){
-        group->CurrentFocus()->OnMouseMove(event);
+        Window* focus = group->CurrentFocus();
+        if(focus != NULL)
+            focus->OnMouseMove(event);
     }
 
     void Application::OnMouseWheel(SDL_MouseWheelEvent event, aPoint pos){
-        group->CurrentFocus()->OnMouseWheel(event, pos);
+        Window* focus = group->CurrentFocus();
+        if(focus != NULL)
+            focus->OnMouseWheel(event, pos);
     }
 
     // void UICore::MoveMouse(SDL_Event event){

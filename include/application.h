@@ -38,6 +38,10 @@ namespace AbyssCore{
             static unsigned int globalVAO;
             static unsigned int globalVBO;
 
+            static unsigned int closeTexture;
+            static unsigned int minimizeTexture;
+            static unsigned int resizeTexture;
+
             static unsigned int windowfb;
             static unsigned int widgetfb;
             static unsigned int windowTex;
@@ -53,6 +57,7 @@ namespace AbyssCore{
 
             static void DrawWindowHead(Window* w);
             static void DrawWindowBody(Window* w);
+            static void CreateWindowControlTextures();
             static void DrawWindowControl(Window* w);
 
             static void ProcessMouse(SDL_Event event);

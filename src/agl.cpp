@@ -15,6 +15,7 @@ namespace AbyssCore{
     PFNGLDELETESHADERPROC GLDeleteShader;
     PFNGLUSEPROGRAMPROC GLUseProgram;
     PFNGLUNIFORM1FPROC GLUniform1f;
+    PFNGLUNIFORM4FPROC GLUniform4f;
     PFNGLGETUNIFORMLOCATIONPROC GLGetUniformLocation;
     PFNGLGENVERTEXARRAYSPROC GLGenVertexArrays;
     PFNGLDELETEVERTEXARRAYSPROC GLDeleteVertexArrays;
@@ -33,9 +34,11 @@ namespace AbyssCore{
     PFNGLRENDERBUFFERSTORAGEPROC GLRenderbufferStorage;
     PFNGLFRAMEBUFFERRENDERBUFFERPROC GLFramebufferRenderbuffer;
     PFNGLCHECKFRAMEBUFFERSTATUSPROC GLCheckFramebufferStatus;
+    PFNGLGENERATEMIPMAPPROC GLGenerateMipmap;
 
-    Shader* defaultShader; 
-    Shader* clearShader;
+    Shader* controlShader;
+    Shader* textureShader; 
+    Shader* colorShader;
 
     bool GLInit(SDL_GLContext& context, SDL_Window* window){
         context = SDL_GL_CreateContext(window);
@@ -54,6 +57,7 @@ namespace AbyssCore{
         GLDeleteShader = (PFNGLDELETESHADERPROC)wglGetProcAddress("glDeleteShader");
         GLUseProgram = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram");
         GLUniform1f = (PFNGLUNIFORM1FPROC)wglGetProcAddress("glUniform1f");
+        GLUniform4f = (PFNGLUNIFORM4FPROC)wglGetProcAddress("glUniform4f");
         GLGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation");
         GLGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)wglGetProcAddress("glGenVertexArrays");
         GLDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)wglGetProcAddress("glDeleteVertexArrays");
@@ -72,13 +76,17 @@ namespace AbyssCore{
         GLRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)wglGetProcAddress("glRenderbufferStorage");
         GLFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)wglGetProcAddress("glFramebufferRenderbuffer");
         GLCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)wglGetProcAddress("glCheckFramebufferStatus");
+        GLGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)wglGetProcAddress("glGenerateMipmap");
 #endif
 
-        defaultShader = new Shader();
-        defaultShader->Load(new AString("shaders/defaultVertex.glsl"), new AString("shaders/defaultFragment.glsl"));
+        controlShader = new Shader();
+        controlShader->Load(new AString("shaders/controlVertex.glsl"), new AString("shaders/controlFragment.glsl"));
 
-        clearShader = new Shader();
-        clearShader->Load(new AString("shaders/clearVertex.glsl"), new AString("shaders/clearFragment.glsl"));
+        textureShader = new Shader();
+        textureShader->Load(new AString("shaders/textureVertex.glsl"), new AString("shaders/textureFragment.glsl"));
+
+        colorShader = new Shader();
+        colorShader->Load(new AString("shaders/colorVertex.glsl"), new AString("shaders/colorFragment.glsl"));
 
         SDL_GL_SetSwapInterval(1);
 
@@ -148,10 +156,10 @@ namespace AbyssCore{
         aFColor ncolor = GLConvertColor(color);
 
         Vertex* vertices = (Vertex*)malloc(sizeof(Vertex) * 4);
-        vertices[0] = {nv1, ncolor, {0, 0}};
-        vertices[1] = {nv2, ncolor, {0, 1.0}};
-        vertices[2] = {nv3, ncolor, {1.0, 1.0}};
-        vertices[3] = {nv4, ncolor, {1.0, 0}};
+        vertices[0] = {nv1, ncolor, {0, 1.0}};
+        vertices[1] = {nv2, ncolor, {0, 0}};
+        vertices[2] = {nv3, ncolor, {1.0, 0}};
+        vertices[3] = {nv4, ncolor, {1.0, 1.0}};
 
         return vertices;
     }
@@ -228,6 +236,23 @@ namespace AbyssCore{
         GLDeleteBuffers(1, &VBO);
     }
 
+    unsigned int GLCreate2DTextureRGB(void* data, int width, int height){
+        unsigned int texture;
+        glGenTextures(1, &texture);
+
+        glBindTexture(GL_TEXTURE_2D, texture);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        GLGenerateMipmap(GL_TEXTURE_2D);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        return texture;
+    }
+
     void GLBind2DTexture(unsigned int texture){
         glBindTexture(GL_TEXTURE_2D, texture);
     }
@@ -247,6 +272,9 @@ namespace AbyssCore{
 
         if(!vfile.is_open() || !ffile.is_open())
             return;
+
+        delete vpath;
+        delete fpath;
 
         stringstream vss;
         stringstream fss;
@@ -331,7 +359,7 @@ namespace AbyssCore{
         return true;
     }
 
-    void Shader::SetFloat(AString* name, float value){
-        GLUniform1f(GLGetUniformLocation(ID, name->ToChars()), value);
+    void Shader::SetFloat4(AString* name, float x, float y, float z, float w){
+        GLUniform4f(GLGetUniformLocation(ID, name->ToChars()), x, y, z, w);
     }
 }

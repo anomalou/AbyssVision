@@ -16,6 +16,7 @@ namespace AbyssCore{
     unsigned int Application::framebufferTexture;
 
     unsigned int Application::ozzen;
+    double Application::deltaTime;
 
     bool Application::Init(){
         if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -129,6 +130,9 @@ namespace AbyssCore{
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClearStencil(0x00);
 
+        Uint64 NOW = SDL_GetPerformanceCounter();
+        Uint64 LAST = 0;
+
         while(isRunning){
             if(isResized){
                 glViewport(0, 0, screen_width, screen_height);
@@ -143,6 +147,11 @@ namespace AbyssCore{
 
                 isResized = false;
             }
+
+            LAST = NOW;
+            NOW = SDL_GetPerformanceCounter();
+
+            deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
             
             glClear(GL_COLOR_BUFFER_BIT);
             glClear(GL_STENCIL_BUFFER_BIT);
@@ -648,87 +657,6 @@ namespace AbyssCore{
         if(focus != NULL)
             focus->OnMouseWheel(event, pos);
     }
-
-    // void UICore::MoveMouse(SDL_Event event){
-    //     Window* currentFocus = group->CurrentFocus();
-
-    //     int x = event.motion.x;
-    //     int y = event.motion.y;
-
-    //     Application::mousePosition = {x, y};
-
-    //     if(currentFocus->IsVisible()){
-    //         currentFocus->ProcessGlobalMove(event.motion);
-    //     }
-
-    //     if(InWindow(currentFocus, x, y) && currentFocus->IsVisible()){
-    //         event.motion.x -= currentFocus->GetRect().x;
-    //         event.motion.y -= currentFocus->GetRect().y;
-
-    //         currentFocus->ProcessMove(event.motion);
-    //     }
-    // }
-
-    // void UICore::DragMouse(SDL_Event event){
-    //     Window* currentFocus = group->CurrentFocus();
-
-    //     int x = event.motion.x;
-    //     int y = event.motion.y;
-
-    //     Application::mousePosition = {x, y};
-
-    //     if(currentFocus->IsVisible()){
-    //         currentFocus->ProcessGlobalDrag(event.motion);
-    //     }
-
-    //     if(InWindow(currentFocus, x, y) && currentFocus->IsVisible()){
-    //         event.motion.x -= currentFocus->GetRect().x;
-    //         event.motion.y -= currentFocus->GetRect().y;
-
-    //         currentFocus->ProcessDrag(event.motion);
-    //     }        
-    // }
-
-    // void UICore::ProcessClick(Window* w, SDL_MouseButtonEvent event){
-    //     if(w != group->CurrentFocus()){
-    //         group->FocusWindow(w);
-    //     }
-
-    //     w->ProcessGlobalClick(event);
-
-    //     event.x -= w->GetRect().x;
-    //     event.y -= w->GetRect().y;
-
-    //     w->ProcessClick(event);
-    // }
-
-    // void UICore::ClickMouse(SDL_Event event){
-    //     int x = event.button.x;
-    //     int y = event.button.y;
-
-    //     vector<Window*> windowPull = group->GetPull();
-    //     vector<Window*> invertPull = vector<Window*>();
-
-    //     while(windowPull.size() != 0){
-    //         invertPull.push_back(windowPull.back());
-    //         windowPull.pop_back();
-    //     }
-
-    //     for(Window* w : invertPull){
-    //         if(w->IsVisible() && w != group->Background()){
-    //             if(InWindow(w, x, y)){
-    //                 ProcessClick(w, event.button);
-    //                 return;
-    //             }
-    //         }
-    //     }
-
-    //     if(group->Background() != NULL){
-    //         if(InWindow(group->Background(), x, y)){
-    //             ProcessClick(group->Background(), event.button);
-    //         }
-    //     }
-    // }
 
     IWindowsGroup* Application::GetGroup(){
         return group;

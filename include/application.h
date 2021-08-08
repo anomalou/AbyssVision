@@ -47,6 +47,7 @@ namespace AbyssCore{
 
         public:
             static unsigned int ozzen;
+            static double deltaTime;
 
         private:
             static bool CreateSDLWindow();

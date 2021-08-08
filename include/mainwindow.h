@@ -21,6 +21,7 @@ namespace AbyssCore{
         private:
             EmptyWindow* window;
             unsigned int ozzenVAO, ozzenVBO;
+            double currentSize;
 
         public:
             MainWindow();

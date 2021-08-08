@@ -74,14 +74,24 @@ namespace AbyssCore{
         // AssignWidget(slide, new AString("move"));
         // AssignWidget(full, new AString("full"));
         AssignWidget(trackbar, new AString("trackbar"));
+
+        currentSize = 200;
     }
 
     void MainWindow::Paint(Anchor anchor){
         Window::Paint(anchor);
 
         float scale = (float)trackbar->GetValue() / 10;
+        int toSize = scale * 200;
 
-        GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({anchor.x + 10, anchor.y + 70, (int)(200 * scale), (int)(200 * scale)}), aColor({WHITE})), 4, ozzenVAO, ozzenVBO);
+        double odds = abs((double)toSize - currentSize);
+
+        if(currentSize < toSize)
+            currentSize += (odds * Application::deltaTime / 100);
+        else if(currentSize > toSize)
+            currentSize -= (odds * Application::deltaTime / 100);
+
+        GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({anchor.x + 10, anchor.y + 70, (int)(round(currentSize)), (int)(round(currentSize))}), aColor({WHITE})), 4, ozzenVAO, ozzenVBO);
 
         textureShader->Use();
 

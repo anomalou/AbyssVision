@@ -2,7 +2,12 @@
 
 in vec4 vertexColor;
 out vec4 fragColor;
+uniform int useVertexColor;
+uniform vec4 color;
 
 void main(){
-    fragColor = vertexColor;
+    if(useVertexColor == 1)
+        fragColor = vertexColor;
+    else
+        fragColor = color;
 }

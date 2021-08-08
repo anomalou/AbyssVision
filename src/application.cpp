@@ -627,14 +627,7 @@ namespace AbyssCore{
                 }
             }
         }
-
-        // if(group->Background() != NULL && inWindow == false){
-        //     if(WindowHit(group->Background(), x, y)){
-        //         if(group->CurrentFocus() != group->Background()){
-        //             group->FocusWindow(group->Background());
-        //         }
-        //     }
-        // }
+        
         Window* focus = group->CurrentFocus();
         if(focus != NULL)
             focus->OnMouseDown(event);

@@ -83,7 +83,6 @@ namespace AbyssCore{
     }
 
     void SystemGroup::FocusWindow(Window* window){
-        // focus = window;
         for(auto w = windowsPull.begin(); w != windowsPull.end(); w++){
             if(*w == window){
                 windowsPull.erase(w);
@@ -93,21 +92,11 @@ namespace AbyssCore{
         }
     }
 
-    // void SystemGroup::SetBackground(Window* window){
-    //     if(window != NULL)
-    //         window->SetFull(false);
-    //     background = window;        
-    // }
-
     Window* SystemGroup::CurrentFocus(){
         if(windowsPull.size() > 0)
             return windowsPull.back();
         return NULL;
     }
-
-    // Window* SystemGroup::Background(){
-    //     return background;
-    // }
 
     void SystemGroup::ProcessWindows(){
         vector<Window*> toDestroy = vector<Window*>();

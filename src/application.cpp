@@ -300,10 +300,6 @@ namespace AbyssCore{
     }
 
     void Application::DrawWindowHead(Window* w){
-        // int x = 0;
-        // int y = 0;
-        // int width = w->GetRect().w;
-        // int height = HEADER_HEIGHT;
         SDL_Rect rect = w->GetRect();
         rect.h = HEADER_HEIGHT;
 
@@ -333,36 +329,6 @@ namespace AbyssCore{
         glDrawArrays(GL_LINE_LOOP, 0, 4);
 
         GLDestroyVertexObjects(globalVAO, globalVBO);
-
-        // SDL_Color shadow = w->style.shadow;
-        // int shadow_size = w->style.shadow_size;
-
-        // SDL_SetRenderDrawColor(render, shadow.r, shadow.g, shadow.b, shadow.a);
-        // SDL_RenderFillRect(render, new SDL_Rect({rect.x + rect.w, rect.y + shadow_size, shadow_size, HEADER_HEIGHT}));
-
-        // if(w->IsMinimazed())
-        //     SDL_RenderFillRect(render, new SDL_Rect({rect.x + shadow_size, rect.y + HEADER_HEIGHT, rect.w - shadow_size, shadow_size}));
-        
-        // //window title
-
-        // rect.x = x + FSIGN_WIDTH / 2;
-        // rect.y = y + FSIGN_HEIGHT / 2;
-        // rect.w = FSIGN_WIDTH * w->GetName()->Length();
-        // rect.h = FSIGN_HEIGHT;
-
-        // if((rect.w + FSIGN_WIDTH / 2) > w->GetRect().w)
-        //     rect.w = w->GetRect().w - FSIGN_WIDTH / 2;
-
-        // SDL_Color color = {BLACK};
-
-        // SDL_Surface* surface = TTF_RenderText_Solid(font, w->GetName()->ToChars(), color);
-
-        // SDL_Texture* header = SDL_CreateTextureFromSurface(render, surface);
-
-        // SDL_RenderCopy(render, header, NULL, &rect);
-
-        // SDL_FreeSurface(surface);
-        // SDL_DestroyTexture(header);
     }
 
     void Application::DrawWindowBody(Window* w){
@@ -413,7 +379,6 @@ namespace AbyssCore{
 
                 colorShader->Use();
                 colorShader->SetInt1(AString("useVertexColor"), 1);
-                // colorShader->SetFloat4(AString("color"), 1, 1, 1, 1);
 
                 GLBindVertexArray(wVAO);
 
@@ -445,8 +410,6 @@ namespace AbyssCore{
                 GLBindVertexArray(wVAO);
                 glDrawArrays(GL_LINE_LOOP, 0, 4);
 
-                // GLCreateVertexObjects(GLCreateRectArray(mrect, aColor({WHITE})), 4, globalVAO, globalVBO);
-                // glDrawArrays(GL_QUADS, 0, 4);
                 GLDestroyVertexObjects(wVAO, wVBO);
             }
         }
@@ -462,50 +425,6 @@ namespace AbyssCore{
         GLDestroyVertexObjects(globalVAO, globalVBO);
 
         glClear(GL_STENCIL_BUFFER_BIT);
-
-        // else
-        //     rect.y = 0;
-
-        // SDL_Color border = w->GetStyle().border;
-        // SDL_Texture* currTarget = SDL_GetRenderTarget(render);
-
-        // SDL_Texture* bodyTex = SDL_CreateTexture(render, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, rect.w, rect.h);
-        // SDL_SetRenderTarget(render, bodyTex);
-        // w->Paint(render);
-
-        // for(Widget* w : w->GetPull()){
-        //     if(w->IsVisible()){
-        //         SDL_Rect wrect = w->GetRect();
-
-        //         SDL_Texture* widgetTex = SDL_CreateTexture(render, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, wrect.w, wrect.h);
-        //         SDL_SetRenderTarget(render, widgetTex);
-        //         w->Paint(render);
-        //         SDL_SetRenderTarget(render, bodyTex);
-        //         SDL_RenderCopy(render, widgetTex, NULL, &wrect);
-        //         SDL_DestroyTexture(widgetTex);
-
-        //         // SDL_Color border = w->GetStyle().border;
-
-        //         // SDL_SetRenderDrawColor(render, border.r, border.g, border.b, border.a);
-        //         // SDL_RenderDrawRect(render, &wrect);
-        //     }
-        // }
-
-        // SDL_SetRenderTarget(render, currTarget);
-        // SDL_RenderCopy(render, bodyTex, NULL, &rect);
-        // SDL_DestroyTexture(bodyTex);
-
-        // // SDL_SetRenderDrawColor(render, border.r, border.g, border.b, border.a);
-        // // SDL_RenderDrawRect(render, &rect);
-
-        // SDL_Color shadow = w->style.shadow;
-        // int shadow_size = w->style.shadow_size;
-
-        // SDL_SetRenderDrawColor(render, shadow.r, shadow.g, shadow.b, shadow.a);
-        // SDL_Rect shadows[2] = {{rect.x + shadow_size, rect.y + rect.h, rect.w - shadow_size, shadow_size},
-        //                        {rect.x + rect.w, rect.y + shadow_size + 1, shadow_size, rect.h - 1}};
-
-        // SDL_RenderFillRects(render, shadows, 2);
     }
 
     void Application::CreateWindowControlTextures(){
@@ -627,7 +546,7 @@ namespace AbyssCore{
                 }
             }
         }
-        
+
         Window* focus = group->CurrentFocus();
         if(focus != NULL)
             focus->OnMouseDown(event);

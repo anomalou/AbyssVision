@@ -10,9 +10,13 @@ namespace AbyssCore{
 
         unsigned int VAO, VBO;
 
-        GLBindVertices(GLCreateLineArray(globRect, color), 2, VAO, VBO);
+        colorShader->Use();
+        colorShader->SetInt1(AString("useVertexColor"), 1);
+
+        GLCreateVertexObjects(GLCreateLineArray(globRect, color), 2, VAO, VBO);
+        GLBindVertexArray(VAO);
         glDrawArrays(GL_LINE_STRIP, 0, 2);
-        GLUnbindVertices(VAO, VBO);
+        GLDestroyVertexObjects(VAO, VBO);
     }
 
     void DrawRect(Anchor anchor, SDL_Rect rect, aColor color){
@@ -20,9 +24,13 @@ namespace AbyssCore{
 
         unsigned int VAO, VBO;
 
-        GLBindVertices(GLCreateRectArray(globRect, color), 4, VAO, VBO);
+        colorShader->Use();
+        colorShader->SetInt1(AString("useVertexColor"), 1);
+
+        GLCreateVertexObjects(GLCreateRectArray(globRect, color), 4, VAO, VBO);
+        GLBindVertexArray(VAO);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
-        GLUnbindVertices(VAO, VBO);
+        GLDestroyVertexObjects(VAO, VBO);
     }
 
     void FillRect(Anchor anchor, SDL_Rect rect, aColor color){
@@ -30,8 +38,12 @@ namespace AbyssCore{
         
         unsigned int VAO, VBO;
 
-        GLBindVertices(GLCreateRectArray(globRect, color), 4, VAO, VBO);
+        colorShader->Use();
+        colorShader->SetInt1(AString("useVertexColor"), 1);
+
+        GLCreateVertexObjects(GLCreateRectArray(globRect, color), 4, VAO, VBO);
+        GLBindVertexArray(VAO);
         glDrawArrays(GL_QUADS, 0, 4);
-        GLUnbindVertices(VAO, VBO);
+        GLDestroyVertexObjects(VAO, VBO);
     }
 }

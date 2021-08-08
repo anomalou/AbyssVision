@@ -20,9 +20,11 @@ namespace AbyssCore{
 
         private:
             EmptyWindow* window;
+            unsigned int ozzenVAO, ozzenVBO;
 
         public:
             MainWindow();
+            void Paint(Anchor anchor);
 
         friend void Open(Widget* sender, ActionEvent event);
         friend void Hide(Widget* sender, ActionEvent event);

@@ -12,19 +12,21 @@ namespace AbyssCore{
     unsigned int Application::closeTexture;
     unsigned int Application::minimizeTexture;
     unsigned int Application::resizeTexture;
-    unsigned int Application::windowfb;
-    unsigned int Application::widgetfb;
-    unsigned int Application::windowTex;
-    unsigned int Application::widgetTex;
-    unsigned int Application::windowStencil;
-    unsigned int Application::widgetStencil;
+    unsigned int Application::framebuffer;
+    unsigned int Application::framebufferTexture;
+
+    unsigned int Application::ozzen;
 
     bool Application::Init(){
         if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
             return false;
 
-        if(TTF_Init() != 0)
+        int flags = IMG_INIT_PNG;
+        if(!(IMG_Init(flags) & flags)){
             return false;
+        }
+        // if(TTF_Init() != 0)
+        //     return false;
 
         SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -117,6 +119,12 @@ namespace AbyssCore{
         isResized = true;
 
         CreateWindowControlTextures();
+        CreateFramebuffer();
+
+        //easter egg =)
+        SDL_Surface* img = LoadImage("texture.png");
+
+        ozzen = GLCreate2DTexture(img->pixels, img->w, img->h, GL_RGBA, GL_LINEAR);
 
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClearStencil(0x00);
@@ -167,6 +175,43 @@ namespace AbyssCore{
             // glDrawArrays(GL_QUADS, 0, 4);
             // GLUnbindVertices(VAO, VBO);
 
+            // GLBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+            // glClearColor(1.0f, 0.8f, 0.8f, 1.0f);
+
+            // glClear(GL_COLOR_BUFFER_BIT);
+
+            // colorShader->Use();
+
+            // glViewport(0, 0, screen_width, screen_height);
+
+            // GLBindVertices(GLCreateRectArray(SDL_Rect({10, 10, 100, 100}), aColor({RED})), 4, globalVAO, globalVBO);
+            // glDrawArrays(GL_QUADS, 0, 4);
+            // GLUnbindVertices(globalVAO, globalVBO);
+
+            // GLBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+            // glViewport(0, 0, screen_width, screen_height);
+
+            // glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+            // glClear(GL_COLOR_BUFFER_BIT);
+
+            // textureShader->Use();
+
+            // textureShader->SetInt1(AString("flip"), 1);
+
+            // GLBind2DTexture(testTexture);
+
+            // GLBindVertices(GLCreateRectArray(SDL_Rect({0, 0, 360, 360}), aColor({WHITE})), 4, globalVAO, globalVBO);
+            // glDrawArrays(GL_QUADS, 0, 4);
+            // GLUnbindVertices(globalVAO, globalVBO);
+
+            // colorShader->Use();
+
+            // GLBindVertices(GLCreateRectArray(SDL_Rect({10, 10, 100, 100}), aColor({BLACK})), 4, globalVAO, globalVBO);
+            // glDrawArrays(GL_QUADS, 0, 4);
+            // GLUnbindVertices(globalVAO, globalVBO);
+
             for(Window* w : group->GetPull()){
                 if(w->IsVisible()){
                     DrawWindow(w);
@@ -179,6 +224,47 @@ namespace AbyssCore{
         glDeleteTextures(1, &closeTexture);
         glDeleteTextures(1, &minimizeTexture);
         glDeleteTextures(1, &resizeTexture);
+
+        GLDeleteFramebuffers(1, &framebuffer);
+        glDeleteTextures(1, &framebufferTexture);
+    }
+
+    void Application::CreateFramebuffer(){
+        GLGenFramebuffers(1, &framebuffer);
+        GLBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+        glGenTextures(1, &framebufferTexture);
+        glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screen_width, screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        GLFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebufferTexture, 0);
+
+        glMatrixMode(GL_PROJECTION);
+        glMatrixMode(GL_MODELVIEW);
+
+        if(GLCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            printf("Framebuffer not done!\n");
+        
+        GLBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    SDL_Surface* Application::LoadImage(const char* name){
+        SDL_Surface* img = IMG_Load(name);
+
+        if(img == NULL){
+            printf("Cant load img!\n");
+            return NULL;
+        }
+
+        
+
+        // img = SDL_ConvertSurface(img, SDL_GetWindowSurface(window)->format, 0);
+
+        return img;
     }
 
     void Application::DrawWindow(Window* w){
@@ -212,30 +298,32 @@ namespace AbyssCore{
         SDL_Rect rect = w->GetRect();
         rect.h = HEADER_HEIGHT;
 
-        aColor focus = w->style.focus;
-        aColor nofocus = w->style.nofocus;
+        aFColor focus = GLConvertColor(w->style.focus);
+        aFColor nofocus = GLConvertColor(w->style.nofocus);
 
-        aColor border = w->style.border;
+        aFColor border = GLConvertColor(w->style.border);
 
         colorShader->Use();
 
-        Vertex* headFillRectArray;
-        Vertex* headBorderRectArray = GLCreateRectArray(rect, border);
+        Vertex* headRectArray = GLCreateRectArray(rect, aColor({WHITE}));
+        GLCreateVertexObjects(headRectArray, 4, globalVAO, globalVBO);
+
+        colorShader->SetInt1(AString("useVertexColor"), 0);
 
         if(group->CurrentFocus() == w)
-            headFillRectArray = GLCreateRectArray(rect, focus);
+            colorShader->SetFloat4(AString("color"), focus.r, focus.g, focus.b, focus.a);
         else
-            headFillRectArray = GLCreateRectArray(rect, nofocus);
+            colorShader->SetFloat4(AString("color"), nofocus.r, nofocus.g, nofocus.b, nofocus.a);
 
-        GLBindVertices(headFillRectArray, 4, globalVAO, globalVBO);
+        GLBindVertexArray(globalVAO);
+
         glDrawArrays(GL_QUADS, 0, 4);
-        GLUnbindVertices(globalVAO, globalVBO);
 
-        colorShader->Use();
+        colorShader->SetFloat4(AString("color"), border.r, border.g, border.b, border.a);
 
-        GLBindVertices(headBorderRectArray, 4, globalVAO, globalVBO);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
-        GLUnbindVertices(globalVAO, globalVBO);
+
+        GLDestroyVertexObjects(globalVAO, globalVBO);
 
         // SDL_Color shadow = w->style.shadow;
         // int shadow_size = w->style.shadow_size;
@@ -274,9 +362,13 @@ namespace AbyssCore{
         if(w->IsFull())
             rect.y += HEADER_HEIGHT;
 
-        aColor border = w->style.border;
+        aFColor border = GLConvertColor(w->style.border);
 
         colorShader->Use();
+
+        colorShader->SetInt1(AString("useVertexColor"), 0);
+
+        GLCreateVertexObjects(GLCreateRectArray(rect, aColor({WHITE})), 4, globalVAO, globalVBO);
 
         glEnable(GL_STENCIL_TEST);
 
@@ -284,16 +376,19 @@ namespace AbyssCore{
         glStencilMask(0xFF);
 
         glStencilFunc(GL_NEVER, 1, 0xFF);
+        
+        colorShader->SetFloat4(AString("color"), 1, 1, 1, 1);
+        GLBindVertexArray(globalVAO);
 
-        GLBindVertices(GLCreateRectArray(rect, aColor({WHITE})), 4, globalVAO, globalVBO);
         glDrawArrays(GL_QUADS, 0, 4);
-        GLUnbindVertices(globalVAO, globalVBO);
 
         glStencilFunc(GL_EQUAL, 1, 0xFF);
         glStencilMask(0);
 
         Anchor anchor = {rect.x, rect.y, rect.w, rect.h};
         w->Paint(anchor);
+
+        unsigned int wVAO, wVBO;
 
         for(Widget * wg : w->GetPull()){
             if(wg->IsVisible() && wg->GetRect().x <= w->GetRect().w && wg->GetRect().y <= w->GetRect().h){
@@ -305,13 +400,15 @@ namespace AbyssCore{
                 wrect.x += rect.x;
                 wrect.y += rect.y;
 
-                SDL_Rect mrect = wrect;
-                mrect.w -= 1;
-                mrect.h -= 1;
+                GLCreateVertexObjects(GLCreateRectArray(wrect, aColor({WHITE})), 4, wVAO, wVBO);
 
-                GLBindVertices(GLCreateRectArray(mrect, aColor({WHITE})), 4, globalVAO, globalVBO);
+                colorShader->Use();
+                colorShader->SetInt1(AString("useVertexColor"), 1);
+                // colorShader->SetFloat4(AString("color"), 1, 1, 1, 1);
+
+                GLBindVertexArray(wVAO);
+
                 glDrawArrays(GL_QUADS, 0, 4);
-                GLUnbindVertices(globalVAO, globalVBO);
 
                 glStencilFunc(GL_EQUAL, 2, 0xFF);
                 glStencilMask(0);
@@ -320,34 +417,40 @@ namespace AbyssCore{
 
                 wg->Paint(anchor);
 
-                aColor border = wg->style.border;
-
-                colorShader->Use();
-
-                glStencilFunc(GL_EQUAL, 1, 0xFF);
-                
-                GLBindVertices(GLCreateRectArray(wrect, border), 4, globalVAO, globalVBO);
-                glDrawArrays(GL_LINE_LOOP, 0, 4);
-                GLUnbindVertices(globalVAO, globalVBO);
-
-                glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
-                glStencilFunc(GL_NEVER, 1, 0xFF);
+                glStencilOp(GL_DECR, GL_KEEP, GL_KEEP);
+                glStencilFunc(GL_LESS, 2, 0xFF);
                 glStencilMask(0xFF);
 
-                GLBindVertices(GLCreateRectArray(mrect, aColor({WHITE})), 4, globalVAO, globalVBO);
+                GLBindVertexArray(wVAO);
                 glDrawArrays(GL_QUADS, 0, 4);
-                GLUnbindVertices(globalVAO, globalVBO);
+
+                glStencilFunc(GL_EQUAL, 1, 0xFF);
+                glStencilMask(0x00);
+
+                aFColor border = GLConvertColor(wg->style.border);
+
+                colorShader->Use();
+                colorShader->SetInt1(AString("useVertexColor"), 0);
+                colorShader->SetFloat4(AString("color"), border.r, border.g, border.b, border.a);
+
+                GLBindVertexArray(wVAO);
+                glDrawArrays(GL_LINE_LOOP, 0, 4);
+
+                // GLCreateVertexObjects(GLCreateRectArray(mrect, aColor({WHITE})), 4, globalVAO, globalVBO);
+                // glDrawArrays(GL_QUADS, 0, 4);
+                GLDestroyVertexObjects(wVAO, wVBO);
             }
         }
 
         glDisable(GL_STENCIL_TEST);
         glStencilMask(0xFF);
 
-        colorShader->Use();
+        colorShader->SetInt1(AString("useVertexColor"), 0);
+        colorShader->SetFloat4(AString("color"), border.r, border.g, border.b, border.a);
 
-        GLBindVertices(GLCreateRectArray(rect, border), 4, globalVAO, globalVBO);
+        GLBindVertexArray(globalVAO);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
-        GLUnbindVertices(globalVAO, globalVBO);
+        GLDestroyVertexObjects(globalVAO, globalVBO);
 
         glClear(GL_STENCIL_BUFFER_BIT);
 
@@ -397,42 +500,13 @@ namespace AbyssCore{
     }
 
     void Application::CreateWindowControlTextures(){
-        unsigned char close[] = {
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-            255, 255, 255, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 255, 255, 255, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 0, 0, 0, 255, 255, 255, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 0, 0, 0, 255, 255, 255, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-            255, 255, 255, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 255, 255, 255, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
-        };
+        SDL_Surface* close = LoadImage("close.png");
+        SDL_Surface* minimize = LoadImage("minimize.png");
+        SDL_Surface* resize = LoadImage("resize.png");
 
-        unsigned char minimize[] = {
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-            255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
-        };
-
-        unsigned char resize[] = {
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 200, 200, 200, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 200, 200, 200, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 200, 200, 200, 200, 200, 200, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 200, 200, 200, 200, 200, 200, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 200, 200, 200, 200, 200, 200, 200, 200, 200, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 255, 255, 255,
-            200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
-        };
-
-        closeTexture = GLCreate2DTextureRGB(close, 7, 7);
-        minimizeTexture = GLCreate2DTextureRGB(minimize, 7, 7);
-        resizeTexture = GLCreate2DTextureRGB(resize, 7, 7);
+        closeTexture = GLCreate2DTexture(close->pixels, close->w, close->h, GL_RGB, GL_NEAREST);
+        minimizeTexture = GLCreate2DTexture(minimize->pixels, minimize->w, minimize->h, GL_RGB, GL_LINEAR);
+        resizeTexture = GLCreate2DTexture(resize->pixels, resize->w, resize->h, GL_RGB, GL_NEAREST);
     }
 
     void Application::DrawWindowControl(Window* w){
@@ -452,7 +526,7 @@ namespace AbyssCore{
         aFColor enabled = GLConvertColor(w->style.enabled);
         aFColor disabled = GLConvertColor(w->style.disabled);
 
-        AString* uniformName = new AString("colorModificator");
+        AString uniformName = AString("colorModificator");
 
         controlShader->Use();
 
@@ -463,9 +537,20 @@ namespace AbyssCore{
         else
             controlShader->SetFloat4(uniformName, disabled.r, disabled.g, disabled.b, disabled.a);
 
-        GLBindVertices(GLCreateRectArray(rects[0], control), 4, globalVAO, globalVBO);
+        GLCreateVertexObjects(GLCreateRectArray(rects[0], control), 4, globalVAO, globalVBO);
+
+        GLBindVertexArray(globalVAO);
         glDrawArrays(GL_QUADS, 0, 4);
-        GLUnbindVertices(globalVAO, globalVBO);
+
+        colorShader->Use();
+
+        colorShader->SetInt1(AString("useVertexColor"), 0);
+        colorShader->SetFloat4(AString("color"), border.r, border.g, border.b, border.a);
+
+        glDrawArrays(GL_LINE_LOOP, 0, 4);
+        GLDestroyVertexObjects(globalVAO, globalVBO);
+
+        controlShader->Use();
 
         GLBind2DTexture(minimizeTexture);
 
@@ -474,19 +559,15 @@ namespace AbyssCore{
         else
             controlShader->SetFloat4(uniformName, disabled.r, disabled.g, disabled.b, disabled.a);
 
-        GLBindVertices(GLCreateRectArray(rects[1], control), 4, globalVAO, globalVBO);
+        GLCreateVertexObjects(GLCreateRectArray(rects[1], control), 4, globalVAO, globalVBO);
+        
+        GLBindVertexArray(globalVAO);
         glDrawArrays(GL_QUADS, 0, 4);
-        GLUnbindVertices(globalVAO, globalVBO);
 
         colorShader->Use();
 
-        GLBindVertices(GLCreateRectArray(rects[0], border), 4, globalVAO, globalVBO);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
-        GLUnbindVertices(globalVAO, globalVBO);
-
-        GLBindVertices(GLCreateRectArray(rects[1], border), 4, globalVAO, globalVBO);
-        glDrawArrays(GL_LINE_LOOP, 0, 4);
-        GLUnbindVertices(globalVAO, globalVBO);
+        GLDestroyVertexObjects(globalVAO, globalVBO);
 
         if(!w->IsMinimized() && w->CanResize()){
             controlShader->Use();
@@ -495,9 +576,10 @@ namespace AbyssCore{
 
             GLBind2DTexture(resizeTexture);
 
-            GLBindVertices(GLCreateRectArray(resRect, control), 4, globalVAO, globalVBO);
+            GLCreateVertexObjects(GLCreateRectArray(resRect, control), 4, globalVAO, globalVBO);
+            GLBindVertexArray(globalVAO);
             glDrawArrays(GL_QUADS, 0, 4);
-            GLUnbindVertices(globalVAO, globalVBO);
+            GLDestroyVertexObjects(globalVAO, globalVBO);
         }
     }
 

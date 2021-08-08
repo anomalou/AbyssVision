@@ -6,8 +6,8 @@
 #include <thread>
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <SDL_image.h>
 #include <GL/glu.h>
-#include <SDL_ttf.h>
 #include <windowsgroup.h>
 #include <systemgroup.h>
 #include <window.h>
@@ -42,12 +42,11 @@ namespace AbyssCore{
             static unsigned int minimizeTexture;
             static unsigned int resizeTexture;
 
-            static unsigned int windowfb;
-            static unsigned int widgetfb;
-            static unsigned int windowTex;
-            static unsigned int widgetTex;
-            static unsigned int windowStencil;
-            static unsigned int widgetStencil;
+            static unsigned int framebuffer;
+            static unsigned int framebufferTexture;
+
+        public:
+            static unsigned int ozzen;
 
         private:
             static bool CreateSDLWindow();
@@ -70,6 +69,9 @@ namespace AbyssCore{
 
             static void Input();
             static void Render();
+
+            static void CreateFramebuffer();
+            static SDL_Surface* LoadImage(const char* name);
 
         public:
             static bool Init();

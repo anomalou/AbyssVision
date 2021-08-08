@@ -6,7 +6,7 @@
 #define RESOLUTION_X 1280
 #define RESOLUTION_Y 720
 
-#define WINDOW_FLAGS SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
+#define WINDOW_FLAGS SDL_WINDOW_OPENGL
 
 namespace AbyssCore{
     extern int screen_width;

@@ -107,6 +107,7 @@ namespace AbyssCore{
     extern PFNGLLINKPROGRAMPROC GLLinkProgram;
     extern PFNGLDELETESHADERPROC GLDeleteShader;
     extern PFNGLUSEPROGRAMPROC GLUseProgram;
+    extern PFNGLUNIFORM1IPROC GLUniform1i;
     extern PFNGLUNIFORM1FPROC GLUniform1f;
     extern PFNGLUNIFORM4FPROC GLUniform4f;
     extern PFNGLGETUNIFORMLOCATIONPROC GLGetUniformLocation;
@@ -120,6 +121,7 @@ namespace AbyssCore{
     extern PFNGLVERTEXATTRIBPOINTERPROC GLVertexAttribPointer;
     extern PFNGLENABLEVERTEXATTRIBARRAYPROC GLEnableVertexAttribArray;
     extern PFNGLGENFRAMEBUFFERSPROC GLGenFramebuffers;
+    extern PFNGLDELETEFRAMEBUFFERSPROC GLDeleteFramebuffers;
     extern PFNGLBINDFRAMEBUFFERPROC GLBindFramebuffer;
     extern PFNGLFRAMEBUFFERTEXTURE2DPROC GLFramebufferTexture2D;
     extern PFNGLGENRENDERBUFFERSPROC GLGenRenderbuffers;
@@ -137,9 +139,9 @@ namespace AbyssCore{
     aFColor GLConvertColor(aColor color);
     Vertex* GLCreateRectArray(SDL_Rect rect, aColor color);
     Vertex* GLCreateLineArray(aPair pairs, aColor color);
-    void GLBindVertices(Vertex* array, int size, unsigned int &VAO, unsigned int &VBO);
-    void GLUnbindVertices(unsigned int VAO, unsigned int VBO);
-    unsigned int GLCreate2DTextureRGB(void* data, int width, int height);
+    void GLCreateVertexObjects(Vertex* array, int size, unsigned int &VAO, unsigned int &VBO);
+    void GLDestroyVertexObjects(unsigned int VAO, unsigned int VBO);
+    unsigned int GLCreate2DTexture(void* data, int width, int height, int colorMode, int filtration);
     void GLBind2DTexture(unsigned int texture);
 
     class Shader{
@@ -156,7 +158,8 @@ namespace AbyssCore{
 
             bool GetError(int proc, Uint32 type);
 
-            void SetFloat4(AString* name, float x, float y, float z, float w);
+            void SetInt1(AString name, int i);
+            void SetFloat4(AString name, float x, float y, float z, float w);
     };
 
     extern Shader* controlShader;

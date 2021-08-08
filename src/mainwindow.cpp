@@ -64,10 +64,35 @@ namespace AbyssCore{
         trackbar->SetPos(10, 10);
         trackbar->SetSize(200, 50);
 
+        trackbar->maxValue = 1;
+        trackbar->maxValue = 100;
+
+        trackbar->SetValue(10);
+
         // AssignWidget(open, new AString("open"));
         // AssignWidget(hide, new AString("hide"));
         // AssignWidget(slide, new AString("move"));
         // AssignWidget(full, new AString("full"));
         AssignWidget(trackbar, new AString("trackbar"));
+    }
+
+    void MainWindow::Paint(Anchor anchor){
+        Window::Paint(anchor);
+
+        float scale = (float)trackbar->GetValue() / 10;
+
+        GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({anchor.x + 10, anchor.y + 70, (int)(200 * scale), (int)(200 * scale)}), aColor({WHITE})), 4, ozzenVAO, ozzenVBO);
+
+        textureShader->Use();
+
+        textureShader->SetInt1(AString("flip"), 1);
+
+        GLBind2DTexture(Application::ozzen);
+
+        GLBindVertexArray(ozzenVAO);
+        glDrawArrays(GL_QUADS, 0, 4);
+
+        GLDestroyVertexObjects(ozzenVAO, ozzenVBO);
+
     }
 }

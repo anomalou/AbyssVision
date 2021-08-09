@@ -9,25 +9,16 @@ namespace AbyssCore{
     SDL_GLContext Application::glContext;
     unsigned int Application::globalVAO;
     unsigned int Application::globalVBO;
-    unsigned int Application::closeTexture;
-    unsigned int Application::minimizeTexture;
-    unsigned int Application::resizeTexture;
     unsigned int Application::framebuffer;
     unsigned int Application::framebufferTexture;
-
-    unsigned int Application::ozzen;
-    double Application::deltaTime;
 
     bool Application::Init(){
         if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
             return false;
 
-        int flags = IMG_INIT_PNG;
-        if(!(IMG_Init(flags) & flags)){
+        if(!(IMG_Init(TEXTURE_FLAGS) & TEXTURE_FLAGS)){
             return false;
         }
-        // if(TTF_Init() != 0)
-        //     return false;
 
         SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -119,13 +110,8 @@ namespace AbyssCore{
 
         isResized = true;
 
-        CreateWindowControlTextures();
+        Resources::LoadBaseTextures();
         CreateFramebuffer();
-
-        //easter egg =)
-        SDL_Surface* img = LoadImage("texture.png");
-
-        ozzen = GLCreate2DTexture(img->pixels, img->w, img->h, GL_RGBA, GL_LINEAR);
 
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClearStencil(0x00);
@@ -151,7 +137,7 @@ namespace AbyssCore{
             LAST = NOW;
             NOW = SDL_GetPerformanceCounter();
 
-            deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
+            Time::deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
             
             glClear(GL_COLOR_BUFFER_BIT);
             glClear(GL_STENCIL_BUFFER_BIT);
@@ -230,9 +216,7 @@ namespace AbyssCore{
             SDL_GL_SwapWindow(window);
         }
 
-        glDeleteTextures(1, &closeTexture);
-        glDeleteTextures(1, &minimizeTexture);
-        glDeleteTextures(1, &resizeTexture);
+        Resources::FreeResources();
 
         GLDeleteFramebuffers(1, &framebuffer);
         glDeleteTextures(1, &framebufferTexture);
@@ -259,21 +243,6 @@ namespace AbyssCore{
             printf("Framebuffer not done!\n");
         
         GLBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-
-    SDL_Surface* Application::LoadImage(const char* name){
-        SDL_Surface* img = IMG_Load(name);
-
-        if(img == NULL){
-            printf("Cant load img!\n");
-            return NULL;
-        }
-
-        
-
-        // img = SDL_ConvertSurface(img, SDL_GetWindowSurface(window)->format, 0);
-
-        return img;
     }
 
     void Application::DrawWindow(Window* w){
@@ -427,16 +396,6 @@ namespace AbyssCore{
         glClear(GL_STENCIL_BUFFER_BIT);
     }
 
-    void Application::CreateWindowControlTextures(){
-        SDL_Surface* close = LoadImage("close.png");
-        SDL_Surface* minimize = LoadImage("minimize.png");
-        SDL_Surface* resize = LoadImage("resize.png");
-
-        closeTexture = GLCreate2DTexture(close->pixels, close->w, close->h, GL_RGB, GL_NEAREST);
-        minimizeTexture = GLCreate2DTexture(minimize->pixels, minimize->w, minimize->h, GL_RGB, GL_LINEAR);
-        resizeTexture = GLCreate2DTexture(resize->pixels, resize->w, resize->h, GL_RGB, GL_NEAREST);
-    }
-
     void Application::DrawWindowControl(Window* w){
         SDL_Rect wRect = w->GetRect();
 
@@ -458,7 +417,7 @@ namespace AbyssCore{
 
         controlShader->Use();
 
-        GLBind2DTexture(closeTexture);
+        GLBind2DTexture(Resources::Get("close").id);
 
         if(w->CanClose())
             controlShader->SetFloat4(uniformName, enabled.r, enabled.g, enabled.b, enabled.a);
@@ -480,7 +439,7 @@ namespace AbyssCore{
 
         controlShader->Use();
 
-        GLBind2DTexture(minimizeTexture);
+        GLBind2DTexture(Resources::Get("minimize").id);
 
         if(w->CanMinimize())
             controlShader->SetFloat4(uniformName, enabled.r, enabled.g, enabled.b, enabled.a);
@@ -502,7 +461,7 @@ namespace AbyssCore{
 
             controlShader->SetFloat4(uniformName, enabled.r, enabled.g, enabled.b, enabled.a);
 
-            GLBind2DTexture(resizeTexture);
+            GLBind2DTexture(Resources::Get("resize").id);
 
             GLCreateVertexObjects(GLCreateRectArray(resRect, control), 4, globalVAO, globalVBO);
             GLBindVertexArray(globalVAO);

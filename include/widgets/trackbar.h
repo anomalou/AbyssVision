@@ -2,6 +2,7 @@
 #define TRACKBAR_H
 
 #include <widget.h>
+#include <timeparams.h>
 #include <math.h>
 
 #define TRACKBAR_WIDTH 10
@@ -13,6 +14,7 @@ namespace AbyssCore{
     class Trackbar : public Widget{
         private:
             int value;
+            double handlePosition;
             State handleState;
 
             bool beginLMove;
@@ -20,6 +22,7 @@ namespace AbyssCore{
         public:
             int minValue;
             int maxValue;
+            double smooth;
 
             Action valueChanged;
 

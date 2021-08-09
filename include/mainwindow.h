@@ -5,6 +5,7 @@
 #include <emptywindow.h>
 #include <widgets/button.h>
 #include <widgets/trackbar.h>
+#include <resources.h>
 
 namespace AbyssCore{
     /**

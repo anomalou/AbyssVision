@@ -5,6 +5,8 @@ namespace AbyssCore{
         minValue = 0;
         maxValue = 10;
         value = 0;
+        handlePosition = 0;
+        smooth = 100;
 
         style.selected = {BLUE};
 
@@ -19,7 +21,14 @@ namespace AbyssCore{
 
         int x_value = step * (value - minValue);
 
-        return x_value;
+        double odds = abs(handlePosition - x_value);
+
+        if(handlePosition > x_value)
+            handlePosition -= odds * Time::deltaTime / smooth;
+        if(handlePosition < x_value)
+            handlePosition += odds * Time::deltaTime / smooth;
+
+        return (int)round(handlePosition);
     }
 
     aRect Trackbar::CalculateHandleRect(){
@@ -90,16 +99,35 @@ namespace AbyssCore{
         aRect rect = CalculateHandleRect();
 
         DrawLine(anchor, aPair({x1, y1, x2, y2}), aColor({BLACK}));
+
+        unsigned int VAO, VBO;
+
+        GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({anchor.x + rect.left, anchor.y + rect.top, TRACKBAR_WIDTH, TRACKBAR_HEIGHT}), style.background), 4, VAO, VBO);
+        GLBindVertexArray(VAO);
+
+        colorShader->Use();
+
+        aFColor selected = GLConvertColor(style.selected);
+        aFColor border = GLConvertColor(style.border);
+
         switch(handleState){
             case Idle:
-                FillRect(anchor, SDL_Rect({rect.left, rect.top, TRACKBAR_WIDTH, TRACKBAR_HEIGHT}), style.background);
+                colorShader->SetInt1(AString("useVertexColor"), 1);
             break;
             case Pressed:
-                FillRect(anchor, SDL_Rect({rect.left, rect.top, TRACKBAR_WIDTH, TRACKBAR_HEIGHT}), style.selected);
+                colorShader->SetInt1(AString("useVertexColor"), 0);
+                colorShader->SetFloat4(AString("color"), selected.r, selected.g, selected.b, selected.a);
             break;
         }
+
+        glDrawArrays(GL_QUADS, 0, 4);
+
+        colorShader->SetInt1(AString("useVertexColor"), 0);
+        colorShader->SetFloat4(AString("color"), border.r, border.g, border.b, border.a);
         
-        DrawRect(anchor, SDL_Rect({rect.left, rect.top, TRACKBAR_WIDTH, TRACKBAR_HEIGHT}), style.border);
+        glDrawArrays(GL_LINE_LOOP, 0, 4);
+
+        GLDestroyVertexObjects(VAO, VBO);
     }
 
     void Trackbar::OnMouseDown(SDL_MouseButtonEvent event){

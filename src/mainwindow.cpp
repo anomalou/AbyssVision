@@ -64,10 +64,10 @@ namespace AbyssCore{
         trackbar->SetPos(10, 10);
         trackbar->SetSize(200, 50);
 
-        trackbar->maxValue = 1;
-        trackbar->maxValue = 100;
+        trackbar->minValue = 1;
+        trackbar->maxValue = 10;
 
-        trackbar->SetValue(10);
+        trackbar->SetValue(1);
 
         // AssignWidget(open, new AString("open"));
         // AssignWidget(hide, new AString("hide"));
@@ -87,9 +87,9 @@ namespace AbyssCore{
         double odds = abs((double)toSize - currentSize);
 
         if(currentSize < toSize)
-            currentSize += (odds * Application::deltaTime / 100);
+            currentSize += (odds * Time::deltaTime / 100);
         else if(currentSize > toSize)
-            currentSize -= (odds * Application::deltaTime / 100);
+            currentSize -= (odds * Time::deltaTime / 100);
 
         GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({anchor.x + 10, anchor.y + 70, (int)(round(currentSize)), (int)(round(currentSize))}), aColor({WHITE})), 4, ozzenVAO, ozzenVBO);
 
@@ -97,7 +97,7 @@ namespace AbyssCore{
 
         textureShader->SetInt1(AString("flip"), 1);
 
-        GLBind2DTexture(Application::ozzen);
+        GLBind2DTexture(Resources::Get("ozzen").id);
 
         GLBindVertexArray(ozzenVAO);
         glDrawArrays(GL_QUADS, 0, 4);

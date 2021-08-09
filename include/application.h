@@ -17,6 +17,8 @@
 #include <wparams.h>
 #include <agl.h>
 #include <aparams.h>
+#include <timeparams.h>
+#include <resources.h>
 
 using namespace std;
 
@@ -38,16 +40,8 @@ namespace AbyssCore{
             static unsigned int globalVAO;
             static unsigned int globalVBO;
 
-            static unsigned int closeTexture;
-            static unsigned int minimizeTexture;
-            static unsigned int resizeTexture;
-
             static unsigned int framebuffer;
             static unsigned int framebufferTexture;
-
-        public:
-            static unsigned int ozzen;
-            static double deltaTime;
 
         private:
             static bool CreateSDLWindow();
@@ -57,7 +51,6 @@ namespace AbyssCore{
 
             static void DrawWindowHead(Window* w);
             static void DrawWindowBody(Window* w);
-            static void CreateWindowControlTextures();
             static void DrawWindowControl(Window* w);
 
             static void ProcessMouse(SDL_Event event);
@@ -72,7 +65,6 @@ namespace AbyssCore{
             static void Render();
 
             static void CreateFramebuffer();
-            static SDL_Surface* LoadImage(const char* name);
 
         public:
             static bool Init();

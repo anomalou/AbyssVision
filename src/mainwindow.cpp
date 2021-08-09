@@ -97,7 +97,7 @@ namespace AbyssCore{
 
         textureShader->SetInt1(AString("flip"), 1);
 
-        GLBind2DTexture(Resources::Get("ozzen").id);
+        GLBind2DTexture(Resources::GetTexture("ozzen").id);
 
         GLBindVertexArray(ozzenVAO);
         glDrawArrays(GL_QUADS, 0, 4);

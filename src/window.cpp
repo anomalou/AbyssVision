@@ -150,6 +150,14 @@ namespace AbyssCore{
         resizeHitBox = {rect.w - CBUTTON_WIDTH, rect.h + HEADER_HEIGHT - CBUTTON_WIDTH, CBUTTON_WIDTH, CBUTTON_WIDTH};
     }
 
+    void Window::OnKeyPressed(SDL_KeyboardEvent event){
+
+    }
+
+    void Window::OnKeyReleased(SDL_KeyboardEvent event){
+
+    }
+
     void Window::OnMouseDown(SDL_MouseButtonEvent event){
         int x = event.x;
         int y = event.y;

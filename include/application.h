@@ -33,8 +33,6 @@ namespace AbyssCore{
 
             static thread* render;
 
-            static bool isResized;
-
             static SDL_GLContext glContext;
 
             static unsigned int globalVAO;
@@ -52,6 +50,8 @@ namespace AbyssCore{
             static void DrawWindowHead(Window* w);
             static void DrawWindowBody(Window* w);
             static void DrawWindowControl(Window* w);
+
+            static void ProcessKey(SDL_Event event);
 
             static void ProcessMouse(SDL_Event event);
             static void OnMouseDown(SDL_MouseButtonEvent event);

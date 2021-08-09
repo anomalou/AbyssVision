@@ -23,8 +23,8 @@ namespace AbyssCore{
 
         public:
             static void LoadBaseTextures();
-            static Texture Load(string path, string name);
-            static Texture Get(string name);
+            static Texture LoadTexture(string path, string name);
+            static Texture GetTexture(string name);
             static void FreeResources();
     };
 }

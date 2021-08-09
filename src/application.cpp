@@ -5,7 +5,6 @@ namespace AbyssCore{
     SDL_Window* Application::window;
     IWindowsGroup* Application::group;
     thread* Application::render;
-    bool Application::isResized;
     SDL_GLContext Application::glContext;
     unsigned int Application::globalVAO;
     unsigned int Application::globalVBO;
@@ -52,6 +51,7 @@ namespace AbyssCore{
             Input();
         }
 
+        Dispose();
     }
 
     void Application::Dispose(){
@@ -70,13 +70,12 @@ namespace AbyssCore{
                 case SDL_QUIT:
                     isRunning = false;
                 break;
-                case SDL_WINDOWEVENT:
-                {
-                    if(event.window.event == SDL_WINDOWEVENT_RESIZED){
-                        SDL_GetWindowSize(window, &screen_width, &screen_height);
-                        isResized = true;
-                    }
-                }
+                // case SDL_WINDOWEVENT:
+                // {
+                //     if(event.window.event == SDL_WINDOWEVENT_RESIZED){
+                //         SDL_GetWindowSize(window, &screen_width, &screen_height);
+                //     }
+                // }
                 break;
                 case SDL_MOUSEBUTTONDOWN:
                 case SDL_MOUSEBUTTONUP:
@@ -85,13 +84,8 @@ namespace AbyssCore{
                     ProcessMouse(event);
                 break;
                 case SDL_KEYDOWN:
-                {
-                    switch(event.key.keysym.scancode){
-                        case SDL_SCANCODE_ESCAPE:
-                            isRunning = false;
-                        break;
-                    }
-                }   
+                case SDL_KEYUP:
+                    ProcessKey(event);
                 break;
             }
         }
@@ -108,8 +102,6 @@ namespace AbyssCore{
             return;
         }
 
-        isResized = true;
-
         Resources::LoadBaseTextures();
         CreateFramebuffer();
 
@@ -119,21 +111,9 @@ namespace AbyssCore{
         Uint64 NOW = SDL_GetPerformanceCounter();
         Uint64 LAST = 0;
 
+        glViewport(0, 0, screen_width, screen_height);
+
         while(isRunning){
-            if(isResized){
-                glViewport(0, 0, screen_width, screen_height);
-                // if(!CreateFrameBuffer(windowfb, windowTex, windowStencil)){
-                //     isRunning = false;
-                //     return;
-                // }
-                // if(!CreateFrameBuffer(widgetfb, widgetTex, widgetStencil)){
-                //     isRunning = false;
-                //     return;
-                // }
-
-                isResized = false;
-            }
-
             LAST = NOW;
             NOW = SDL_GetPerformanceCounter();
 
@@ -417,7 +397,7 @@ namespace AbyssCore{
 
         controlShader->Use();
 
-        GLBind2DTexture(Resources::Get("close").id);
+        GLBind2DTexture(Resources::GetTexture("close").id);
 
         if(w->CanClose())
             controlShader->SetFloat4(uniformName, enabled.r, enabled.g, enabled.b, enabled.a);
@@ -439,7 +419,7 @@ namespace AbyssCore{
 
         controlShader->Use();
 
-        GLBind2DTexture(Resources::Get("minimize").id);
+        GLBind2DTexture(Resources::GetTexture("minimize").id);
 
         if(w->CanMinimize())
             controlShader->SetFloat4(uniformName, enabled.r, enabled.g, enabled.b, enabled.a);
@@ -461,12 +441,24 @@ namespace AbyssCore{
 
             controlShader->SetFloat4(uniformName, enabled.r, enabled.g, enabled.b, enabled.a);
 
-            GLBind2DTexture(Resources::Get("resize").id);
+            GLBind2DTexture(Resources::GetTexture("resize").id);
 
             GLCreateVertexObjects(GLCreateRectArray(resRect, control), 4, globalVAO, globalVBO);
             GLBindVertexArray(globalVAO);
             glDrawArrays(GL_QUADS, 0, 4);
             GLDestroyVertexObjects(globalVAO, globalVBO);
+        }
+    }
+
+    void Application::ProcessKey(SDL_Event event){
+        Window* focus = group->CurrentFocus();
+        if(focus != NULL){
+            if(event.key.state == SDL_PRESSED){
+                focus->OnKeyPressed(event.key);
+            }
+            if(event.key.state == SDL_RELEASED){
+                focus->OnKeyReleased(event.key);
+            }
         }
     }
 

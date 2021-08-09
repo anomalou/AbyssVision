@@ -5,13 +5,13 @@ namespace AbyssCore{
     map<string, Texture*> Resources::textures = map<string, Texture*>();
 
     void Resources::LoadBaseTextures(){
-        Load("ozen.png", "ozzen");
-        Load("close.png", "close");
-        Load("minimize.png", "minimize");
-        Load("resize.png", "resize");
+        LoadTexture("ozen.png", "ozzen");
+        LoadTexture("close.png", "close");
+        LoadTexture("minimize.png", "minimize");
+        LoadTexture("resize.png", "resize");
     }
 
-    Texture Resources::Load(string path, string name){
+    Texture Resources::LoadTexture(string path, string name){
         SDL_Surface* img = IMG_Load(path.c_str());
 
         if(img == NULL){
@@ -25,7 +25,7 @@ namespace AbyssCore{
         strcpy(namePtr, name.c_str());
 
         while(textures.find(name) != textures.end()){
-            strcat(namePtr, "1");
+            strcat(namePtr, "copy");
         }
 
         const char* nameConst = namePtr;
@@ -48,7 +48,7 @@ namespace AbyssCore{
         return *texture;
     }
 
-    Texture Resources::Get(string name){
+    Texture Resources::GetTexture(string name){
         if(textures.find(name) != textures.end())
             return *textures.at(name);
         else

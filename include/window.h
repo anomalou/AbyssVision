@@ -83,6 +83,9 @@ namespace AbyssCore{
             virtual void AllowResize(bool b);
             virtual void AllowMoving(bool m);
 
+            virtual void OnKeyPressed(SDL_KeyboardEvent event);
+            virtual void OnKeyReleased(SDL_KeyboardEvent event);
+
             virtual void OnMouseDown(SDL_MouseButtonEvent event);
             virtual void OnMouseUp(SDL_MouseButtonEvent event);
             virtual void OnMouseMove(SDL_MouseMotionEvent event);

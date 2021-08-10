@@ -42,7 +42,7 @@ namespace AbyssCore{
 
             mw->SetVisible(true);
             group->FocusWindow(mw);
-            group->Create(mw, new AString("Main window"));
+            group->Create(mw, "Main window");
         }
 
         render = new thread(Render);
@@ -262,18 +262,18 @@ namespace AbyssCore{
         Vertex* headRectArray = GLCreateRectArray(rect, aColor({WHITE}));
         GLCreateVertexObjects(headRectArray, 4, globalVAO, globalVBO);
 
-        colorShader->SetInt1(AString("useVertexColor"), 0);
+        colorShader->SetInt1("useVertexColor", 0);
 
         if(group->CurrentFocus() == w)
-            colorShader->SetFloat4(AString("color"), focus.r, focus.g, focus.b, focus.a);
+            colorShader->SetFloat4("color", focus.r, focus.g, focus.b, focus.a);
         else
-            colorShader->SetFloat4(AString("color"), nofocus.r, nofocus.g, nofocus.b, nofocus.a);
+            colorShader->SetFloat4("color", nofocus.r, nofocus.g, nofocus.b, nofocus.a);
 
         GLBindVertexArray(globalVAO);
 
         glDrawArrays(GL_QUADS, 0, 4);
 
-        colorShader->SetFloat4(AString("color"), border.r, border.g, border.b, border.a);
+        colorShader->SetFloat4("color", border.r, border.g, border.b, border.a);
 
         glDrawArrays(GL_LINE_LOOP, 0, 4);
 
@@ -290,7 +290,7 @@ namespace AbyssCore{
 
         colorShader->Use();
 
-        colorShader->SetInt1(AString("useVertexColor"), 0);
+        colorShader->SetInt1("useVertexColor", 0);
 
         GLCreateVertexObjects(GLCreateRectArray(rect, aColor({WHITE})), 4, globalVAO, globalVBO);
 
@@ -301,7 +301,7 @@ namespace AbyssCore{
 
         glStencilFunc(GL_NEVER, 1, 0xFF);
         
-        colorShader->SetFloat4(AString("color"), 1, 1, 1, 1);
+        colorShader->SetFloat4("color", 1, 1, 1, 1);
         GLBindVertexArray(globalVAO);
 
         glDrawArrays(GL_QUADS, 0, 4);
@@ -327,7 +327,7 @@ namespace AbyssCore{
                 GLCreateVertexObjects(GLCreateRectArray(wrect, aColor({WHITE})), 4, wVAO, wVBO);
 
                 colorShader->Use();
-                colorShader->SetInt1(AString("useVertexColor"), 1);
+                colorShader->SetInt1("useVertexColor", 1);
 
                 GLBindVertexArray(wVAO);
 
@@ -353,8 +353,8 @@ namespace AbyssCore{
                 aFColor border = GLConvertColor(wg->style.border);
 
                 colorShader->Use();
-                colorShader->SetInt1(AString("useVertexColor"), 0);
-                colorShader->SetFloat4(AString("color"), border.r, border.g, border.b, border.a);
+                colorShader->SetInt1("useVertexColor", 0);
+                colorShader->SetFloat4("color", border.r, border.g, border.b, border.a);
 
                 GLBindVertexArray(wVAO);
                 glDrawArrays(GL_LINE_LOOP, 0, 4);
@@ -366,8 +366,8 @@ namespace AbyssCore{
         glDisable(GL_STENCIL_TEST);
         glStencilMask(0xFF);
 
-        colorShader->SetInt1(AString("useVertexColor"), 0);
-        colorShader->SetFloat4(AString("color"), border.r, border.g, border.b, border.a);
+        colorShader->SetInt1("useVertexColor", 0);
+        colorShader->SetFloat4("color", border.r, border.g, border.b, border.a);
 
         GLBindVertexArray(globalVAO);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
@@ -393,7 +393,7 @@ namespace AbyssCore{
         aFColor enabled = GLConvertColor(w->style.enabled);
         aFColor disabled = GLConvertColor(w->style.disabled);
 
-        AString uniformName = AString("colorModificator");
+        string uniformName = "colorModificator";
 
         controlShader->Use();
 
@@ -411,8 +411,8 @@ namespace AbyssCore{
 
         colorShader->Use();
 
-        colorShader->SetInt1(AString("useVertexColor"), 0);
-        colorShader->SetFloat4(AString("color"), border.r, border.g, border.b, border.a);
+        colorShader->SetInt1("useVertexColor", 0);
+        colorShader->SetFloat4("color", border.r, border.g, border.b, border.a);
 
         glDrawArrays(GL_LINE_LOOP, 0, 4);
         GLDestroyVertexObjects(globalVAO, globalVBO);

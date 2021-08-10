@@ -2,7 +2,7 @@
 
 namespace AbyssCore{
     Window::Window(){
-        name = new AString();
+        name = "\r";
 
         widgetPull = vector<Widget*>();
 
@@ -39,7 +39,7 @@ namespace AbyssCore{
         return id;
     }
 
-    AString* Window::GetName(){
+    string Window::GetName(){
         return name;
     }
 
@@ -95,7 +95,7 @@ namespace AbyssCore{
         this->id = id;
     }
 
-    void Window::SetName(AString* name){
+    void Window::SetName(string name){
         this->name = name;
     }
 
@@ -349,12 +349,12 @@ namespace AbyssCore{
         return vector<Widget*>(widgetPull);
     }
 
-    bool Window::AssignWidget(Widget* w, AString* byName){
+    bool Window::AssignWidget(Widget* w, string byName){
         if(w == nullptr)
             return false;
 
         for(Widget * w : widgetPull){
-            if(strcmp(w->GetName()->ToChars(), byName->ToChars()) == 0)
+            if(strcmp(w->GetName().c_str(), byName.c_str()) == 0)
                 return false;
         }
 
@@ -375,9 +375,9 @@ namespace AbyssCore{
         return false;
     }
 
-    Widget* Window::Find(AString* byName){
+    Widget* Window::Find(string byName){
         for(Widget* w : widgetPull){
-            if(strcmp(byName->ToChars(), w->GetName()->ToChars()) == 0){
+            if(strcmp(byName.c_str(), w->GetName().c_str()) == 0){
                 return w;
             }
         }

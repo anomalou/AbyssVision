@@ -2,14 +2,14 @@
 
 namespace AbyssCore{
     Widget::Widget(Window* parent){
-        name = new AString();
+        name = "\r";
         style = Style{{LIGHT_GRAY}, {GRAY}, {WHITE}, 0, {WHITE}, {BLACK}, {GRAY}, {WHITE}, {GRAY}, {GRAY}, {WHITE}};
         this->parent = parent;
         isVisible = true;
         isDisabled = false;
     }
 
-    AString* Widget::GetName(){
+    string Widget::GetName(){
         return name;
     }
 
@@ -25,7 +25,7 @@ namespace AbyssCore{
         return isDisabled;
     }
 
-    void Widget::SetName(AString* name){
+    void Widget::SetName(string name){
         this->name = name;
     }
 

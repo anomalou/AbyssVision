@@ -5,20 +5,20 @@ namespace AbyssCore{
     void Open(Widget* sender, ActionEvent event){
         MainWindow* mainWindow = dynamic_cast<MainWindow*>(event.parent);
 
-        if(Application::GetGroup()->Find(new AString("empty")) == nullptr){
+        if(Application::GetGroup()->Find("empty") == nullptr){
             mainWindow->window = new EmptyWindow();
-            Application::GetGroup()->Create(mainWindow->window, new AString("empty"));
+            Application::GetGroup()->Create(mainWindow->window, "empty");
         }
     }
     void Hide(Widget* sender, ActionEvent event){
         MainWindow* mainWindow = dynamic_cast<MainWindow*>(event.parent);
 
-        if(Application::GetGroup()->Find(new AString("empty")) != nullptr)
+        if(Application::GetGroup()->Find("empty") != nullptr)
             mainWindow->window->SetVisible(!mainWindow->window->IsVisible());
     }
 
     void MoveAction(Widget* sender, ActionEvent event){
-        EmptyWindow* empty = dynamic_cast<EmptyWindow*>(Application::GetGroup()->Find(new AString("empty")));
+        EmptyWindow* empty = dynamic_cast<EmptyWindow*>(Application::GetGroup()->Find("empty"));
 
         if(empty != nullptr){
             SDL_Point pos = empty->pos;
@@ -73,7 +73,7 @@ namespace AbyssCore{
         // AssignWidget(hide, new AString("hide"));
         // AssignWidget(slide, new AString("move"));
         // AssignWidget(full, new AString("full"));
-        AssignWidget(trackbar, new AString("trackbar"));
+        AssignWidget(trackbar, "trackbar");
 
         currentSize = 200;
     }
@@ -95,7 +95,7 @@ namespace AbyssCore{
 
         textureShader->Use();
 
-        textureShader->SetInt1(AString("flip"), 1);
+        textureShader->SetInt1("flip", 1);
 
         GLBind2DTexture(Resources::GetTexture("ozzen").id);
 

@@ -11,7 +11,7 @@
 #include <string>
 #include <sstream>
 #include <aparams.h>
-#include <astring.h>
+#include <string>
 
 #define VSHADER 0
 #define FSHADER 1
@@ -154,12 +154,12 @@ namespace AbyssCore{
         public:
             void Use();
 
-            void Load(AString* vpath, AString* fpath);
+            void Load(string vpath, string fpath);
 
             bool GetError(int proc, Uint32 type);
 
-            void SetInt1(AString name, int i);
-            void SetFloat4(AString name, float x, float y, float z, float w);
+            void SetInt1(string name, int i);
+            void SetFloat4(string name, float x, float y, float z, float w);
     };
 
     extern Shader* controlShader;

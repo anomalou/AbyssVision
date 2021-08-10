@@ -84,13 +84,13 @@ namespace AbyssCore{
 #endif
 
         controlShader = new Shader();
-        controlShader->Load(new AString("shaders/controlVertex.glsl"), new AString("shaders/controlFragment.glsl"));
+        controlShader->Load("shaders/controlVertex.glsl", "shaders/controlFragment.glsl");
 
         textureShader = new Shader();
-        textureShader->Load(new AString("shaders/textureVertex.glsl"), new AString("shaders/textureFragment.glsl"));
+        textureShader->Load("shaders/textureVertex.glsl", "shaders/textureFragment.glsl");
 
         colorShader = new Shader();
-        colorShader->Load(new AString("shaders/colorVertex.glsl"), new AString("shaders/colorFragment.glsl"));
+        colorShader->Load("shaders/colorVertex.glsl", "shaders/colorFragment.glsl");
 
         SDL_GL_SetSwapInterval(1);
 
@@ -271,16 +271,13 @@ namespace AbyssCore{
         GLUseProgram(ID);
     }
 
-    void Shader::Load(AString* vpath, AString* fpath){
+    void Shader::Load(string vpath, string fpath){
         
-        ifstream vfile(vpath->ToChars(), ios::binary);
-        ifstream ffile(fpath->ToChars(), ios::binary);
+        ifstream vfile(vpath, ios::binary);
+        ifstream ffile(fpath, ios::binary);
 
         if(!vfile.is_open() || !ffile.is_open())
             return;
-
-        delete vpath;
-        delete fpath;
 
         stringstream vss;
         stringstream fss;
@@ -365,11 +362,11 @@ namespace AbyssCore{
         return true;
     }
 
-    void Shader::SetInt1(AString name, int i){
-        GLUniform1i(GLGetUniformLocation(ID, name.ToChars()), i);
+    void Shader::SetInt1(string name, int i){
+        GLUniform1i(GLGetUniformLocation(ID, name.c_str()), i);
     }
 
-    void Shader::SetFloat4(AString name, float x, float y, float z, float w){
-        GLUniform4f(GLGetUniformLocation(ID, name.ToChars()), x, y, z, w);
+    void Shader::SetFloat4(string name, float x, float y, float z, float w){
+        GLUniform4f(GLGetUniformLocation(ID, name.c_str()), x, y, z, w);
     }
 }

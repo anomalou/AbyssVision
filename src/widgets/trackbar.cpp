@@ -112,18 +112,18 @@ namespace AbyssCore{
 
         switch(handleState){
             case Idle:
-                colorShader->SetInt1(AString("useVertexColor"), 1);
+                colorShader->SetInt1("useVertexColor", 1);
             break;
             case Pressed:
-                colorShader->SetInt1(AString("useVertexColor"), 0);
-                colorShader->SetFloat4(AString("color"), selected.r, selected.g, selected.b, selected.a);
+                colorShader->SetInt1("useVertexColor", 0);
+                colorShader->SetFloat4("color", selected.r, selected.g, selected.b, selected.a);
             break;
         }
 
         glDrawArrays(GL_QUADS, 0, 4);
 
-        colorShader->SetInt1(AString("useVertexColor"), 0);
-        colorShader->SetFloat4(AString("color"), border.r, border.g, border.b, border.a);
+        colorShader->SetInt1("useVertexColor", 0);
+        colorShader->SetFloat4("color", border.r, border.g, border.b, border.a);
         
         glDrawArrays(GL_LINE_LOOP, 0, 4);
 

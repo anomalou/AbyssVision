@@ -37,12 +37,12 @@ namespace AbyssCore{
         return invertPull;
     }
 
-    bool SystemGroup::Create(Window* window, AString* byName){
+    bool SystemGroup::Create(Window* window, string byName){
         if(window == nullptr)
             return false;
 
         for(Window* w : windowsPull){
-            if(strcmp(byName->ToChars(), w->GetName()->ToChars()) == 0)
+            if(strcmp(byName.c_str(), w->GetName().c_str()) == 0)
                 return false;
         }
 
@@ -62,9 +62,9 @@ namespace AbyssCore{
         return false;
     }
 
-    Window* SystemGroup::Find(AString* byName){
+    Window* SystemGroup::Find(string byName){
         for(Window* w : windowsPull){
-            if(strcmp(w->GetName()->ToChars(), byName->ToChars()) == 0){
+            if(strcmp(w->GetName().c_str(), byName.c_str()) == 0){
                 return w;
             }
         }

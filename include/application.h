@@ -12,7 +12,6 @@
 #include <systemgroup.h>
 #include <window.h>
 #include <mainwindow.h>
-#include <astring.h>
 #include <colors.h>
 #include <wparams.h>
 #include <agl.h>

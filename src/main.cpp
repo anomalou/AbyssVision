@@ -29,16 +29,16 @@ int main(int argc, char* args[]){
 
     Application::Init();
 
-    Application::GetGroup()->Create(mw, new AString("main window"));
-    Application::GetGroup()->Create(ew1, new AString("empty window 1"));
-    Application::GetGroup()->Create(ew2, new AString("empty window 2"));
-    Application::GetGroup()->Create(ew3, new AString("empty window 3"));
-    Application::GetGroup()->Create(ew4, new AString("empty window 4"));
-    Application::GetGroup()->Create(ew5, new AString("empty window 5"));
-    Application::GetGroup()->Create(ew6, new AString("empty window 6"));
-    Application::GetGroup()->Create(ew7, new AString("empty window 7"));
-    Application::GetGroup()->Create(ew8, new AString("empty window 8"));
-    Application::GetGroup()->Create(ew9, new AString("empty window 9"));
+    Application::GetGroup()->Create(mw, "main window");
+    Application::GetGroup()->Create(ew1, "empty window 1");
+    Application::GetGroup()->Create(ew2, "empty window 2");
+    Application::GetGroup()->Create(ew3, "empty window 3");
+    Application::GetGroup()->Create(ew4, "empty window 4");
+    Application::GetGroup()->Create(ew5, "empty window 5");
+    Application::GetGroup()->Create(ew6, "empty window 6");
+    Application::GetGroup()->Create(ew7, "empty window 7");
+    Application::GetGroup()->Create(ew8, "empty window 8");
+    Application::GetGroup()->Create(ew9, "empty window 9");
 
     Application::Start();
 

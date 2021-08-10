@@ -4,7 +4,6 @@
 #include <SDL.h>
 #include <simplegl.h>
 #include <wparams.h>
-#include <astring.h>
 #include <colors.h>
 #include <widget.h>
 #include <style.h>
@@ -34,7 +33,7 @@ namespace AbyssCore{
 
         protected:
             int id;
-            AString* name;
+            string name;
             SDL_Rect rect;
             bool isVisible;
             bool isMinimized;
@@ -56,7 +55,7 @@ namespace AbyssCore{
             Window();
 
             virtual int GetID();
-            virtual AString* GetName();
+            virtual string GetName();
             virtual SDL_Rect GetRect();
             virtual bool IsVisible();
             virtual bool IsMinimized();
@@ -71,7 +70,7 @@ namespace AbyssCore{
             virtual bool NeedDestroy();
 
             virtual void SetID(int id);
-            virtual void SetName(AString* name);
+            virtual void SetName(string name);
             virtual void SetPos(int x, int y);
             virtual void SetSize(int w, int h);
             virtual void SetRect(SDL_Rect rect);
@@ -98,9 +97,9 @@ namespace AbyssCore{
             virtual void Paint(Anchor anchor);
 
             virtual vector<Widget*> GetPull();
-            virtual bool AssignWidget(Widget* w, AString* byName);
+            virtual bool AssignWidget(Widget* w, string byName);
             virtual bool DestroyWidget(Widget* w);
-            virtual Widget* Find(AString* byName);
+            virtual Widget* Find(string byName);
 
         protected:
             virtual void CalculateControlHitBox();

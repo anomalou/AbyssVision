@@ -104,5 +104,18 @@ namespace AbyssCore{
 
         GLDestroyVertexObjects(ozzenVAO, ozzenVBO);
 
+        Texture text = Resources::CreateStringTexture("==, !=, ..., >=, <=, ->", "firacode15");
+
+        unsigned int VAO, VBO;
+
+        GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({anchor.x + 300, anchor.y + 10, text.width, text.height}), aColor({WHITE})), 4, VAO, VBO);
+
+        GLBindVertexArray(VAO);
+
+        GLBind2DTexture(text.id);
+
+        glDrawArrays(GL_QUADS, 0 ,4);
+
+        GLDestroyVertexObjects(VAO, VBO);
     }
 }

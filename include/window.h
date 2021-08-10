@@ -32,8 +32,8 @@ namespace AbyssCore{
             
 
         protected:
-            int id;
             string name;
+            string title;
             SDL_Rect rect;
             bool isVisible;
             bool isMinimized;
@@ -54,8 +54,8 @@ namespace AbyssCore{
         public:
             Window();
 
-            virtual int GetID();
             virtual string GetName();
+            virtual string GetTitle();
             virtual SDL_Rect GetRect();
             virtual bool IsVisible();
             virtual bool IsMinimized();
@@ -69,8 +69,8 @@ namespace AbyssCore{
             virtual SDL_Rect GetResizeHitBox();
             virtual bool NeedDestroy();
 
-            virtual void SetID(int id);
             virtual void SetName(string name);
+            virtual void SetTitle(string title);
             virtual void SetPos(int x, int y);
             virtual void SetSize(int w, int h);
             virtual void SetRect(SDL_Rect rect);

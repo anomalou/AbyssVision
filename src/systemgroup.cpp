@@ -5,16 +5,6 @@ namespace AbyssCore{
         windowsPull = list<Window*>();
     }
 
-    int SystemGroup::FreeID(){
-        int max = START_ID;
-        for(Window* w : windowsPull){
-            if(w->GetID() > max)
-                max = w->GetID();
-        }
-
-        return max;
-    }
-
     vector<Window*> SystemGroup::GetPull(){
         vector<Window*> pull = vector<Window*>();
 
@@ -65,16 +55,6 @@ namespace AbyssCore{
     Window* SystemGroup::Find(string byName){
         for(Window* w : windowsPull){
             if(strcmp(w->GetName().c_str(), byName.c_str()) == 0){
-                return w;
-            }
-        }
-
-        return NULL;
-    }
-
-    Window* SystemGroup::Find(int byID){
-        for(Window* w : windowsPull){
-            if(w->GetID() == byID){
                 return w;
             }
         }

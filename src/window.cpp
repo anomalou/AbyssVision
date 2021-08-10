@@ -35,12 +35,12 @@ namespace AbyssCore{
         
     }
 
-    int Window::GetID(){
-        return id;
-    }
-
     string Window::GetName(){
         return name;
+    }
+
+    string Window::GetTitle(){
+        return title;
     }
 
     SDL_Rect Window::GetRect(){
@@ -91,12 +91,12 @@ namespace AbyssCore{
         return needDestroy;
     }
 
-    void Window::SetID(int id){
-        this->id = id;
-    }
-
     void Window::SetName(string name){
         this->name = name;
+    }
+
+    void Window::SetTitle(string title){
+        this->title = title;
     }
 
     void Window::SetPos(int x, int y){

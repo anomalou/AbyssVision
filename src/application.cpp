@@ -15,6 +15,9 @@ namespace AbyssCore{
         if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
             return false;
 
+        if(TTF_Init() != 0)
+            return false;
+
         if(!(IMG_Init(TEXTURE_FLAGS) & TEXTURE_FLAGS)){
             return false;
         }
@@ -103,6 +106,7 @@ namespace AbyssCore{
         }
 
         Resources::LoadBaseTextures();
+        Resources::LoadBaseFonts();
         CreateFramebuffer();
 
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -272,6 +276,27 @@ namespace AbyssCore{
         GLBindVertexArray(globalVAO);
 
         glDrawArrays(GL_QUADS, 0, 4);
+
+        unsigned int textVAO, textVBO;
+
+        Texture text = Resources::CreateStringTexture(w->GetTitle(), "arial15", 50);
+
+        GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({rect.x + 10, rect.y, text.width, text.height}), aColor({WHITE})), 4, textVAO, textVBO);
+
+        GLBind2DTexture(text.id);
+
+        GLBindVertexArray(textVAO);
+
+        textureShader->Use();
+        textureShader->SetInt1("flip", 1);
+
+        glDrawArrays(GL_QUADS, 0, 4);
+
+        GLDestroyVertexObjects(textVAO, textVBO);
+
+        GLBindVertexArray(globalVAO);
+
+        colorShader->Use();
 
         colorShader->SetFloat4("color", border.r, border.g, border.b, border.a);
 

@@ -11,6 +11,8 @@
 #include <string>
 #include <sstream>
 #include <aparams.h>
+#include <structs.h>
+#include <resources.h>
 #include <string>
 
 #define VSHADER 0
@@ -22,74 +24,6 @@
 using namespace std;
 
 namespace AbyssCore{
-
-    typedef struct{
-        int left;
-        int right;
-        int top;
-        int bottom;
-    }aRect;
-
-    typedef struct{
-        float left;
-        float right;
-        float top;
-        float bottom;
-    }aFRect;
-
-    typedef struct{
-        int x1;
-        int y1;
-        int x2;
-        int y2;
-    }aPair;
-
-    typedef struct{
-        int x;
-        int y;
-    }aPoint;
-
-    typedef struct{
-        int x;
-        int y;
-        int z;
-    }aPoint3;
-
-    typedef struct{
-        float x;
-        float y;
-    }aFPoint;
-
-    typedef struct{
-        float x;
-        float y;
-        float z;
-    }aFPoint3;
-
-    typedef struct{
-        int width;
-        int height;
-    }aSize;
-
-    typedef struct{
-        BYTE r;
-        BYTE g;
-        BYTE b;
-        BYTE a;
-    }aColor;
-
-    typedef struct{
-        float r;
-        float g;
-        float b;
-        float a;
-    }aFColor;
-
-    typedef struct{
-        aFPoint3 pos;
-        aFColor color;
-        aFPoint texPos;
-    }Vertex;
 
     // typedef struct{
     //     int size;
@@ -118,6 +52,7 @@ namespace AbyssCore{
     extern PFNGLBINDVERTEXARRAYPROC GLBindVertexArray;
     extern PFNGLBINDBUFFERPROC GLBindBuffer;
     extern PFNGLBUFFERDATAPROC GLBufferData;
+    extern PFNGLBUFFERSUBDATAPROC GLBufferSubData;
     extern PFNGLVERTEXATTRIBPOINTERPROC GLVertexAttribPointer;
     extern PFNGLENABLEVERTEXATTRIBARRAYPROC GLEnableVertexAttribArray;
     extern PFNGLGENFRAMEBUFFERSPROC GLGenFramebuffers;
@@ -135,14 +70,17 @@ namespace AbyssCore{
 
     bool GLGetError();
 
-    aFPoint3 GLScreenToNormal(aPoint3 pos);
+    aFPoint3 GLPixelsToNormal(aPoint3 coord, int w, int h);
+    aFPoint3 GLScreenToNormal(aPoint3 coord);
     aFColor GLConvertColor(aColor color);
     Vertex* GLCreateRectArray(SDL_Rect rect, aColor color);
     Vertex* GLCreateLineArray(aPair pairs, aColor color);
+    float* GLVAtoFA(Vertex* array, int size);
     void GLCreateVertexObjects(Vertex* array, int size, unsigned int &VAO, unsigned int &VBO);
     void GLDestroyVertexObjects(unsigned int VAO, unsigned int VBO);
     unsigned int GLCreate2DTexture(void* data, int width, int height, int colorMode, int filtration);
     void GLBind2DTexture(unsigned int texture);
+    void GLRenderText(string str, string font, aPoint pos, int maxWidth = screen_width);
 
     class Shader{
         private:

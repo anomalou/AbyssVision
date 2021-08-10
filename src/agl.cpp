@@ -25,6 +25,7 @@ namespace AbyssCore{
     PFNGLBINDVERTEXARRAYPROC GLBindVertexArray;
     PFNGLBINDBUFFERPROC GLBindBuffer;
     PFNGLBUFFERDATAPROC GLBufferData;
+    PFNGLBUFFERSUBDATAPROC GLBufferSubData;
     PFNGLVERTEXATTRIBPOINTERPROC GLVertexAttribPointer;
     PFNGLENABLEVERTEXATTRIBARRAYPROC GLEnableVertexAttribArray;
     PFNGLGENFRAMEBUFFERSPROC GLGenFramebuffers;
@@ -69,6 +70,7 @@ namespace AbyssCore{
         GLBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)wglGetProcAddress("glBindVertexArray");
         GLBindBuffer = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer");
         GLBufferData = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData");
+        GLBufferSubData = (PFNGLBUFFERSUBDATAPROC)wglGetProcAddress("glBufferSubData");
         GLVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer");
         GLEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glEnableVertexAttribArray");
         GLGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)wglGetProcAddress("glGenFramebuffers");
@@ -127,17 +129,21 @@ namespace AbyssCore{
         return false;
     }
 
-    aFPoint3 GLScreenToNormal(aPoint3 pos){
-        float x_mid = screen_width / 2;
-        float y_mid = screen_height / 2;
+    aFPoint3 GLPixelsToNormal(aPoint3 coord, int w, int h){
+        float x_mid = w / 2;
+        float y_mid = h / 2;
 
-        float x = (-(x_mid - pos.x)) / x_mid;
+        float x = (-(x_mid - coord.x)) / x_mid;
         // float r = -(x_mid - (rect.x + rect.w)) / x_mid;
-        float y = (y_mid - pos.y) / y_mid;
+        float y = (y_mid - coord.y) / y_mid;
         // float b = (y_mid - (rect.y + rect.h)) / y_mid;
-        float z = (float)pos.z;
+        float z = (float)coord.z;
 
         return aFPoint3({x, y, z});
+    }
+
+    aFPoint3 GLScreenToNormal(aPoint3 coord){
+        return GLPixelsToNormal(coord, screen_width, screen_height);
     }
 
     aFColor GLConvertColor(aColor color){
@@ -184,6 +190,24 @@ namespace AbyssCore{
         return vertices;
     }
 
+    float* GLVAtoFA(Vertex* array, int size){
+        float* fvertices = (float*)malloc(sizeof(float) * size * VERTEX_PARAMS);
+
+        for(int i = 0; i < size; i++){
+            fvertices[i * VERTEX_PARAMS + 0] = array[i].pos.x;
+            fvertices[i * VERTEX_PARAMS + 1] = array[i].pos.y;
+            fvertices[i * VERTEX_PARAMS + 2] = array[i].pos.z;
+            fvertices[i * VERTEX_PARAMS + 3] = array[i].color.r;
+            fvertices[i * VERTEX_PARAMS + 4] = array[i].color.g;
+            fvertices[i * VERTEX_PARAMS + 5] = array[i].color.b;
+            fvertices[i * VERTEX_PARAMS + 6] = array[i].color.a;
+            fvertices[i * VERTEX_PARAMS + 7] = array[i].texPos.x;
+            fvertices[i * VERTEX_PARAMS + 8] = array[i].texPos.y;
+        }
+        
+        return fvertices;
+    }
+
     void GLCreateVertexObjects(Vertex* vertices, int size, unsigned int &VAO, unsigned int &VBO){
         GLGenVertexArrays(1, &VAO);
         GLGenBuffers(1, &VBO);
@@ -191,32 +215,7 @@ namespace AbyssCore{
         GLBindVertexArray(VAO);
         GLBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-        float* fvertices = (float*)malloc(sizeof(float) * size * VERTEX_PARAMS);
-
-        for(int i = 0; i < size; i++){
-            fvertices[i * VERTEX_PARAMS + 0] = vertices[i].pos.x;
-            fvertices[i * VERTEX_PARAMS + 1] = vertices[i].pos.y;
-            fvertices[i * VERTEX_PARAMS + 2] = vertices[i].pos.z;
-            fvertices[i * VERTEX_PARAMS + 3] = vertices[i].color.r;
-            fvertices[i * VERTEX_PARAMS + 4] = vertices[i].color.g;
-            fvertices[i * VERTEX_PARAMS + 5] = vertices[i].color.b;
-            fvertices[i * VERTEX_PARAMS + 6] = vertices[i].color.a;
-            fvertices[i * VERTEX_PARAMS + 7] = vertices[i].texPos.x;
-            fvertices[i * VERTEX_PARAMS + 8] = vertices[i].texPos.y;
-            // aPoint globPos = {arrayPtr[i].pos.x + array.x, arrayPtr[i].pos.y + array.y};
-
-            // aFPoint normalCoord = GLConvertToNormal(globPos);
-            // aFColor normalColor = GLConvertColor(arrayPtr[i].color);
-
-            // vertices[0 + i * 8] = normalCoord.x;
-            // vertices[1 + i * 8] = normalCoord.y;
-            // vertices[2 + i * 8] = arrayPtr->texPos.x;
-            // vertices[3 + i * 8] = arrayPtr->texPos.y;
-            // vertices[4 + i * 8] = normalColor.r;
-            // vertices[5 + i * 8] = normalColor.g;
-            // vertices[6 + i * 8] = normalColor.b;
-            // vertices[7 + i * 8] = normalColor.a;
-        }
+        float* fvertices = GLVAtoFA(vertices, size);
 
         GLBufferData(GL_ARRAY_BUFFER, sizeof(float) * size * VERTEX_PARAMS, fvertices, GL_STATIC_DRAW);
 
@@ -235,10 +234,6 @@ namespace AbyssCore{
         GLBindVertexArray(0);
         GLBindBuffer(GL_ARRAY_BUFFER, 0);
     }
-
-    // void GLDrawVertices(GLenum mode, int vnumber){
-    //     glDrawArrays(mode, 0, vnumber);
-    // }
 
     void GLDestroyVertexObjects(unsigned int VAO, unsigned int VBO){
         GLBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -268,6 +263,73 @@ namespace AbyssCore{
     void GLBind2DTexture(unsigned int texture){
         glBindTexture(GL_TEXTURE_2D, texture);
     }
+
+    void GLRenderText(string str, string font, aPoint pos, int maxWidth){
+        Font fontObj = Resources::GetFont(font);
+
+        aFPoint3 nstart = GLScreenToNormal(aPoint3({pos.x, pos.y, 0}));
+
+        unsigned int dVAO, dVBO;
+
+        GLGenVertexArrays(1, &dVAO);
+        GLGenBuffers(1, &dVBO);
+        GLBindVertexArray(dVAO);
+        GLBindBuffer(GL_ARRAY_BUFFER, dVBO);
+
+        GLBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * VERTEX_PARAMS, NULL, GL_DYNAMIC_DRAW);
+
+        GLVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)0);
+        GLEnableVertexAttribArray(0);
+
+        GLVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(3 * sizeof(float)));
+        GLEnableVertexAttribArray(1);
+
+        GLVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(7 * sizeof(float)));
+        GLEnableVertexAttribArray(2);
+
+        GLBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        aFColor black = {0, 0, 0, 1};
+
+        GLBind2DTexture(fontObj.gliphsTexture);
+
+        textureShader->Use();
+        textureShader->SetInt1("flip", 1);
+
+        for(int i = 0; i < str.length(); i++){
+            char c = str[i];
+            if(fontObj.gliphs.find(c) == fontObj.gliphs.end()){
+                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error with text!", "Foundned unsupported simbols in text!", NULL);
+                return;
+            }
+            Gliph *gliph = fontObj.gliphs.at(c);
+            // gliph->texCoord.
+
+            int width = gliph->maxx - gliph->minx;
+            int height = gliph->maxy - gliph->miny;
+
+            aFPoint3 nlu = GLScreenToNormal(aPoint3({pos.x + gliph->minx, pos.y - gliph->maxy, 0}));
+            aFPoint3 nrb = GLScreenToNormal(aPoint3({pos.x + gliph->advance, pos.y - gliph->miny, 0}));
+
+            Vertex* gliphVertices = (Vertex*)malloc(sizeof(Vertex) * 4);
+            gliphVertices[0] = {{nlu.x, nrb.y, 0}, black, {gliph->texRect.left, gliph->texRect.bottom}};
+            gliphVertices[1] = {{nlu.x, nlu.y, 0}, black, {gliph->texRect.left, gliph->texRect.top}};
+            gliphVertices[2] = {{nrb.x, nlu.y, 0}, black, {gliph->texRect.right, gliph->texRect.top}};
+            gliphVertices[3] = {{nrb.x, nrb.y, 0}, black, {gliph->texRect.right, gliph->texRect.bottom}};
+
+            GLBindBuffer(GL_ARRAY_BUFFER, dVBO);
+            GLBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * 4, GLVAtoFA(gliphVertices, 4));
+            GLBindBuffer(GL_ARRAY_BUFFER, 0);
+
+            glDrawArrays(GL_QUADS, 0, 4);
+
+            pos.x += gliph->advance;
+        }
+
+        // 
+        // gliphVertices[0] = {{}}
+
+    }   
 
     Shader::Shader(){
         

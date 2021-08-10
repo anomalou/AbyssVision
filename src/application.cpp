@@ -279,20 +279,20 @@ namespace AbyssCore{
 
         unsigned int textVAO, textVBO;
 
-        Texture text = Resources::CreateStringTexture(w->GetTitle(), "arial15", 200);
+        // Texture text = Resources::CreateStringTexture(w->GetTitle(), "arial15", 200);
 
-        GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({rect.x + 10, rect.y + 10, text.width, text.height}), aColor({WHITE})), 4, textVAO, textVBO);
+        // GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({rect.x + 10, rect.y + 10, text.width, text.height}), aColor({WHITE})), 4, textVAO, textVBO);
 
-        GLBind2DTexture(text.id);
+        // GLBind2DTexture(text.id);
 
-        GLBindVertexArray(textVAO);
+        // GLBindVertexArray(textVAO);
 
-        textureShader->Use();
-        textureShader->SetInt1("flip", 1);
+        // textureShader->Use();
+        // textureShader->SetInt1("flip", 1);
 
-        glDrawArrays(GL_QUADS, 0, 4);
+        // glDrawArrays(GL_QUADS, 0, 4);
 
-        GLDestroyVertexObjects(textVAO, textVBO);
+        // GLDestroyVertexObjects(textVAO, textVBO);
 
         GLBindVertexArray(globalVAO);
 

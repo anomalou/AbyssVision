@@ -77,7 +77,51 @@ namespace AbyssCore{
 
         const char* nameConst = namePtr;
 
-        Font* font = new Font({sfont, psize});
+        Font* font = new Font();
+        font->font = sfont;
+        font->psize = psize;
+        SDL_Surface *gliphSurface = TTF_RenderText_Blended(sfont, GLIPHS, SDL_Color({0, 0, 0, 255}));
+        font->gliphsTexture = GLCreate2DTexture(gliphSurface->pixels, gliphSurface->w, gliphSurface->h, GL_RGBA, GL_LINEAR);
+
+        if(font->gliphsTexture == 0){
+            SDL_ShowSimpleMessageBox(SDL_MessageBoxFlags::SDL_MESSAGEBOX_ERROR, "Error with font initialization!", name.c_str(), NULL);
+            return;
+        }
+
+        int offset = 0;
+
+        int min = 0;
+
+        for(int i = 0; i < 96; i++){
+            char c = GLIPHS[i];
+
+            Gliph* gliph = new Gliph();
+
+            TTF_GlyphMetrics(sfont, c, &gliph->minx, &gliph->maxx, &gliph->miny, &gliph->maxy, &gliph->advance);
+
+            if(gliph->miny < min)
+                min = gliph->miny;
+
+            float a = (float)(offset + gliph->minx) / (float)gliphSurface->w;
+            float b = (float)(offset + gliph->advance) / (float)gliphSurface->w;
+
+            offset += gliph->advance;
+
+            gliph->texRect = {a, b, 0, 0};
+
+            font->gliphs.insert({c, gliph});
+        }
+
+        min = abs(min);
+
+        for(int i = 0; i < 96; i++){
+            char c = GLIPHS[i];
+            Gliph *gliph = font->gliphs.at(c);
+            gliph->texRect.bottom = (float)(min + gliph->miny) / (float)(psize);
+            gliph->texRect.top = (float)(min + gliph->maxy) / (float)(psize);
+        }
+
+        SDL_FreeSurface(gliphSurface);
 
         fonts.insert({nameConst, font});
     }
@@ -86,8 +130,17 @@ namespace AbyssCore{
         if(textures.find(name) != textures.end())
             return *textures.at(name);
         else{
-            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Cant load texture!", name.c_str(), NULL);
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Cant get texture!", name.c_str(), NULL);
             return {0, 0, 0, 0};
+        }
+    }
+
+    Font Resources::GetFont(string name){
+        if(fonts.find(name) != fonts.end())
+            return *fonts.at(name);
+        else{
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Cant get font!", name.c_str(), NULL);
+            return {};
         }
     }
 

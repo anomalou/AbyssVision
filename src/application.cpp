@@ -279,9 +279,9 @@ namespace AbyssCore{
 
         unsigned int textVAO, textVBO;
 
-        Texture text = Resources::CreateStringTexture(w->GetTitle(), "arial15", 50);
+        Texture text = Resources::CreateStringTexture(w->GetTitle(), "arial15", 200);
 
-        GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({rect.x + 10, rect.y, text.width, text.height}), aColor({WHITE})), 4, textVAO, textVBO);
+        GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({rect.x + 10, rect.y + 10, text.width, text.height}), aColor({WHITE})), 4, textVAO, textVBO);
 
         GLBind2DTexture(text.id);
 

@@ -3,6 +3,7 @@
 namespace AbyssCore{
     Window::Window(){
         name = "\r";
+        title = "\r";
 
         widgetPull = vector<Widget*>();
 

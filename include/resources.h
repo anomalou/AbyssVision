@@ -36,7 +36,7 @@ namespace AbyssCore{
             static Texture LoadTexture(string path, string name);
             static void LoadFont(string path, string name, int psize);
             static Texture GetTexture(string name);
-            static Texture CreateStringTexture(string str, string font, int maxChars = 256, int maxLines = 1);
+            static Texture CreateStringTexture(string str, string font, int maxChars = screen_width, int maxLines = 1);
             static void FreeResources();
     };
 }

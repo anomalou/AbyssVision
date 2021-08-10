@@ -26,10 +26,10 @@ int main(int argc, char* args[]){
     // mw->AllowClose(false);
     // mw->AllowMinimize(false);
     mw->SetSize(RESOLUTION_X - 100, RESOLUTION_Y - 100);
+    mw->SetTitle("Main menu");
 
     Application::Init();
 
-    Application::GetGroup()->Create(mw, "main window");
     Application::GetGroup()->Create(ew1, "empty window 1");
     Application::GetGroup()->Create(ew2, "empty window 2");
     Application::GetGroup()->Create(ew3, "empty window 3");
@@ -39,6 +39,8 @@ int main(int argc, char* args[]){
     Application::GetGroup()->Create(ew7, "empty window 7");
     Application::GetGroup()->Create(ew8, "empty window 8");
     Application::GetGroup()->Create(ew9, "empty window 9");
+
+    Application::GetGroup()->Create(mw, "main window");
 
     Application::Start();
 

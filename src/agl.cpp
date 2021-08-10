@@ -229,6 +229,9 @@ namespace AbyssCore{
         GLVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(7 * sizeof(float)));
         GLEnableVertexAttribArray(2);
 
+        delete vertices;
+        delete fvertices;
+
         GLBindVertexArray(0);
         GLBindBuffer(GL_ARRAY_BUFFER, 0);
     }

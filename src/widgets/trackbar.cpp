@@ -103,7 +103,7 @@ namespace AbyssCore{
         unsigned int VAO, VBO;
 
         GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({anchor.x + rect.left, anchor.y + rect.top, TRACKBAR_WIDTH, TRACKBAR_HEIGHT}), style.background), 4, VAO, VBO);
-        GLBindVertexArray(VAO);
+        glBindVertexArray(VAO);
 
         colorShader->Use();
 

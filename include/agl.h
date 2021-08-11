@@ -30,41 +30,45 @@ namespace AbyssCore{
     //     Vertex* vertices;
     // }VertexArray;
 
-    extern PFNGLCREATESHADERPROC GLCreateShader;
-    extern PFNGLCREATEPROGRAMPROC GLCreateProgram;
-    extern PFNGLSHADERSOURCEPROC GLShaderSource;
-    extern PFNGLCOMPILESHADERPROC GLCompileShader;
-    extern PFNGLGETSHADERIVPROC GLGetShaderiv;
-    extern PFNGLGETPROGRAMIVPROC GLGetProgramiv;
-    extern PFNGLGETSHADERINFOLOGPROC GLGetShaderInfoLog;
-    extern PFNGLATTACHSHADERPROC GLAttachShader;
-    extern PFNGLLINKPROGRAMPROC GLLinkProgram;
-    extern PFNGLDELETESHADERPROC GLDeleteShader;
-    extern PFNGLUSEPROGRAMPROC GLUseProgram;
-    extern PFNGLUNIFORM1IPROC GLUniform1i;
-    extern PFNGLUNIFORM1FPROC GLUniform1f;
-    extern PFNGLUNIFORM4FPROC GLUniform4f;
-    extern PFNGLGETUNIFORMLOCATIONPROC GLGetUniformLocation;
-    extern PFNGLGENVERTEXARRAYSPROC GLGenVertexArrays;
-    extern PFNGLDELETEVERTEXARRAYSPROC GLDeleteVertexArrays;
-    extern PFNGLGENBUFFERSPROC GLGenBuffers;
-    extern PFNGLDELETEBUFFERSPROC GLDeleteBuffers;
-    extern PFNGLBINDVERTEXARRAYPROC GLBindVertexArray;
-    extern PFNGLBINDBUFFERPROC GLBindBuffer;
-    extern PFNGLBUFFERDATAPROC GLBufferData;
-    extern PFNGLBUFFERSUBDATAPROC GLBufferSubData;
-    extern PFNGLVERTEXATTRIBPOINTERPROC GLVertexAttribPointer;
-    extern PFNGLENABLEVERTEXATTRIBARRAYPROC GLEnableVertexAttribArray;
-    extern PFNGLGENFRAMEBUFFERSPROC GLGenFramebuffers;
-    extern PFNGLDELETEFRAMEBUFFERSPROC GLDeleteFramebuffers;
-    extern PFNGLBINDFRAMEBUFFERPROC GLBindFramebuffer;
-    extern PFNGLFRAMEBUFFERTEXTURE2DPROC GLFramebufferTexture2D;
-    extern PFNGLGENRENDERBUFFERSPROC GLGenRenderbuffers;
-    extern PFNGLBINDRENDERBUFFERPROC GLBindRenderbuffer;
-    extern PFNGLRENDERBUFFERSTORAGEPROC GLRenderbufferStorage;
-    extern PFNGLFRAMEBUFFERRENDERBUFFERPROC GLFramebufferRenderbuffer;
-    extern PFNGLCHECKFRAMEBUFFERSTATUSPROC GLCheckFramebufferStatus;
-    extern PFNGLGENERATEMIPMAPPROC GLGenerateMipmap;
+    extern PFNGLCREATESHADERPROC glCreateShader;
+    extern PFNGLCREATEPROGRAMPROC glCreateProgram;
+    extern PFNGLSHADERSOURCEPROC glShaderSource;
+    extern PFNGLCOMPILESHADERPROC glCompileShader;
+    extern PFNGLGETSHADERIVPROC glGetShaderiv;
+    extern PFNGLGETPROGRAMIVPROC glGetProgramiv;
+    extern PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
+    extern PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
+    extern PFNGLATTACHSHADERPROC glAttachShader;
+    extern PFNGLLINKPROGRAMPROC glLinkProgram;
+    extern PFNGLDELETESHADERPROC glDeleteShader;
+    extern PFNGLUSEPROGRAMPROC glUseProgram;
+    extern PFNGLPROGRAMUNIFORM1IPROC glProgramUniform1i;
+    extern PFNGLPROGRAMUNIFORM4IPROC glProgramUniform4i;
+    extern PFNGLPROGRAMUNIFORM4FPROC glProgramUniform4f;
+    extern PFNGLUNIFORM1IPROC glUniform1i;
+    extern PFNGLUNIFORM1FPROC glUniform1f;
+    extern PFNGLUNIFORM4FPROC glUniform4f;
+    extern PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
+    extern PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
+    extern PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
+    extern PFNGLGENBUFFERSPROC glGenBuffers;
+    extern PFNGLDELETEBUFFERSPROC glDeleteBuffers;
+    extern PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
+    extern PFNGLBINDBUFFERPROC glBindBuffer;
+    extern PFNGLBUFFERDATAPROC glBufferData;
+    extern PFNGLBUFFERSUBDATAPROC glBufferSubData;
+    extern PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
+    extern PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
+    extern PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
+    extern PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
+    extern PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
+    extern PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
+    extern PFNGLGENRENDERBUFFERSPROC glGenRenderbuffers;
+    extern PFNGLBINDRENDERBUFFERPROC glBindRenderbuffer;
+    extern PFNGLRENDERBUFFERSTORAGEPROC glRenderbufferStorage;
+    extern PFNGLFRAMEBUFFERRENDERBUFFERPROC glFramebufferRenderbuffer;
+    extern PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
+    extern PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
 
     bool GLInit(SDL_GLContext& context, SDL_Window* window);
 
@@ -81,6 +85,30 @@ namespace AbyssCore{
     unsigned int GLCreate2DTexture(void* data, int width, int height, int colorMode, int filtration);
     void GLBind2DTexture(unsigned int texture);
     void GLRenderText(string str, string font, aPoint pos, int maxWidth = screen_width);
+
+    class OpenGL{
+        private:
+            static unsigned int currentVAO;
+            static unsigned int currentVBO;
+            static unsigned int current2DTexture;
+            static unsigned int currentProgram;
+
+        public:
+            static void GetError();
+            static aFPoint PixelsToNormal(aPoint coord, int w, int h);
+            static aFPoint TexelsToNormal(aPoint coord, int w, int h);
+            static aFColor NormilizeColor(aColor color);
+            static void GenArrayBuffer(unsigned int &name, GLenum mode, GLsizeiptr size, void* data = NULL);
+            static void GenVertexArray(unsigned int &name);
+            static void Bind2DTexture(unsigned int name);
+            static void BindVAO(unsigned int name);
+            static void BindVBO(unsigned int name);
+            static void UseProgram(unsigned int name);
+            static void UseProgram(string name);
+            static void Set1i(string name, int x);
+            static void Set4i(string name, int x, int y, int z, int w);
+            static void Set4f(string name, float x, float y, float z, float w);
+    };
 
     class Shader{
         private:

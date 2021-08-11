@@ -83,30 +83,30 @@ namespace AbyssCore{
 
         Clear(anchor, aColor({RED}));
 
-        float scale = (float)trackbar->GetValue() / 10;
-        int toSize = scale * 200;
+        // float scale = (float)trackbar->GetValue() / 10;
+        // int toSize = scale * 200;
 
-        double odds = abs((double)toSize - currentSize);
+        // double odds = abs((double)toSize - currentSize);
 
-        if(currentSize < toSize)
-            currentSize += (odds * Time::deltaTime / 100);
-        else if(currentSize > toSize)
-            currentSize -= (odds * Time::deltaTime / 100);
+        // if(currentSize < toSize)
+        //     currentSize += (odds * Time::deltaTime / 100);
+        // else if(currentSize > toSize)
+        //     currentSize -= (odds * Time::deltaTime / 100);
 
-        GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({anchor.x + 10, anchor.y + 70, (int)(round(currentSize)), (int)(round(currentSize))}), aColor({WHITE})), 4, ozzenVAO, ozzenVBO);
+        // GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({anchor.x + 10, anchor.y + 70, (int)(round(currentSize)), (int)(round(currentSize))}), aColor({WHITE})), 4, ozzenVAO, ozzenVBO);
 
-        textureShader->Use();
+        // textureShader->Use();
 
-        textureShader->SetInt1("flip", 1);
+        // textureShader->SetInt1("flip", 1);
 
-        GLBind2DTexture(Resources::GetTexture("ozzen").id);
+        // GLBind2DTexture(Resources::GetTexture("ozzen").id);
 
-        GLBindVertexArray(ozzenVAO);
-        glDrawArrays(GL_QUADS, 0, 4);
+        // glBindVertexArray(ozzenVAO);
+        // glDrawArrays(GL_QUADS, 0, 4);
 
-        GLDestroyVertexObjects(ozzenVAO, ozzenVBO);
+        // GLDestroyVertexObjects(ozzenVAO, ozzenVBO);
 
-        GLRenderText("To start game tou should press play button", "arial15", aPoint({anchor.x + 300, anchor.y + 30}));
+        // GLRenderText("To start game tou should press play button", "arial15", aPoint({anchor.x + 300, anchor.y + 30}));
 
         // Texture text = Resources::CreateStringTexture("Hellog world!!!", "arial30");
 

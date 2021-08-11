@@ -34,8 +34,11 @@ namespace AbyssCore{
 
             static SDL_GLContext glContext;
 
-            static unsigned int globalVAO;
-            static unsigned int globalVBO;
+            static unsigned int windowVAO;
+            static unsigned int windowVBO;
+
+            static unsigned int widgetVAO;
+            static unsigned int widgetVBO;
 
             static unsigned int framebuffer;
             static unsigned int framebufferTexture;

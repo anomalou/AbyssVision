@@ -14,7 +14,7 @@ namespace AbyssCore{
         colorShader->SetInt1("useVertexColor", 1);
 
         GLCreateVertexObjects(GLCreateLineArray(globRect, color), 2, VAO, VBO);
-        GLBindVertexArray(VAO);
+        glBindVertexArray(VAO);
         glDrawArrays(GL_LINE_STRIP, 0, 2);
         GLDestroyVertexObjects(VAO, VBO);
     }
@@ -28,7 +28,7 @@ namespace AbyssCore{
         colorShader->SetInt1("useVertexColor", 1);
 
         GLCreateVertexObjects(GLCreateRectArray(globRect, color), 4, VAO, VBO);
-        GLBindVertexArray(VAO);
+        glBindVertexArray(VAO);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
         GLDestroyVertexObjects(VAO, VBO);
     }
@@ -42,7 +42,7 @@ namespace AbyssCore{
         colorShader->SetInt1("useVertexColor", 1);
 
         GLCreateVertexObjects(GLCreateRectArray(globRect, color), 4, VAO, VBO);
-        GLBindVertexArray(VAO);
+        glBindVertexArray(VAO);
         glDrawArrays(GL_QUADS, 0, 4);
         GLDestroyVertexObjects(VAO, VBO);
     }

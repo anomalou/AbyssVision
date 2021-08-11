@@ -4,19 +4,56 @@ namespace AbyssCore{
 
     map<string, Texture*> Resources::textures = map<string, Texture*>();
     map<string, Font*> Resources::fonts = map<string, Font*>();
+    map<string, unsigned int> Resources::shaders = map<string, unsigned int>();
 
     map<string, Texture*> Resources::textCache = map<string, Texture*>();
 
-    void Resources::LoadBaseTextures(){
+    bool Resources::GetShaderError(unsigned int id, int type){
+        int success;
+        char infoLog[512];
+
+        switch(type){
+            case PROGRAM:
+                glGetProgramiv(id, GL_LINK_STATUS, &success);
+            break;
+            case VSHADER:
+            case FSHADER:
+                glGetShaderiv(id, GL_COMPILE_STATUS, &success);
+            break;
+        }
+
+        if(!success){
+            switch(type){
+                case PROGRAM:
+                    glGetProgramInfoLog(id, 512, NULL, infoLog);
+                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Shader linking error!", infoLog, NULL);
+                break;
+                case VSHADER:
+                    glGetShaderInfoLog(id, 512, NULL, infoLog);
+                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Vertex compiling error!", infoLog, NULL);
+                break;
+                case FSHADER:
+                    glGetShaderInfoLog(id, 512, NULL, infoLog);
+                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fragment compiling error!", infoLog, NULL);
+                break;
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    void Resources::LoadBaseResources(){
         LoadTexture("ozen.png", "ozzen");
         LoadTexture("close.png", "close");
         LoadTexture("minimize.png", "minimize");
         LoadTexture("resize.png", "resize");
-    }
 
-    void Resources::LoadBaseFonts(){
         LoadFont("arial.ttf", "arial15", 15);
         LoadFont("firacode.ttf", "firacode15", 15);
+
+        LoadShader("shaders/interfacev.glsl", "shaders/interfacef.glsl", "interface");
     }
 
     Texture Resources::LoadTexture(string path, string name){
@@ -126,6 +163,64 @@ namespace AbyssCore{
         fonts.insert({nameConst, font});
     }
 
+    void Resources::LoadShader(string vpath, string fpath, string name){
+        unsigned int id;
+
+        ifstream vfile(vpath, ios::binary);
+        ifstream ffile(fpath, ios::binary);
+
+        if(!vfile.is_open() || !ffile.is_open())
+            return;
+
+        stringstream vss;
+        stringstream fss;
+
+        vss << vfile.rdbuf();
+        fss << ffile.rdbuf();
+
+        string vs = vss.str();
+        string fs = fss.str();
+
+        vfile.close();
+        ffile.close();
+
+        const char* vShaderCode = vs.c_str();
+        const char* fShaderCode = fs.c_str();
+
+        unsigned int vertex, fragment;
+        int success;
+        char info[512];
+
+        vertex = glCreateShader(GL_VERTEX_SHADER);
+
+        glShaderSource(vertex, 1, &vShaderCode, NULL);
+
+        glCompileShader(vertex);
+
+        if(!GetShaderError(vertex, VSHADER))
+            return;
+
+        fragment = glCreateShader(GL_FRAGMENT_SHADER);
+
+        glShaderSource(fragment, 1, &fShaderCode, NULL);
+
+        glCompileShader(fragment);
+
+        if(!GetShaderError(fragment, FSHADER))
+            return;
+
+        id = glCreateProgram();
+        glAttachShader(id, vertex);
+        glAttachShader(id, fragment);
+        glLinkProgram(id);
+
+        GetShaderError(id, PROGRAM);
+        glDeleteShader(vertex);
+        glDeleteShader(fragment);
+
+        shaders.insert({name, id});
+    }
+
     Texture Resources::GetTexture(string name){
         if(textures.find(name) != textures.end())
             return *textures.at(name);
@@ -142,6 +237,16 @@ namespace AbyssCore{
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Cant get font!", name.c_str(), NULL);
             return {};
         }
+    }
+
+    unsigned int Resources::GetShader(string name){
+        if(shaders.find(name) != shaders.end()){
+            return shaders.at(name);
+        }
+
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Shader not founded!", name.c_str(), NULL);
+
+        return 0;
     }
 
     Texture Resources::CreateStringTexture(string str, string font, int maxChars, int maxLines){

@@ -17,16 +17,21 @@ namespace AbyssCore{
         private:
             static map<string, Texture*> textures;
             static map<string, Font*> fonts;
+            static map<string, unsigned int> shaders;
             
             static map<string, Texture*> textCache;
 
+        private:
+            static bool GetShaderError(unsigned int id, int type);
+
         public:
-            static void LoadBaseTextures();
-            static void LoadBaseFonts();
+            static void LoadBaseResources();
             static Texture LoadTexture(string path, string name);
             static void LoadFont(string path, string name, int psize);
+            static void LoadShader(string vpath, string fpath, string name);
             static Texture GetTexture(string name);
             static Font GetFont(string name);
+            static unsigned int GetShader(string name);
             /**
              * \brief Depricated
              */

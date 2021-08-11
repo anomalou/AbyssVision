@@ -2,42 +2,45 @@
 
 namespace AbyssCore{
 
-    PFNGLCREATESHADERPROC GLCreateShader;
-    PFNGLCREATEPROGRAMPROC GLCreateProgram;
-    PFNGLSHADERSOURCEPROC GLShaderSource;
-    PFNGLCOMPILESHADERPROC GLCompileShader;
-    PFNGLGETSHADERIVPROC GLGetShaderiv;
-    PFNGLGETPROGRAMIVPROC GLGetProgramiv;
-    PFNGLGETSHADERINFOLOGPROC GLGetShaderInfoLog;
-    PFNGLGETPROGRAMINFOLOGPROC GLGetProgramInfoLog;
-    PFNGLATTACHSHADERPROC GLAttachShader;
-    PFNGLLINKPROGRAMPROC GLLinkProgram;
-    PFNGLDELETESHADERPROC GLDeleteShader;
-    PFNGLUSEPROGRAMPROC GLUseProgram;
-    PFNGLUNIFORM1IPROC GLUniform1i;
-    PFNGLUNIFORM1FPROC GLUniform1f;
-    PFNGLUNIFORM4FPROC GLUniform4f;
-    PFNGLGETUNIFORMLOCATIONPROC GLGetUniformLocation;
-    PFNGLGENVERTEXARRAYSPROC GLGenVertexArrays;
-    PFNGLDELETEVERTEXARRAYSPROC GLDeleteVertexArrays;
-    PFNGLGENBUFFERSPROC GLGenBuffers;
-    PFNGLDELETEBUFFERSPROC GLDeleteBuffers;
-    PFNGLBINDVERTEXARRAYPROC GLBindVertexArray;
-    PFNGLBINDBUFFERPROC GLBindBuffer;
-    PFNGLBUFFERDATAPROC GLBufferData;
-    PFNGLBUFFERSUBDATAPROC GLBufferSubData;
-    PFNGLVERTEXATTRIBPOINTERPROC GLVertexAttribPointer;
-    PFNGLENABLEVERTEXATTRIBARRAYPROC GLEnableVertexAttribArray;
-    PFNGLGENFRAMEBUFFERSPROC GLGenFramebuffers;
-    PFNGLDELETEFRAMEBUFFERSPROC GLDeleteFramebuffers;
-    PFNGLBINDFRAMEBUFFERPROC GLBindFramebuffer;
-    PFNGLFRAMEBUFFERTEXTURE2DPROC GLFramebufferTexture2D;
-    PFNGLGENRENDERBUFFERSPROC GLGenRenderbuffers;
-    PFNGLBINDRENDERBUFFERPROC GLBindRenderbuffer;
-    PFNGLRENDERBUFFERSTORAGEPROC GLRenderbufferStorage;
-    PFNGLFRAMEBUFFERRENDERBUFFERPROC GLFramebufferRenderbuffer;
-    PFNGLCHECKFRAMEBUFFERSTATUSPROC GLCheckFramebufferStatus;
-    PFNGLGENERATEMIPMAPPROC GLGenerateMipmap;
+    PFNGLCREATESHADERPROC glCreateShader;
+    PFNGLCREATEPROGRAMPROC glCreateProgram;
+    PFNGLSHADERSOURCEPROC glShaderSource;
+    PFNGLCOMPILESHADERPROC glCompileShader;
+    PFNGLGETSHADERIVPROC glGetShaderiv;
+    PFNGLGETPROGRAMIVPROC glGetProgramiv;
+    PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
+    PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
+    PFNGLATTACHSHADERPROC glAttachShader;
+    PFNGLLINKPROGRAMPROC glLinkProgram;
+    PFNGLDELETESHADERPROC glDeleteShader;
+    PFNGLUSEPROGRAMPROC glUseProgram;
+    PFNGLPROGRAMUNIFORM1IPROC glProgramUniform1i;
+    PFNGLPROGRAMUNIFORM4IPROC glProgramUniform4i;
+    PFNGLPROGRAMUNIFORM4FPROC glProgramUniform4f;
+    PFNGLUNIFORM1IPROC glUniform1i;
+    PFNGLUNIFORM1FPROC glUniform1f;
+    PFNGLUNIFORM4FPROC glUniform4f;
+    PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
+    PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
+    PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
+    PFNGLGENBUFFERSPROC glGenBuffers;
+    PFNGLDELETEBUFFERSPROC glDeleteBuffers;
+    PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
+    PFNGLBINDBUFFERPROC glBindBuffer;
+    PFNGLBUFFERDATAPROC glBufferData;
+    PFNGLBUFFERSUBDATAPROC glBufferSubData;
+    PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
+    PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
+    PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
+    PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
+    PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
+    PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
+    PFNGLGENRENDERBUFFERSPROC glGenRenderbuffers;
+    PFNGLBINDRENDERBUFFERPROC glBindRenderbuffer;
+    PFNGLRENDERBUFFERSTORAGEPROC glRenderbufferStorage;
+    PFNGLFRAMEBUFFERRENDERBUFFERPROC glFramebufferRenderbuffer;
+    PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
+    PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
 
     Shader* controlShader;
     Shader* textureShader; 
@@ -47,42 +50,45 @@ namespace AbyssCore{
         context = SDL_GL_CreateContext(window);
 
 #ifdef WINDOWS
-        GLCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader");
-        GLCreateProgram = (PFNGLCREATEPROGRAMPROC)wglGetProcAddress("glCreateProgram");
-        GLShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource");
-        GLCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader");
-        GLGetShaderiv = (PFNGLGETSHADERIVPROC)wglGetProcAddress("glGetShaderiv");
-        GLGetProgramiv = (PFNGLGETPROGRAMIVPROC)wglGetProcAddress("glGetProgramiv");
-        GLGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)wglGetProcAddress("glGetShaderInfoLog");
-        GLGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)wglGetProcAddress("glGetProgramInfoLog");
-        GLAttachShader = (PFNGLATTACHSHADERPROC)wglGetProcAddress("glAttachShader");
-        GLLinkProgram = (PFNGLLINKPROGRAMPROC)wglGetProcAddress("glLinkProgram");
-        GLDeleteShader = (PFNGLDELETESHADERPROC)wglGetProcAddress("glDeleteShader");
-        GLUseProgram = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram");
-        GLUniform1i = (PFNGLUNIFORM1IPROC)wglGetProcAddress("glUniform1i");
-        GLUniform1f = (PFNGLUNIFORM1FPROC)wglGetProcAddress("glUniform1f");
-        GLUniform4f = (PFNGLUNIFORM4FPROC)wglGetProcAddress("glUniform4f");
-        GLGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation");
-        GLGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)wglGetProcAddress("glGenVertexArrays");
-        GLDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)wglGetProcAddress("glDeleteVertexArrays");
-        GLGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers");
-        GLDeleteBuffers = (PFNGLDELETEBUFFERSPROC)wglGetProcAddress("glDeleteBuffers");
-        GLBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)wglGetProcAddress("glBindVertexArray");
-        GLBindBuffer = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer");
-        GLBufferData = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData");
-        GLBufferSubData = (PFNGLBUFFERSUBDATAPROC)wglGetProcAddress("glBufferSubData");
-        GLVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer");
-        GLEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glEnableVertexAttribArray");
-        GLGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)wglGetProcAddress("glGenFramebuffers");
-        GLDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSPROC)wglGetProcAddress("glDeleteFramebuffers");
-        GLBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)wglGetProcAddress("glBindFramebuffer");
-        GLFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)wglGetProcAddress("glFramebufferTexture2D");
-        GLGenRenderbuffers = (PFNGLGENRENDERBUFFERSPROC)wglGetProcAddress("glGenRenderbuffers");
-        GLBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)wglGetProcAddress("glBindRenderbuffer");
-        GLRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)wglGetProcAddress("glRenderbufferStorage");
-        GLFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)wglGetProcAddress("glFramebufferRenderbuffer");
-        GLCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)wglGetProcAddress("glCheckFramebufferStatus");
-        GLGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)wglGetProcAddress("glGenerateMipmap");
+        glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader");
+        glCreateProgram = (PFNGLCREATEPROGRAMPROC)wglGetProcAddress("glCreateProgram");
+        glShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource");
+        glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader");
+        glGetShaderiv = (PFNGLGETSHADERIVPROC)wglGetProcAddress("glGetShaderiv");
+        glGetProgramiv = (PFNGLGETPROGRAMIVPROC)wglGetProcAddress("glGetProgramiv");
+        glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)wglGetProcAddress("glGetShaderInfoLog");
+        glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)wglGetProcAddress("glGetProgramInfoLog");
+        glAttachShader = (PFNGLATTACHSHADERPROC)wglGetProcAddress("glAttachShader");
+        glLinkProgram = (PFNGLLINKPROGRAMPROC)wglGetProcAddress("glLinkProgram");
+        glDeleteShader = (PFNGLDELETESHADERPROC)wglGetProcAddress("glDeleteShader");
+        glUseProgram = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram");
+        glProgramUniform1i = (PFNGLPROGRAMUNIFORM1IPROC)wglGetProcAddress("glProgramUniform1i");
+        glProgramUniform4i = (PFNGLPROGRAMUNIFORM4IPROC)wglGetProcAddress("glProgramUniform4i");
+        glProgramUniform4f = (PFNGLPROGRAMUNIFORM4FPROC)wglGetProcAddress("glProgramUniform4f");
+        glUniform1i = (PFNGLUNIFORM1IPROC)wglGetProcAddress("glUniform1i");
+        glUniform1f = (PFNGLUNIFORM1FPROC)wglGetProcAddress("glUniform1f");
+        glUniform4f = (PFNGLUNIFORM4FPROC)wglGetProcAddress("glUniform4f");
+        glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation");
+        glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)wglGetProcAddress("glGenVertexArrays");
+        glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)wglGetProcAddress("glDeleteVertexArrays");
+        glGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers");
+        glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)wglGetProcAddress("glDeleteBuffers");
+        glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)wglGetProcAddress("glBindVertexArray");
+        glBindBuffer = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer");
+        glBufferData = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData");
+        glBufferSubData = (PFNGLBUFFERSUBDATAPROC)wglGetProcAddress("glBufferSubData");
+        glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer");
+        glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glEnableVertexAttribArray");
+        glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)wglGetProcAddress("glGenFramebuffers");
+        glDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSPROC)wglGetProcAddress("glDeleteFramebuffers");
+        glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)wglGetProcAddress("glBindFramebuffer");
+        glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)wglGetProcAddress("glFramebufferTexture2D");
+        glGenRenderbuffers = (PFNGLGENRENDERBUFFERSPROC)wglGetProcAddress("glGenRenderbuffers");
+        glBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)wglGetProcAddress("glBindRenderbuffer");
+        glRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)wglGetProcAddress("glRenderbufferStorage");
+        glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)wglGetProcAddress("glFramebufferRenderbuffer");
+        glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)wglGetProcAddress("glCheckFramebufferStatus");
+        glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)wglGetProcAddress("glGenerateMipmap");
 #endif
 
         controlShader = new Shader();
@@ -106,27 +112,20 @@ namespace AbyssCore{
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
-        if(GLGetError())
-            return false;
+        // if(GLGetError())
+        //     return false;
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
-        if(GLGetError())
-            return false;
+        // if(GLGetError())
+        //     return false;
 
         return true;
     }
 
     bool GLGetError(){
-        auto error = GL_NO_ERROR;
-        error = glGetError();
-        if(error != GL_NO_ERROR){
-            printf("Error! %s\n", gluErrorString(error));
-            return true;
-        }
-
-        return false;
+        
     }
 
     aFPoint3 GLPixelsToNormal(aPoint3 coord, int w, int h){
@@ -209,38 +208,38 @@ namespace AbyssCore{
     }
 
     void GLCreateVertexObjects(Vertex* vertices, int size, unsigned int &VAO, unsigned int &VBO){
-        GLGenVertexArrays(1, &VAO);
-        GLGenBuffers(1, &VBO);
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
 
-        GLBindVertexArray(VAO);
-        GLBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBindVertexArray(VAO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
         float* fvertices = GLVAtoFA(vertices, size);
 
-        GLBufferData(GL_ARRAY_BUFFER, sizeof(float) * size * VERTEX_PARAMS, fvertices, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * size * VERTEX_PARAMS, fvertices, GL_STATIC_DRAW);
 
-        GLVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)0);
-        GLEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
 
-        GLVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(3 * sizeof(float)));
-        GLEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
 
-        GLVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(7 * sizeof(float)));
-        GLEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(7 * sizeof(float)));
+        glEnableVertexAttribArray(2);
 
         delete vertices;
         delete fvertices;
 
-        GLBindVertexArray(0);
-        GLBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     void GLDestroyVertexObjects(unsigned int VAO, unsigned int VBO){
-        GLBindBuffer(GL_ARRAY_BUFFER, 0);
-        GLBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
 
-        GLDeleteVertexArrays(1, &VAO);
-        GLDeleteBuffers(1, &VBO);
+        glDeleteVertexArrays(1, &VAO);
+        glDeleteBuffers(1, &VBO);
     }
 
     unsigned int GLCreate2DTexture(void* data, int width, int height, int colorMode, int filtration){
@@ -253,7 +252,7 @@ namespace AbyssCore{
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtration);
 
         glTexImage2D(GL_TEXTURE_2D, 0, colorMode, width, height, 0, colorMode, GL_UNSIGNED_BYTE, data);
-        GLGenerateMipmap(GL_TEXTURE_2D);
+        glGenerateMipmap(GL_TEXTURE_2D);
 
         glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -271,23 +270,23 @@ namespace AbyssCore{
 
         unsigned int dVAO, dVBO;
 
-        GLGenVertexArrays(1, &dVAO);
-        GLGenBuffers(1, &dVBO);
-        GLBindVertexArray(dVAO);
-        GLBindBuffer(GL_ARRAY_BUFFER, dVBO);
+        glGenVertexArrays(1, &dVAO);
+        glGenBuffers(1, &dVBO);
+        glBindVertexArray(dVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, dVBO);
 
-        GLBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * VERTEX_PARAMS, NULL, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * VERTEX_PARAMS, NULL, GL_DYNAMIC_DRAW);
 
-        GLVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)0);
-        GLEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
 
-        GLVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(3 * sizeof(float)));
-        GLEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
 
-        GLVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(7 * sizeof(float)));
-        GLEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(7 * sizeof(float)));
+        glEnableVertexAttribArray(2);
 
-        GLBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         aFColor black = {0, 0, 0, 1};
 
@@ -317,9 +316,9 @@ namespace AbyssCore{
             gliphVertices[2] = {{nrb.x, nlu.y, 0}, black, {gliph->texRect.right, gliph->texRect.top}};
             gliphVertices[3] = {{nrb.x, nrb.y, 0}, black, {gliph->texRect.right, gliph->texRect.bottom}};
 
-            GLBindBuffer(GL_ARRAY_BUFFER, dVBO);
-            GLBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * 4, GLVAtoFA(gliphVertices, 4));
-            GLBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ARRAY_BUFFER, dVBO);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * 4, GLVAtoFA(gliphVertices, 4));
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
 
             glDrawArrays(GL_QUADS, 0, 4);
 
@@ -329,14 +328,113 @@ namespace AbyssCore{
         // 
         // gliphVertices[0] = {{}}
 
+    }
+
+    unsigned int OpenGL::currentVAO = 0;
+    unsigned int OpenGL::currentVBO = 0;
+    unsigned int OpenGL::current2DTexture = 0;
+    unsigned int OpenGL::currentProgram = 0;
+
+    void OpenGL::GetError(){
+        auto error = GL_NO_ERROR;
+        error = glGetError();
+        if(error != GL_NO_ERROR){
+            printf("Error! %s\n", gluErrorString(error));
+        }
+    }
+
+    aFPoint OpenGL::PixelsToNormal(aPoint coord, int w, int h){
+        float x_mid = w / 2;
+        float y_mid = h / 2;
+
+        float x = (-(x_mid - coord.x)) / x_mid;
+        // float r = -(x_mid - (rect.x + rect.w)) / x_mid;
+        float y = (y_mid - coord.y) / y_mid;
+        // float b = (y_mid - (rect.y + rect.h)) / y_mid;
+
+        return aFPoint({x, y});
+    }
+
+    aFPoint OpenGL::TexelsToNormal(aPoint coord, int w, int h){
+        
+    }
+
+    aFColor OpenGL::NormilizeColor(aColor color){
+        float r = (float)color.r / (float)255;
+        float g = (float)color.g / (float)255;
+        float b = (float)color.b / (float)255;
+        float a = (float)color.a / (float)255;
+
+        return aFColor({r, g, b, a});
+    }
+
+    void OpenGL::GenArrayBuffer(unsigned int &name, GLenum mode, GLsizeiptr size, void* data){
+        glGenBuffers(1, &name);
+        BindVBO(name);
+        glBufferData(GL_ARRAY_BUFFER, size, data, mode);
+        BindVBO(0);
     }   
+
+    void OpenGL::GenVertexArray(unsigned int &name){
+        glGenVertexArrays(1, &name);
+    }
+
+    void OpenGL::Bind2DTexture(unsigned int name){
+        if(current2DTexture != name){
+            glBindTexture(GL_TEXTURE_2D, name);
+            current2DTexture = name;
+        }
+    }
+
+    void OpenGL::BindVAO(unsigned int name){
+        if(currentVAO != name){
+            glBindVertexArray(name);
+            currentVAO = name;
+        }
+    }
+
+    void OpenGL::BindVBO(unsigned int name){
+        if(currentVBO != name){
+            glBindBuffer(GL_ARRAY_BUFFER, name);
+            currentVBO = name;
+        }
+    }
+
+    void OpenGL::UseProgram(unsigned int name){
+        if(currentProgram != name){
+            glUseProgram(name);
+            currentProgram = name;
+        }
+    }
+
+    void OpenGL::UseProgram(string name){
+        UseProgram(Resources::GetShader(name));
+    }
+
+    void OpenGL::Set1i(string name, int x){
+        if(currentProgram != 0){
+            glProgramUniform1i(currentProgram, glGetUniformLocation(currentProgram, name.c_str()), x);
+        }
+    }
+
+    void OpenGL::Set4i(string name, int x, int y, int z, int w){
+        if(currentProgram != 0){
+            glProgramUniform4i(currentProgram, glGetUniformLocation(currentProgram, name.c_str()), x, y, z, w);
+        }
+    }
+
+    void OpenGL::Set4f(string name, float x, float y, float z, float w){
+        if(currentProgram != 0){
+            glProgramUniform4f(currentProgram, glGetUniformLocation(currentProgram, name.c_str()), x, y, z, w);
+        }
+    }
 
     Shader::Shader(){
         
     }
 
     void Shader::Use(){
-        GLUseProgram(ID);
+        glUseProgram(ID);
     }
 
     void Shader::Load(string vpath, string fpath){
@@ -366,32 +464,32 @@ namespace AbyssCore{
         int success;
         char info[512];
 
-        vertex = GLCreateShader(GL_VERTEX_SHADER);
+        vertex = glCreateShader(GL_VERTEX_SHADER);
 
-        GLShaderSource(vertex, 1, &vShaderCode, NULL);
+        glShaderSource(vertex, 1, &vShaderCode, NULL);
 
-        GLCompileShader(vertex);
+        glCompileShader(vertex);
 
         if(!GetError(vertex, VSHADER))
             return;
 
-        fragment = GLCreateShader(GL_FRAGMENT_SHADER);
+        fragment = glCreateShader(GL_FRAGMENT_SHADER);
 
-        GLShaderSource(fragment, 1, &fShaderCode, NULL);
+        glShaderSource(fragment, 1, &fShaderCode, NULL);
 
-        GLCompileShader(fragment);
+        glCompileShader(fragment);
 
         if(!GetError(fragment, FSHADER))
             return;
 
-        ID = GLCreateProgram();
-        GLAttachShader(ID, vertex);
-        GLAttachShader(ID, fragment);
-        GLLinkProgram(ID);
+        ID = glCreateProgram();
+        glAttachShader(ID, vertex);
+        glAttachShader(ID, fragment);
+        glLinkProgram(ID);
 
         GetError(ID, PROGRAM);
-        GLDeleteShader(vertex);
-        GLDeleteShader(fragment);
+        glDeleteShader(vertex);
+        glDeleteShader(fragment);
     }
 
     bool Shader::GetError(int proc, Uint32 type){
@@ -400,26 +498,26 @@ namespace AbyssCore{
 
         switch(type){
             case PROGRAM:
-                GLGetProgramiv(proc, GL_LINK_STATUS, &success);
+                glGetProgramiv(proc, GL_LINK_STATUS, &success);
             break;
             case VSHADER:
             case FSHADER:
-                GLGetShaderiv(proc, GL_COMPILE_STATUS, &success);
+                glGetShaderiv(proc, GL_COMPILE_STATUS, &success);
             break;
         }
 
         if(!success){
             switch(type){
                 case PROGRAM:
-                    GLGetProgramInfoLog(proc, 512, NULL, infoLog);
+                    glGetProgramInfoLog(proc, 512, NULL, infoLog);
                     printf("Some error in linking shader program! %s\n", infoLog);
                 break;
                 case VSHADER:
-                    GLGetShaderInfoLog(proc, 512, NULL, infoLog);
+                    glGetShaderInfoLog(proc, 512, NULL, infoLog);
                     printf("Vertex shader compile error! %s\n", infoLog);
                 break;
                 case FSHADER:
-                    GLGetShaderInfoLog(proc, 512, NULL, infoLog);
+                    glGetShaderInfoLog(proc, 512, NULL, infoLog);
                     printf("Fragment shader compile error! %s\n", infoLog);
                 break;
             }
@@ -431,10 +529,10 @@ namespace AbyssCore{
     }
 
     void Shader::SetInt1(string name, int i){
-        GLUniform1i(GLGetUniformLocation(ID, name.c_str()), i);
+        glUniform1i(glGetUniformLocation(ID, name.c_str()), i);
     }
 
     void Shader::SetFloat4(string name, float x, float y, float z, float w){
-        GLUniform4f(GLGetUniformLocation(ID, name.c_str()), x, y, z, w);
+        glUniform4f(glGetUniformLocation(ID, name.c_str()), x, y, z, w);
     }
 }

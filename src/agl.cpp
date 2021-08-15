@@ -41,10 +41,8 @@ namespace AbyssCore{
     PFNGLFRAMEBUFFERRENDERBUFFERPROC glFramebufferRenderbuffer;
     PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
     PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
-
-    Shader* controlShader;
-    Shader* textureShader; 
-    Shader* colorShader;
+    PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
+    PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
 
     bool GLInit(SDL_GLContext& context, SDL_Window* window){
         context = SDL_GL_CreateContext(window);
@@ -89,16 +87,18 @@ namespace AbyssCore{
         glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)wglGetProcAddress("glFramebufferRenderbuffer");
         glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)wglGetProcAddress("glCheckFramebufferStatus");
         glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)wglGetProcAddress("glGenerateMipmap");
+        glDrawArraysInstanced = (PFNGLDRAWARRAYSINSTANCEDPROC)wglGetProcAddress("glDrawArraysInstanced");
+        glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)wglGetProcAddress("glVertexAttribDivisor");
 #endif
 
-        controlShader = new Shader();
-        controlShader->Load("shaders/controlVertex.glsl", "shaders/controlFragment.glsl");
+        // controlShader = new Shader();
+        // controlShader->Load("shaders/controlVertex.glsl", "shaders/controlFragment.glsl");
 
-        textureShader = new Shader();
-        textureShader->Load("shaders/textureVertex.glsl", "shaders/textureFragment.glsl");
+        // textureShader = new Shader();
+        // textureShader->Load("shaders/textureVertex.glsl", "shaders/textureFragment.glsl");
 
-        colorShader = new Shader();
-        colorShader->Load("shaders/colorVertex.glsl", "shaders/colorFragment.glsl");
+        // colorShader = new Shader();
+        // colorShader->Load("shaders/colorVertex.glsl", "shaders/colorFragment.glsl");
 
         SDL_GL_SetSwapInterval(1);
 
@@ -154,181 +154,181 @@ namespace AbyssCore{
         return aFColor({r, g, b, a});
     }
 
-    Vertex* GLCreateRectArray(SDL_Rect rect, aColor color){
-        aPoint3 v1 = {rect.x, rect.y + rect.h, 0};
-        aPoint3 v2 = {rect.x, rect.y, 0};
-        aPoint3 v3 = {rect.x + rect.w, rect.y, 0};
-        aPoint3 v4 = {rect.x + rect.w, rect.y + rect.h, 0};
+    // Vertex* GLCreateRectArray(SDL_Rect rect, aColor color){
+    //     aPoint3 v1 = {rect.x, rect.y + rect.h, 0};
+    //     aPoint3 v2 = {rect.x, rect.y, 0};
+    //     aPoint3 v3 = {rect.x + rect.w, rect.y, 0};
+    //     aPoint3 v4 = {rect.x + rect.w, rect.y + rect.h, 0};
 
-        aFPoint3 nv1 = GLScreenToNormal(v1);
-        aFPoint3 nv2 = GLScreenToNormal(v2);
-        aFPoint3 nv3 = GLScreenToNormal(v3);
-        aFPoint3 nv4 = GLScreenToNormal(v4);
+    //     aFPoint3 nv1 = GLScreenToNormal(v1);
+    //     aFPoint3 nv2 = GLScreenToNormal(v2);
+    //     aFPoint3 nv3 = GLScreenToNormal(v3);
+    //     aFPoint3 nv4 = GLScreenToNormal(v4);
 
-        aFColor ncolor = GLConvertColor(color);
+    //     aFColor ncolor = GLConvertColor(color);
 
-        Vertex* vertices = (Vertex*)malloc(sizeof(Vertex) * 4);
-        vertices[0] = {nv1, ncolor, {0, 0}};
-        vertices[1] = {nv2, ncolor, {0, 1}};
-        vertices[2] = {nv3, ncolor, {1, 1}};
-        vertices[3] = {nv4, ncolor, {1, 0}};
+    //     Vertex* vertices = (Vertex*)malloc(sizeof(Vertex) * 4);
+    //     vertices[0] = {nv1, ncolor, {0, 0}};
+    //     vertices[1] = {nv2, ncolor, {0, 1}};
+    //     vertices[2] = {nv3, ncolor, {1, 1}};
+    //     vertices[3] = {nv4, ncolor, {1, 0}};
 
-        return vertices;
-    }
+    //     return vertices;
+    // }
 
-    Vertex* GLCreateLineArray(aPair pairs, aColor color){
-        aFPoint3 nv1 = GLScreenToNormal(aPoint3({pairs.x1, pairs.y1, 0}));
-        aFPoint3 nv2 = GLScreenToNormal(aPoint3({pairs.x2, pairs.y2, 0}));
+    // Vertex* GLCreateLineArray(aPair pairs, aColor color){
+    //     aFPoint3 nv1 = GLScreenToNormal(aPoint3({pairs.x1, pairs.y1, 0}));
+    //     aFPoint3 nv2 = GLScreenToNormal(aPoint3({pairs.x2, pairs.y2, 0}));
 
-        aFColor ncolor = GLConvertColor(color);
+    //     aFColor ncolor = GLConvertColor(color);
 
-        Vertex* vertices = (Vertex*)malloc(sizeof(Vertex) * 2);
-        vertices[0] = {nv1, ncolor, {0, 0}};
-        vertices[1] = {nv2, ncolor, {0, 0}};
+    //     Vertex* vertices = (Vertex*)malloc(sizeof(Vertex) * 2);
+    //     vertices[0] = {nv1, ncolor, {0, 0}};
+    //     vertices[1] = {nv2, ncolor, {0, 0}};
 
-        return vertices;
-    }
+    //     return vertices;
+    // }
 
-    float* GLVAtoFA(Vertex* array, int size){
-        float* fvertices = (float*)malloc(sizeof(float) * size * VERTEX_PARAMS);
+    // float* GLVAtoFA(Vertex* array, int size){
+    //     float* fvertices = (float*)malloc(sizeof(float) * size * VERTEX_PARAMS);
 
-        for(int i = 0; i < size; i++){
-            fvertices[i * VERTEX_PARAMS + 0] = array[i].pos.x;
-            fvertices[i * VERTEX_PARAMS + 1] = array[i].pos.y;
-            fvertices[i * VERTEX_PARAMS + 2] = array[i].pos.z;
-            fvertices[i * VERTEX_PARAMS + 3] = array[i].color.r;
-            fvertices[i * VERTEX_PARAMS + 4] = array[i].color.g;
-            fvertices[i * VERTEX_PARAMS + 5] = array[i].color.b;
-            fvertices[i * VERTEX_PARAMS + 6] = array[i].color.a;
-            fvertices[i * VERTEX_PARAMS + 7] = array[i].texPos.x;
-            fvertices[i * VERTEX_PARAMS + 8] = array[i].texPos.y;
-        }
+    //     for(int i = 0; i < size; i++){
+    //         fvertices[i * VERTEX_PARAMS + 0] = array[i].pos.x;
+    //         fvertices[i * VERTEX_PARAMS + 1] = array[i].pos.y;
+    //         fvertices[i * VERTEX_PARAMS + 2] = array[i].pos.z;
+    //         fvertices[i * VERTEX_PARAMS + 3] = array[i].color.r;
+    //         fvertices[i * VERTEX_PARAMS + 4] = array[i].color.g;
+    //         fvertices[i * VERTEX_PARAMS + 5] = array[i].color.b;
+    //         fvertices[i * VERTEX_PARAMS + 6] = array[i].color.a;
+    //         fvertices[i * VERTEX_PARAMS + 7] = array[i].texPos.x;
+    //         fvertices[i * VERTEX_PARAMS + 8] = array[i].texPos.y;
+    //     }
         
-        return fvertices;
-    }
+    //     return fvertices;
+    // }
 
-    void GLCreateVertexObjects(Vertex* vertices, int size, unsigned int &VAO, unsigned int &VBO){
-        glGenVertexArrays(1, &VAO);
-        glGenBuffers(1, &VBO);
+    // void GLCreateVertexObjects(Vertex* vertices, int size, unsigned int &VAO, unsigned int &VBO){
+    //     glGenVertexArrays(1, &VAO);
+    //     glGenBuffers(1, &VBO);
 
-        glBindVertexArray(VAO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    //     glBindVertexArray(VAO);
+    //     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-        float* fvertices = GLVAtoFA(vertices, size);
+    //     float* fvertices = GLVAtoFA(vertices, size);
 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * size * VERTEX_PARAMS, fvertices, GL_STATIC_DRAW);
+    //     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * size * VERTEX_PARAMS, fvertices, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
+    //     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)0);
+    //     glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
+    //     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(3 * sizeof(float)));
+    //     glEnableVertexAttribArray(1);
 
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(7 * sizeof(float)));
-        glEnableVertexAttribArray(2);
+    //     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(7 * sizeof(float)));
+    //     glEnableVertexAttribArray(2);
 
-        delete vertices;
-        delete fvertices;
+    //     delete vertices;
+    //     delete fvertices;
 
-        glBindVertexArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
+    //     glBindVertexArray(0);
+    //     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // }
 
-    void GLDestroyVertexObjects(unsigned int VAO, unsigned int VBO){
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
+    // void GLDestroyVertexObjects(unsigned int VAO, unsigned int VBO){
+    //     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //     glBindVertexArray(0);
 
-        glDeleteVertexArrays(1, &VAO);
-        glDeleteBuffers(1, &VBO);
-    }
+    //     glDeleteVertexArrays(1, &VAO);
+    //     glDeleteBuffers(1, &VBO);
+    // }
 
-    unsigned int GLCreate2DTexture(void* data, int width, int height, int colorMode, int filtration){
-        unsigned int texture;
-        glGenTextures(1, &texture);
+    // unsigned int GLCreate2DTexture(void* data, int width, int height, int colorMode, int filtration){
+    //     unsigned int texture;
+    //     glGenTextures(1, &texture);
 
-        glBindTexture(GL_TEXTURE_2D, texture);
+    //     glBindTexture(GL_TEXTURE_2D, texture);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtration);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtration);
+    //     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtration);
+    //     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtration);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, colorMode, width, height, 0, colorMode, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
+    //     glTexImage2D(GL_TEXTURE_2D, 0, colorMode, width, height, 0, colorMode, GL_UNSIGNED_BYTE, data);
+    //     glGenerateMipmap(GL_TEXTURE_2D);
 
-        glBindTexture(GL_TEXTURE_2D, 0);
+    //     glBindTexture(GL_TEXTURE_2D, 0);
 
-        return texture;
-    }
+    //     return texture;
+    // }
 
     void GLBind2DTexture(unsigned int texture){
         glBindTexture(GL_TEXTURE_2D, texture);
     }
 
-    void GLRenderText(string str, string font, aPoint pos, int maxWidth){
-        Font fontObj = Resources::GetFont(font);
+    // void GLRenderText(string str, string font, aPoint pos, int maxWidth){
+    //     Font fontObj = Resources::GetFont(font);
 
-        aFPoint3 nstart = GLScreenToNormal(aPoint3({pos.x, pos.y, 0}));
+    //     aFPoint3 nstart = GLScreenToNormal(aPoint3({pos.x, pos.y, 0}));
 
-        unsigned int dVAO, dVBO;
+    //     unsigned int dVAO, dVBO;
 
-        glGenVertexArrays(1, &dVAO);
-        glGenBuffers(1, &dVBO);
-        glBindVertexArray(dVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, dVBO);
+    //     glGenVertexArrays(1, &dVAO);
+    //     glGenBuffers(1, &dVBO);
+    //     glBindVertexArray(dVAO);
+    //     glBindBuffer(GL_ARRAY_BUFFER, dVBO);
 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * VERTEX_PARAMS, NULL, GL_DYNAMIC_DRAW);
+    //     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * VERTEX_PARAMS, NULL, GL_DYNAMIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
+    //     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)0);
+    //     glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
+    //     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(3 * sizeof(float)));
+    //     glEnableVertexAttribArray(1);
 
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(7 * sizeof(float)));
-        glEnableVertexAttribArray(2);
+    //     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, VERTEX_PARAMS * sizeof(float), (void*)(7 * sizeof(float)));
+    //     glEnableVertexAttribArray(2);
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        aFColor black = {0, 0, 0, 1};
+    //     aFColor black = {0, 0, 0, 1};
 
-        GLBind2DTexture(fontObj.gliphsTexture);
+    //     GLBind2DTexture(fontObj.gliphsTexture);
 
-        textureShader->Use();
-        textureShader->SetInt1("flip", 1);
+    //     textureShader->Use();
+    //     textureShader->SetInt1("flip", 1);
 
-        for(int i = 0; i < str.length(); i++){
-            char c = str[i];
-            if(fontObj.gliphs.find(c) == fontObj.gliphs.end()){
-                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error with text!", "Foundned unsupported simbols in text!", NULL);
-                return;
-            }
-            Gliph *gliph = fontObj.gliphs.at(c);
-            // gliph->texCoord.
+    //     for(int i = 0; i < str.length(); i++){
+    //         char c = str[i];
+    //         if(fontObj.gliphs.find(c) == fontObj.gliphs.end()){
+    //             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error with text!", "Foundned unsupported simbols in text!", NULL);
+    //             return;
+    //         }
+    //         Gliph *gliph = fontObj.gliphs.at(c);
+    //         // gliph->texCoord.
 
-            int width = gliph->maxx - gliph->minx;
-            int height = gliph->maxy - gliph->miny;
+    //         int width = gliph->maxx - gliph->minx;
+    //         int height = gliph->maxy - gliph->miny;
 
-            aFPoint3 nlu = GLScreenToNormal(aPoint3({pos.x + gliph->minx, pos.y - gliph->maxy, 0}));
-            aFPoint3 nrb = GLScreenToNormal(aPoint3({pos.x + gliph->advance, pos.y - gliph->miny, 0}));
+    //         aFPoint3 nlu = GLScreenToNormal(aPoint3({pos.x + gliph->minx, pos.y - gliph->maxy, 0}));
+    //         aFPoint3 nrb = GLScreenToNormal(aPoint3({pos.x + gliph->advance, pos.y - gliph->miny, 0}));
 
-            Vertex* gliphVertices = (Vertex*)malloc(sizeof(Vertex) * 4);
-            gliphVertices[0] = {{nlu.x, nrb.y, 0}, black, {gliph->texRect.left, gliph->texRect.bottom}};
-            gliphVertices[1] = {{nlu.x, nlu.y, 0}, black, {gliph->texRect.left, gliph->texRect.top}};
-            gliphVertices[2] = {{nrb.x, nlu.y, 0}, black, {gliph->texRect.right, gliph->texRect.top}};
-            gliphVertices[3] = {{nrb.x, nrb.y, 0}, black, {gliph->texRect.right, gliph->texRect.bottom}};
+    //         Vertex* gliphVertices = (Vertex*)malloc(sizeof(Vertex) * 4);
+    //         gliphVertices[0] = {{nlu.x, nrb.y, 0}, black, {gliph->texRect.left, gliph->texRect.bottom}};
+    //         gliphVertices[1] = {{nlu.x, nlu.y, 0}, black, {gliph->texRect.left, gliph->texRect.top}};
+    //         gliphVertices[2] = {{nrb.x, nlu.y, 0}, black, {gliph->texRect.right, gliph->texRect.top}};
+    //         gliphVertices[3] = {{nrb.x, nrb.y, 0}, black, {gliph->texRect.right, gliph->texRect.bottom}};
 
-            glBindBuffer(GL_ARRAY_BUFFER, dVBO);
-            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * 4, GLVAtoFA(gliphVertices, 4));
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //         glBindBuffer(GL_ARRAY_BUFFER, dVBO);
+    //         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * 4, GLVAtoFA(gliphVertices, 4));
+    //         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-            glDrawArrays(GL_QUADS, 0, 4);
+    //         glDrawArrays(GL_QUADS, 0, 4);
 
-            pos.x += gliph->advance;
-        }
+    //         pos.x += gliph->advance;
+    //     }
 
-        // 
-        // gliphVertices[0] = {{}}
+    //     // 
+    //     // gliphVertices[0] = {{}}
 
-    }
+    // }
 
     unsigned int OpenGL::currentVAO = 0;
     unsigned int OpenGL::currentVBO = 0;
@@ -341,6 +341,14 @@ namespace AbyssCore{
         if(error != GL_NO_ERROR){
             printf("Error! %s\n", gluErrorString(error));
         }
+    }
+
+    float OpenGL::Proportion(int pixels, int maxValue){
+        return (float)((float)(pixels) / (float)(maxValue));
+    }
+
+    float OpenGL::ScreenProportion(int pixels, int maxPixels){
+        return (float)((float)(pixels * 2) / (float)(maxPixels));
     }
 
     aFPoint OpenGL::PixelsToNormal(aPoint coord, int w, int h){
@@ -368,11 +376,8 @@ namespace AbyssCore{
         return aFColor({r, g, b, a});
     }
 
-    void OpenGL::GenArrayBuffer(unsigned int &name, GLenum mode, GLsizeiptr size, void* data){
+    void OpenGL::GenArrayBuffer(unsigned int &name){
         glGenBuffers(1, &name);
-        BindVBO(name);
-        glBufferData(GL_ARRAY_BUFFER, size, data, mode);
-        BindVBO(0);
     }   
 
     void OpenGL::GenVertexArray(unsigned int &name){
@@ -384,6 +389,23 @@ namespace AbyssCore{
             glBindTexture(GL_TEXTURE_2D, name);
             current2DTexture = name;
         }
+    }
+
+    unsigned int OpenGL::Create2DTexture(void* data, int width, int height, int colorMode, int filtration){
+        unsigned int texture;
+        glGenTextures(1, &texture);
+
+        GLBind2DTexture(texture);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtration);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtration);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, colorMode, width, height, 0, colorMode, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        GLBind2DTexture(0);
+
+        return texture;
     }
 
     void OpenGL::BindVAO(unsigned int name){

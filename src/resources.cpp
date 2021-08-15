@@ -53,7 +53,10 @@ namespace AbyssCore{
         LoadFont("arial.ttf", "arial15", 15);
         LoadFont("firacode.ttf", "firacode15", 15);
 
-        LoadShader("shaders/interfacev.glsl", "shaders/interfacef.glsl", "interface");
+        // LoadShader("shaders/interfacev.glsl", "shaders/interfacef.glsl", "interface");
+        // LoadShader("shaders/windowv.glsl", "shaders/windowf.glsl", "window");
+        LoadShader("shaders/icolorv.glsl", "shaders/icolorf.glsl", "icolor");
+        LoadShader("shaders/itexturev.glsl", "shaders/itexturef.glsl", "itexture");
     }
 
     Texture Resources::LoadTexture(string path, string name){
@@ -78,10 +81,10 @@ namespace AbyssCore{
         Texture* texture = (Texture*)malloc(sizeof(Texture));
 
         if(img->format->BitsPerPixel == 24){
-            texture->id = GLCreate2DTexture(img->pixels, img->w, img->h, GL_RGB, GL_LINEAR);
+            texture->id = OpenGL::Create2DTexture(img->pixels, img->w, img->h, GL_RGB, GL_LINEAR);
             texture->colorMode = GL_RGB;
         }else if(img->format->BitsPerPixel == 32){
-            texture->id = GLCreate2DTexture(img->pixels, img->w, img->h, GL_RGBA, GL_LINEAR);
+            texture->id = OpenGL::Create2DTexture(img->pixels, img->w, img->h, GL_RGBA, GL_LINEAR);
             texture->colorMode = GL_RGBA;
         }
 
@@ -118,7 +121,7 @@ namespace AbyssCore{
         font->font = sfont;
         font->psize = psize;
         SDL_Surface *gliphSurface = TTF_RenderText_Blended(sfont, GLIPHS, SDL_Color({0, 0, 0, 255}));
-        font->gliphsTexture = GLCreate2DTexture(gliphSurface->pixels, gliphSurface->w, gliphSurface->h, GL_RGBA, GL_LINEAR);
+        font->gliphsTexture = OpenGL::Create2DTexture(gliphSurface->pixels, gliphSurface->w, gliphSurface->h, GL_RGBA, GL_LINEAR);
 
         if(font->gliphsTexture == 0){
             SDL_ShowSimpleMessageBox(SDL_MessageBoxFlags::SDL_MESSAGEBOX_ERROR, "Error with font initialization!", name.c_str(), NULL);
@@ -263,7 +266,7 @@ namespace AbyssCore{
 
         unsigned int textTexture;
 
-        textTexture = GLCreate2DTexture(surface->pixels, surface->w, surface->h, GL_RGBA, GL_LINEAR);
+        textTexture = OpenGL::Create2DTexture(surface->pixels, surface->w, surface->h, GL_RGBA, GL_LINEAR);
 
         Texture *tex = new Texture({textTexture, surface->w, surface->h, GL_RGBA});
 

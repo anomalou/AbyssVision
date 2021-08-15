@@ -102,32 +102,34 @@ namespace AbyssCore{
 
         unsigned int VAO, VBO;
 
-        GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({anchor.x + rect.left, anchor.y + rect.top, TRACKBAR_WIDTH, TRACKBAR_HEIGHT}), style.background), 4, VAO, VBO);
+        //TODO: update rendering
+        // GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({anchor.x + rect.left, anchor.y + rect.top, TRACKBAR_WIDTH, TRACKBAR_HEIGHT}), style.background), 4, VAO, VBO);
         glBindVertexArray(VAO);
 
-        colorShader->Use();
+        // colorShader->Use();
 
         aFColor selected = GLConvertColor(style.selected);
         aFColor border = GLConvertColor(style.border);
 
-        switch(handleState){
-            case Idle:
-                colorShader->SetInt1("useVertexColor", 1);
-            break;
-            case Pressed:
-                colorShader->SetInt1("useVertexColor", 0);
-                colorShader->SetFloat4("color", selected.r, selected.g, selected.b, selected.a);
-            break;
-        }
+        // switch(handleState){
+        //     case Idle:
+        //         colorShader->SetInt1("useVertexColor", 1);
+        //     break;
+        //     case Pressed:
+        //         colorShader->SetInt1("useVertexColor", 0);
+        //         colorShader->SetFloat4("color", selected.r, selected.g, selected.b, selected.a);
+        //     break;
+        // }
 
         glDrawArrays(GL_QUADS, 0, 4);
 
-        colorShader->SetInt1("useVertexColor", 0);
-        colorShader->SetFloat4("color", border.r, border.g, border.b, border.a);
+        // colorShader->SetInt1("useVertexColor", 0);
+        // colorShader->SetFloat4("color", border.r, border.g, border.b, border.a);
         
         glDrawArrays(GL_LINE_LOOP, 0, 4);
 
-        GLDestroyVertexObjects(VAO, VBO);
+        //TODO: update rendering
+        // GLDestroyVertexObjects(VAO, VBO);
     }
 
     void Trackbar::OnMouseDown(SDL_MouseButtonEvent event){

@@ -69,6 +69,8 @@ namespace AbyssCore{
     extern PFNGLFRAMEBUFFERRENDERBUFFERPROC glFramebufferRenderbuffer;
     extern PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
     extern PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
+    extern PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
+    extern PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
 
     bool GLInit(SDL_GLContext& context, SDL_Window* window);
 
@@ -77,10 +79,10 @@ namespace AbyssCore{
     aFPoint3 GLPixelsToNormal(aPoint3 coord, int w, int h);
     aFPoint3 GLScreenToNormal(aPoint3 coord);
     aFColor GLConvertColor(aColor color);
-    Vertex* GLCreateRectArray(SDL_Rect rect, aColor color);
-    Vertex* GLCreateLineArray(aPair pairs, aColor color);
-    float* GLVAtoFA(Vertex* array, int size);
-    void GLCreateVertexObjects(Vertex* array, int size, unsigned int &VAO, unsigned int &VBO);
+    // Vertex* GLCreateRectArray(SDL_Rect rect, aColor color);
+    // Vertex* GLCreateLineArray(aPair pairs, aColor color);
+    // float* GLVAtoFA(Vertex* array, int size);
+    // void GLCreateVertexObjects(Vertex* array, int size, unsigned int &VAO, unsigned int &VBO);
     void GLDestroyVertexObjects(unsigned int VAO, unsigned int VBO);
     unsigned int GLCreate2DTexture(void* data, int width, int height, int colorMode, int filtration);
     void GLBind2DTexture(unsigned int texture);
@@ -95,12 +97,15 @@ namespace AbyssCore{
 
         public:
             static void GetError();
+            static float Proportion(int pixels, int maxValue);
+            static float ScreenProportion(int pixels, int maxPixels);
             static aFPoint PixelsToNormal(aPoint coord, int w, int h);
             static aFPoint TexelsToNormal(aPoint coord, int w, int h);
             static aFColor NormilizeColor(aColor color);
-            static void GenArrayBuffer(unsigned int &name, GLenum mode, GLsizeiptr size, void* data = NULL);
+            static void GenArrayBuffer(unsigned int &name);
             static void GenVertexArray(unsigned int &name);
             static void Bind2DTexture(unsigned int name);
+            static unsigned int Create2DTexture(void* data, int width, int height, int colorMode, int filtration);
             static void BindVAO(unsigned int name);
             static void BindVBO(unsigned int name);
             static void UseProgram(unsigned int name);
@@ -127,10 +132,6 @@ namespace AbyssCore{
             void SetInt1(string name, int i);
             void SetFloat4(string name, float x, float y, float z, float w);
     };
-
-    extern Shader* controlShader;
-    extern Shader* textureShader; 
-    extern Shader* colorShader;
 }
 
 #endif

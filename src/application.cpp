@@ -7,11 +7,12 @@ namespace AbyssCore{
     thread* Application::render;
     SDL_GLContext Application::glContext;
 
-    unsigned int Application::windowVAO = 0;
-    unsigned int Application::windowVBO = 0;
+    float Application::defaultNormilizedWidth;
+    float Application::defaultNormilizedHeight;
 
-    unsigned int Application::widgetVAO = 0;
-    unsigned int Application::widgetVBO = 0;
+    unsigned int Application::defaultVAO = 0;
+    unsigned int Application::defaultVBO = 0;
+    unsigned int Application::instancedVBO = 0;
 
     unsigned int Application::framebuffer;
     unsigned int Application::framebufferTexture;
@@ -113,25 +114,7 @@ namespace AbyssCore{
         Resources::LoadBaseResources();
         CreateFramebuffer();
 
-        OpenGL::GenArrayBuffer(windowVBO, GL_DYNAMIC_DRAW, sizeof(float) * 5 * 4);
-        OpenGL::GenVertexArray(windowVAO);
-
-        OpenGL::BindVBO(windowVBO);
-        OpenGL::BindVAO(windowVAO);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(sizeof(float) * 3));
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-
-        OpenGL::GenArrayBuffer(widgetVBO, GL_DYNAMIC_DRAW, sizeof(float) * 5 * 4);
-        OpenGL::GenVertexArray(widgetVAO);
-
-        OpenGL::BindVBO(widgetVBO);
-        OpenGL::BindVAO(widgetVAO);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(sizeof(float) * 3));
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
+        CreateDefaultBuffers();
 
         glClearColor(1, 1, 1, 1);
         glClearStencil(0x00);
@@ -141,11 +124,17 @@ namespace AbyssCore{
 
         glViewport(0, 0, screen_width, screen_height);
 
+        int frame = 0;
+
+        
+
         while(isRunning){
             LAST = NOW;
             NOW = SDL_GetPerformanceCounter();
 
             Time::deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
+
+            int lTime = SDL_GetTicks();
             
             glClear(GL_COLOR_BUFFER_BIT);
             glClear(GL_STENCIL_BUFFER_BIT);
@@ -214,23 +203,34 @@ namespace AbyssCore{
             // GLBindVertices(GLCreateRectArray(SDL_Rect({10, 10, 100, 100}), aColor({BLACK})), 4, globalVAO, globalVBO);
             // glDrawArrays(GL_QUADS, 0, 4);
             // GLUnbindVertices(globalVAO, globalVBO);
+            // float w = OpenGL::Proportion(50, screen_width);
+            // float h = OpenGL::Proportion(50, screen_height);
 
-            // aFPoint v1 = OpenGL::PixelsToNormal(aPoint({0, 200}), screen_width, screen_height);
-            // aFPoint v2 = OpenGL::PixelsToNormal(aPoint({0, 0}), screen_width, screen_height);
-            // aFPoint v3 = OpenGL::PixelsToNormal(aPoint({200, 10}), screen_width, screen_height);
-            // aFPoint v4 = OpenGL::PixelsToNormal(aPoint({200, 200}), screen_width, screen_height);
-
-            // float data[] = {
-            //     v1.x, v1.y, 0.0, 0.0, 0.0,
-            //     v2.x, v2.y, 0.0, 0.0, 1.0,
-            //     v3.x, v3.y, 0.0, 1.0, 1.0,
-            //     v4.x, v4.y, 0.0, 1.0, 0.0
+            // float rect[] = {
+            //     -w, -h, 0,
+            //     -w, h, 0,
+            //     w, h, 0,
+            //     w, -h, 0
             // };
+
+            // float scale_x = 4;
+            // float scale_y = 2;
+
+            // float offset[] = {
+            //     -1 + w, 0.9f - h, 0, scale_x, scale_y, 1,
+            //     1 - w * 2, 1 - h, 0, 2, 1, 1
+            // };
+
+            // unsigned int instancedVBO;
+
+            // OpenGL::GenArrayBuffer(instancedVBO, GL_STATIC_DRAW, sizeof(float) * 6 * 2, offset);
+
 
             // OpenGL::BindVBO(windowVBO);
             // OpenGL::BindVAO(windowVAO);
 
-            // glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 5 * 4, data);
+            // glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 3 * 4, rect);
+
 
             // OpenGL::UseProgram("interface");
 
@@ -239,23 +239,40 @@ namespace AbyssCore{
 
             // OpenGL::Bind2DTexture(Resources::GetTexture("ozzen").id);
 
-            // OpenGL::Set1i("drawBorder", 1);
+            // OpenGL::Set1i("drawBorder", 0);
             // OpenGL::Set4i("borderRect", 10, 10, 100, 100);
             // OpenGL::Set4f("borderColor", 1, 0, 0, 1);
-            // OpenGL::Set4f("backgroundColor", 1, 0, 0, 1);
+            // OpenGL::Set4f("backgroundColor", 0, 0, 0, 1);
 
-            // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
-            // glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(sizeof(float) * 3));
+            // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+            // // glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(sizeof(float) * 3));
             // glEnableVertexAttribArray(0);
-            // glEnableVertexAttribArray(1);
+            // // glEnableVertexAttribArray(1);
+            // // glVertexAttribDivisor(0, 1);
 
-            // glDrawArrays(GL_QUADS, 0, 4);
+            // OpenGL::BindVBO(instancedVBO);
+
+            // glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)0);
+            // glEnableVertexAttribArray(2);
+            // glVertexAttribDivisor(2, 1);
+
+            // glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(sizeof(float) * 3));
+            // glEnableVertexAttribArray(3);
+            // glVertexAttribDivisor(3, 1);
+            
+
+            // glDrawArraysInstanced(GL_QUADS, 0, 4, 2);
 
 
             for(Window* w : group->GetPull()){
                 if(w->IsVisible()){
                     DrawWindow(w);
                 }
+            }
+
+            int cTime = SDL_GetTicks();
+            if(cTime - lTime > 0){
+                printf("FPS: %d\n", 1000/(cTime - lTime));
             }
 
             SDL_GL_SwapWindow(window);
@@ -290,13 +307,88 @@ namespace AbyssCore{
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    void Application::CreateDefaultBuffers(){
+        defaultNormilizedWidth = OpenGL::ScreenProportion(screen_width, screen_width) / 2;
+        defaultNormilizedHeight = OpenGL::ScreenProportion(screen_width, screen_height) / 2;
+
+        float baseRect[] = {
+            -defaultNormilizedWidth, -defaultNormilizedHeight, 0, 0, 0,
+            -defaultNormilizedWidth, defaultNormilizedHeight, 0, 0, 1,
+            defaultNormilizedWidth, defaultNormilizedHeight, 0, 1, 1,
+            defaultNormilizedWidth, -defaultNormilizedHeight, 0, 1, 0
+        };
+
+        OpenGL::GenArrayBuffer(defaultVBO);
+        OpenGL::GenVertexArray(defaultVAO);
+
+        OpenGL::BindVBO(defaultVBO);
+        OpenGL::BindVAO(defaultVAO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 5 * 4, baseRect, GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
+        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(sizeof(float) * 3));
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(3);
+
+        OpenGL::GenArrayBuffer(instancedVBO);
+        OpenGL::BindVBO(instancedVBO);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VERTEX_SIZE, 0);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (void*)(sizeof(float) * 3));
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (void*)(sizeof(float) * 6));
+        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (void*)(sizeof(float) * 10));
+        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (void*)(sizeof(float) * 14));
+        glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (void*)(sizeof(float) * 18));
+        glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(2);
+        glEnableVertexAttribArray(4);
+        glEnableVertexAttribArray(5);
+        glEnableVertexAttribArray(6);
+        glEnableVertexAttribArray(7);
+        glVertexAttribDivisor(1, 1);
+        glVertexAttribDivisor(2, 1);
+        glVertexAttribDivisor(4, 1);
+        glVertexAttribDivisor(5, 1);
+        glVertexAttribDivisor(6, 1);
+        glVertexAttribDivisor(7, 1);
+    }
+
     void Application::DrawWindow(Window* w){
+        // SDL_Rect rect = w->GetRect();
+        // float scaleX = OpenGL::Proportion(rect.w, screen_width);
+
+        // float headerScaleY = 0;
+        // if(w->IsFull())
+        //     headerScaleY = OpenGL::Proportion(HEADER_HEIGHT, screen_width);
+
+        // float bodyScaleY = 0;
+        // if(!w->IsMinimized())
+        //     bodyScaleY = OpenGL::Proportion(rect.h, screen_width);
+
+        // aFPoint headerPos = OpenGL::PixelsToNormal(aPoint({rect.x, rect.y}), screen_width, screen_height);
+        // aFPoint bodyPos = OpenGL::PixelsToNormal(aPoint({rect.x, rect.y + HEADER_HEIGHT}), screen_width, screen_height);
+
+        // float window[] = {
+        //     headerPos.x + defaultNormilizedWidth * scaleX, headerPos.y - defaultNormilizedHeight * headerScaleY, 0, scaleX, headerScaleY, 1, rect.x, rect.y, rect.w, HEADER_HEIGHT,
+        //     bodyPos.x + defaultNormilizedWidth * scaleX, bodyPos.y - defaultNormilizedHeight * bodyScaleY, 0, scaleX, bodyScaleY, 1, rect.x, rect.y + HEADER_HEIGHT, rect.w, rect.h
+        // };
+
+        // OpenGL::BindVAO(windowVAO);
+        // OpenGL::BindVBO(instancedVBO);
+
+        // glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 10 * 2, window);
+
+        // OpenGL::UseProgram("interface");
+        // OpenGL::Set1i("drawBorder", 1);
+        // OpenGL::Set4f("borderColor", 1, 0, 0, 1);
+        // OpenGL::Set4f("backgroundColor", 0, 0, 0, 1);
+
+        // glDrawArraysInstanced(GL_QUADS, 0, 4, 2);
+
         if(w->IsFull())
             DrawWindowHead(w);
-        if(!w->IsMinimized())
-            DrawWindowBody(w);
-        if(w->IsFull())
-            DrawWindowControl(w);
+        // if(!w->IsMinimized())
+            // DrawWindowBody(w);
+        // if(w->IsFull())
+            // DrawWindowControl(w);
     }
 
     void Application::DrawWindowHead(Window* w){
@@ -308,35 +400,66 @@ namespace AbyssCore{
 
         aFColor border = OpenGL::NormilizeColor(w->style.border);
 
-        OpenGL::UseProgram("interface");
-        OpenGL::Set1i("textureFill", 0);
-        OpenGL::Set1i("drawBorder", 1);
-        OpenGL::Set4i("borderRect", rect.x, rect.y, rect.w, rect.h);
-        OpenGL::Set4f("borderColor", border.r, border.g, border.b, border.a);
+        float scaleX = OpenGL::Proportion(rect.w, screen_width);
 
+        float scaleY = 0;
+        if(w->IsFull())
+            scaleY = OpenGL::Proportion(HEADER_HEIGHT, screen_width);
+
+        aFPoint pos = OpenGL::PixelsToNormal(aPoint({rect.x, rect.y}), screen_width, screen_height);
+
+        aFColor background;
         if(group->CurrentFocus() == w)
-            OpenGL::Set4f("backgroundColor", focus.r, focus.g, focus.b, focus.a);
+            background = focus;
         else
-            OpenGL::Set4f("backgroundColor", nofocus.r, nofocus.g, nofocus.b, nofocus.a);
+            background = nofocus;
 
-        OpenGL::BindVBO(windowVBO);
-        OpenGL::BindVAO(windowVAO);
-
-        aFPoint v1 = OpenGL::PixelsToNormal(aPoint({rect.x, rect.y + rect.h}), screen_width, screen_height);
-        aFPoint v2 = OpenGL::PixelsToNormal(aPoint({rect.x, rect.y}), screen_width, screen_height);
-        aFPoint v3 = OpenGL::PixelsToNormal(aPoint({rect.x + rect.w, rect.y}), screen_width, screen_height);
-        aFPoint v4 = OpenGL::PixelsToNormal(aPoint({rect.x + rect.w, rect.y + rect.h}), screen_width, screen_height);
-
-        float rectData[] = {
-            v1.x, v1.y, 0, 0, 0,
-            v2.x, v2.y, 0, 0, 1,
-            v3.x, v3.y, 0, 1, 1,
-            v4.x, v4.y, 0, 1, 0
+        float attribs[] = {
+            pos.x + defaultNormilizedWidth * scaleX, pos.y - defaultNormilizedHeight * scaleY, 0, 
+            scaleX, scaleY, 1, 
+            0, 0, 0, 0,
+            background.r, background.g, background.b, background.a,
+            border.r, border.g, border.b, border.a,
+            (float)rect.x, (float)rect.y, (float)rect.w, (float)rect.h
         };
 
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 5 * 4, rectData);
+        OpenGL::BindVAO(defaultVAO);
+        OpenGL::BindVBO(instancedVBO);
+        glBufferData(GL_ARRAY_BUFFER, VERTEX_SIZE, attribs, GL_STATIC_DRAW);
 
-        glDrawArrays(GL_QUADS, 0, 4);
+        OpenGL::UseProgram("icolor");
+
+        glDrawArraysInstanced(GL_QUADS, 0, 4, 1);
+
+        // OpenGL::UseProgram("interface");
+        // OpenGL::Set1i("textureFill", 0);
+        // OpenGL::Set1i("drawBorder", 1);
+        // OpenGL::Set4i("borderRect", rect.x, rect.y, rect.w, rect.h);
+        // OpenGL::Set4f("borderColor", border.r, border.g, border.b, border.a);
+
+        // if(group->CurrentFocus() == w)
+        //     OpenGL::Set4f("backgroundColor", focus.r, focus.g, focus.b, focus.a);
+        // else
+        //     OpenGL::Set4f("backgroundColor", nofocus.r, nofocus.g, nofocus.b, nofocus.a);
+
+        // OpenGL::BindVBO(windowVBO);
+        // OpenGL::BindVAO(windowVAO);
+
+        // aFPoint v1 = OpenGL::PixelsToNormal(aPoint({rect.x, rect.y + rect.h}), screen_width, screen_height);
+        // aFPoint v2 = OpenGL::PixelsToNormal(aPoint({rect.x, rect.y}), screen_width, screen_height);
+        // aFPoint v3 = OpenGL::PixelsToNormal(aPoint({rect.x + rect.w, rect.y}), screen_width, screen_height);
+        // aFPoint v4 = OpenGL::PixelsToNormal(aPoint({rect.x + rect.w, rect.y + rect.h}), screen_width, screen_height);
+
+        // float rectData[] = {
+        //     v1.x, v1.y, 0, 0, 0,
+        //     v2.x, v2.y, 0, 0, 1,
+        //     v3.x, v3.y, 0, 1, 1,
+        //     v4.x, v4.y, 0, 1, 0
+        // };
+
+        // glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 5 * 4, rectData);
+
+        // glDrawArrays(GL_QUADS, 0, 4);
 
         // Vertex* headRectArray = GLCreateRectArray(rect, aColor({WHITE}));
         // GLCreateVertexObjects(headRectArray, 4, globalVAO, globalVBO);
@@ -389,29 +512,29 @@ namespace AbyssCore{
         aFColor border = OpenGL::NormilizeColor(w->style.border);
         aFColor background = OpenGL::NormilizeColor(w->style.background);
 
-        aFPoint v1 = OpenGL::PixelsToNormal(aPoint({rect.x, rect.y + rect.h}), screen_width, screen_height);
-        aFPoint v2 = OpenGL::PixelsToNormal(aPoint({rect.x, rect.y}), screen_width, screen_height);
-        aFPoint v3 = OpenGL::PixelsToNormal(aPoint({rect.x + rect.w, rect.y}), screen_width, screen_height);
-        aFPoint v4 = OpenGL::PixelsToNormal(aPoint({rect.x + rect.w, rect.y + rect.h}), screen_width, screen_height);
+        // aFPoint v1 = OpenGL::PixelsToNormal(aPoint({rect.x, rect.y + rect.h}), screen_width, screen_height);
+        // aFPoint v2 = OpenGL::PixelsToNormal(aPoint({rect.x, rect.y}), screen_width, screen_height);
+        // aFPoint v3 = OpenGL::PixelsToNormal(aPoint({rect.x + rect.w, rect.y}), screen_width, screen_height);
+        // aFPoint v4 = OpenGL::PixelsToNormal(aPoint({rect.x + rect.w, rect.y + rect.h}), screen_width, screen_height);
 
-        float rectData[] = {
-            v1.x, v1.y, 0, 0, 0,
-            v2.x, v2.y, 0, 0, 1,
-            v3.x, v3.y, 0, 1, 1,
-            v4.x, v4.y, 0, 1, 0
-        };
+        // float rectData[] = {
+        //     v1.x, v1.y, 0, 0, 0,
+        //     v2.x, v2.y, 0, 0, 1,
+        //     v3.x, v3.y, 0, 1, 1,
+        //     v4.x, v4.y, 0, 1, 0
+        // };
 
-        OpenGL::BindVBO(windowVBO);
-        OpenGL::BindVAO(windowVAO);
+        // OpenGL::BindVBO(windowVBO);
+        // OpenGL::BindVAO(windowVAO);
 
-        OpenGL::UseProgram("interface");
-        OpenGL::Set1i("textureFill", 0);
-        OpenGL::Set1i("drawBorder", 1);
-        OpenGL::Set4i("borderRect", rect.x, rect.y, rect.w, rect.h);
-        OpenGL::Set4f("borderColor", border.r, border.g, border.b, border.a);
-        OpenGL::Set4f("backgroundColor", background.r, background.g, background.b, background.a);
+        // OpenGL::UseProgram("interface");
+        // OpenGL::Set1i("textureFill", 0);
+        // OpenGL::Set1i("drawBorder", 1);
+        // OpenGL::Set4i("borderRect", rect.x, rect.y, rect.w, rect.h);
+        // OpenGL::Set4f("borderColor", border.r, border.g, border.b, border.a);
+        // OpenGL::Set4f("backgroundColor", background.r, background.g, background.b, background.a);
 
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 5 * 4, rectData);
+        // glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 5 * 4, rectData);
 
 
 
@@ -428,7 +551,7 @@ namespace AbyssCore{
 
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
 
-        glDrawArrays(GL_QUADS, 0, 4);
+        // glDrawArrays(GL_QUADS, 0, 4);
         
         // colorShader->SetFloat4("color", 1, 1, 1, 1);
         // glBindVertexArray(globalVAO);
@@ -437,9 +560,9 @@ namespace AbyssCore{
 
         //TODO: update paint functions
 
-        // glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-        // glStencilFunc(GL_EQUAL, 1, 0xFF);
-        // glStencilMask(0);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        glStencilFunc(GL_EQUAL, 1, 0xFF);
+        glStencilMask(0);
 
         // Anchor anchor = {rect.x, rect.y, rect.w, rect.h};
         // w->Paint(anchor);
@@ -465,8 +588,8 @@ namespace AbyssCore{
                     wv4.x, wv4.y, 0, 1, 0
                 };
 
-                OpenGL::BindVBO(widgetVBO);
-                OpenGL::BindVAO(widgetVAO);
+                // OpenGL::BindVBO(widgetVBO);
+                // OpenGL::BindVAO(widgetVAO);
 
                 OpenGL::UseProgram("interface");
                 OpenGL::Set1i("textureFill", 0);
@@ -494,8 +617,8 @@ namespace AbyssCore{
 
                 OpenGL::UseProgram("interface");
 
-                OpenGL::BindVBO(widgetVBO);
-                OpenGL::BindVAO(widgetVAO);
+                // OpenGL::BindVBO(widgetVBO);
+                // OpenGL::BindVAO(widgetVAO);
 
                 glStencilOp(GL_DECR, GL_KEEP, GL_KEEP);
                 glStencilFunc(GL_LESS, 2, 0xFF);

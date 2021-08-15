@@ -18,8 +18,16 @@
 #include <aparams.h>
 #include <timeparams.h>
 #include <resources.h>
+#include <renderer.h>
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
+
+
+#define VERTEX_SIZE sizeof(float) * 22
 
 using namespace std;
+using namespace glm;
 
 namespace AbyssCore{
     class Application{
@@ -34,11 +42,12 @@ namespace AbyssCore{
 
             static SDL_GLContext glContext;
 
-            static unsigned int windowVAO;
-            static unsigned int windowVBO;
+            static float defaultNormilizedWidth;
+            static float defaultNormilizedHeight;
 
-            static unsigned int widgetVAO;
-            static unsigned int widgetVBO;
+            static unsigned int defaultVAO;
+            static unsigned int defaultVBO;
+            static unsigned int instancedVBO;
 
             static unsigned int framebuffer;
             static unsigned int framebufferTexture;
@@ -48,6 +57,8 @@ namespace AbyssCore{
             static void DisposeWindow();
 
             static void DrawWindow(Window* w);
+
+            static void CreateDefaultBuffers();
 
             static void DrawWindowHead(Window* w);
             static void DrawWindowBody(Window* w);

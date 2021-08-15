@@ -77,9 +77,12 @@ namespace AbyssCore{
 
     typedef struct{
         aFPoint3 pos;
-        aFColor color;
         aFPoint texPos;
-    }Vertex;
+        aFPoint3 offset;
+        aFPoint3 scale;
+        aFPoint texOffset;
+        SDL_FRect borderRect;
+    }TRectangle;
 
     typedef struct{
         unsigned int id;
@@ -103,6 +106,22 @@ namespace AbyssCore{
         unsigned int gliphsTexture;
         map<char, Gliph*> gliphs;
     }Font;
+
+    typedef struct{
+        int id;
+        aPoint position;
+        aSize size;
+        aColor backgroundColor;
+        bool drawBorder;
+        aColor borderColor;
+    }Rectangle;
+
+    typedef struct{
+        int id;
+        aPoint position;
+        aSize size;
+        string textureName;
+    }Sprite;
 }
 
 

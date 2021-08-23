@@ -6,6 +6,7 @@
 #include <colors.h>
 #include <style.h>
 #include <map>
+#include <renderer.h>
 
 using namespace std;
 
@@ -61,7 +62,7 @@ namespace AbyssCore{
             virtual void OnMouseMove(SDL_MouseMotionEvent event) = 0;
             virtual void OnMouseWheel(SDL_MouseWheelEvent event, aPoint pos) = 0;
 
-            virtual void Paint(Anchor anchor) = 0;
+            virtual void Paint(Renderer &renderer) = 0;
     };
 }
 

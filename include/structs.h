@@ -4,8 +4,10 @@
 #include <SDL_ttf.h>
 #include <string>
 #include <map>
+#include <glm.hpp>
 
 using namespace std;
+using namespace glm;
 
 namespace AbyssCore{
     typedef struct{
@@ -76,15 +78,6 @@ namespace AbyssCore{
     }aFColor;
 
     typedef struct{
-        aFPoint3 pos;
-        aFPoint texPos;
-        aFPoint3 offset;
-        aFPoint3 scale;
-        aFPoint texOffset;
-        SDL_FRect borderRect;
-    }TRectangle;
-
-    typedef struct{
         unsigned int id;
         int width;
         int height;
@@ -106,6 +99,15 @@ namespace AbyssCore{
         unsigned int gliphsTexture;
         map<char, Gliph*> gliphs;
     }Font;
+
+    typedef struct{
+        vec3 offset;
+        vec3 scale;
+        vec4 texOffset;
+        vec4 background;
+        vec4 border;
+        vec4 borderRect;
+    }Instanced;
 
     typedef struct{
         int id;

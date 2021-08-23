@@ -26,7 +26,7 @@ namespace AbyssCore{
 
         public:
             MainWindow();
-            void Paint(Anchor anchor);
+            void Paint(Renderer &anchor);
 
         friend void Open(Widget* sender, ActionEvent event);
         friend void Hide(Widget* sender, ActionEvent event);

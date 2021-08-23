@@ -9,6 +9,7 @@
 #include <style.h>
 #include <vector>
 #include <stdio.h>
+#include <renderer.h>
 
 using namespace std;
 
@@ -94,7 +95,7 @@ namespace AbyssCore{
             // virtual void MinimazeAction();
             // virtual void ResizeAction(int w, int h);
 
-            virtual void Paint(Anchor anchor);
+            virtual void Paint(Renderer &renderer);
 
             virtual vector<Widget*> GetPull();
             virtual bool AssignWidget(Widget* w, string byName);

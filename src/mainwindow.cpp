@@ -78,10 +78,8 @@ namespace AbyssCore{
         currentSize = 200;
     }
 
-    void MainWindow::Paint(Anchor anchor){
-        Window::Paint(anchor);
-
-        Clear(anchor, aColor({RED}));
+    void MainWindow::Paint(Renderer &renderer){
+        Window::Paint(renderer);
 
         // float scale = (float)trackbar->GetValue() / 10;
         // int toSize = scale * 200;

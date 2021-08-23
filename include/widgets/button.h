@@ -14,7 +14,7 @@ namespace AbyssCore{
 
         public:
             Button(Window* parent);
-            void Paint(Anchor anchor);
+            void Paint(Renderer &renderer);
             void OnMouseDown(SDL_MouseButtonEvent event);
             void OnMouseUp(SDL_MouseButtonEvent event);
             void OnMouseMove(SDL_MouseMotionEvent event);

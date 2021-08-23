@@ -6,18 +6,18 @@ namespace AbyssCore{
         state = Idle;
     }
 
-    void Button::Paint(Anchor anchor){
-        switch(state){
-            case Idle:
-                Clear(anchor, style.background);
-            break;
-            case Pressed:
-                Clear(anchor, style.selected);
-            break;
-            case Hovered:
-                Clear(anchor, style.hover);
-            break;
-        }
+    void Button::Paint(Renderer &renderer){
+        // switch(state){
+        //     case Idle:
+        //         Clear(anchor, style.background);
+        //     break;
+        //     case Pressed:
+        //         Clear(anchor, style.selected);
+        //     break;
+        //     case Hovered:
+        //         Clear(anchor, style.hover);
+        //     break;
+        // }
     }
 
     void Button::OnMouseDown(SDL_MouseButtonEvent event){

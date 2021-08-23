@@ -21,6 +21,7 @@ namespace AbyssCore{
             void DrawSprite(SDL_Rect rect, string texture);
             vector<Rectangle> GetRectangles();
             vector<Sprite> GetSprites();
+            int MaxID();
     };
 }
 

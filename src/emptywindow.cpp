@@ -5,9 +5,10 @@ namespace AbyssCore{
         pos = {0, 0};
     }
 
-    void EmptyWindow::Paint(Anchor anchor){
-        Clear(anchor, aColor({WHITE}));
+    void EmptyWindow::Paint(Renderer &renderer){
+        Window::Paint(renderer);
+        // Clear(anchor, aColor({WHITE}));
 
-        DrawRect(anchor, SDL_Rect({pos.x, pos.y, 10, 10}), aColor({BLACK}));
+        // DrawRect(anchor, SDL_Rect({pos.x, pos.y, 10, 10}), aColor({BLACK}));
     }
 }

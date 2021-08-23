@@ -88,28 +88,28 @@ namespace AbyssCore{
         return value;
     }
 
-    void Trackbar::Paint(Anchor anchor){
-        Clear(anchor, style.background);
+    void Trackbar::Paint(Renderer &renderer){
+        // Clear(anchor, style.background);
 
-        int x1 = HANDLE_OFFSET;
-        int y1 = rect.h / 2;
-        int x2 = rect.w - HANDLE_OFFSET;
-        int y2 = y1;
+        // int x1 = HANDLE_OFFSET;
+        // int y1 = rect.h / 2;
+        // int x2 = rect.w - HANDLE_OFFSET;
+        // int y2 = y1;
 
-        aRect rect = CalculateHandleRect();
+        // aRect rect = CalculateHandleRect();
 
-        DrawLine(anchor, aPair({x1, y1, x2, y2}), aColor({BLACK}));
+        // DrawLine(anchor, aPair({x1, y1, x2, y2}), aColor({BLACK}));
 
-        unsigned int VAO, VBO;
+        // unsigned int VAO, VBO;
 
         //TODO: update rendering
         // GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({anchor.x + rect.left, anchor.y + rect.top, TRACKBAR_WIDTH, TRACKBAR_HEIGHT}), style.background), 4, VAO, VBO);
-        glBindVertexArray(VAO);
+        // glBindVertexArray(VAO);
 
         // colorShader->Use();
 
-        aFColor selected = GLConvertColor(style.selected);
-        aFColor border = GLConvertColor(style.border);
+        // aFColor selected = GLConvertColor(style.selected);
+        // aFColor border = GLConvertColor(style.border);
 
         // switch(handleState){
         //     case Idle:
@@ -121,12 +121,12 @@ namespace AbyssCore{
         //     break;
         // }
 
-        glDrawArrays(GL_QUADS, 0, 4);
+        // glDrawArrays(GL_QUADS, 0, 4);
 
         // colorShader->SetInt1("useVertexColor", 0);
         // colorShader->SetFloat4("color", border.r, border.g, border.b, border.a);
         
-        glDrawArrays(GL_LINE_LOOP, 0, 4);
+        // glDrawArrays(GL_LINE_LOOP, 0, 4);
 
         //TODO: update rendering
         // GLDestroyVertexObjects(VAO, VBO);

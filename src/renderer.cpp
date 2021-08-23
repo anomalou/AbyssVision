@@ -12,7 +12,7 @@ namespace AbyssCore{
     void Renderer::DrawRect(SDL_Rect rect, aColor backgroundColor, bool drawBorder, aColor borderColor){
         Rectangle rectangle;
         rectangle.id = startID;
-        rectangle.position = {rect.x, rect.y};
+        rectangle.position = {rect.x + startCoords.x, rect.y + startCoords.y};
         rectangle.size = {rect.w, rect.h};
         rectangle.backgroundColor = backgroundColor;
         rectangle.drawBorder = drawBorder;
@@ -26,7 +26,7 @@ namespace AbyssCore{
     void Renderer::DrawSprite(SDL_Rect rect, string texture){
         Sprite sprite;
         sprite.id = startID;
-        sprite.position = {rect.x, rect.y};
+        sprite.position = {rect.x + startCoords.x, rect.y + startCoords.y};
         sprite.size = {rect.w, rect.h};
         sprite.textureName = texture;
 
@@ -41,5 +41,9 @@ namespace AbyssCore{
 
     vector<Sprite> Renderer::GetSprites(){
         return vector<Sprite>(sprites);
+    }
+
+    int Renderer::MaxID(){
+        return startID;
     }
 }

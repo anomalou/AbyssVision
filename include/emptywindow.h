@@ -13,7 +13,7 @@ namespace AbyssCore{
             EmptyWindow();
 
         public:
-            virtual void Paint(Anchor anchor) override;
+            virtual void Paint(Renderer &renderer) override;
     };
 }
 

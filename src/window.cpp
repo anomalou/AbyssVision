@@ -342,8 +342,13 @@ namespace AbyssCore{
         return false;
     }
 
-    void Window::Paint(Anchor anchor){
-        Clear(anchor, style.background);
+    void Window::Paint(Renderer &renderer){
+        //TODO: default paint
+        // for(int i = 0; i < 100; i++){
+        //     for(int t = 0; t < 100; t++){
+        //         renderer.DrawRect(SDL_Rect({i * 5, t * 5, 5, 5}), aColor({RED}), false, aColor({WHITE}));
+        //     }
+        // }
     }
 
     vector<Widget*> Window::GetPull(){

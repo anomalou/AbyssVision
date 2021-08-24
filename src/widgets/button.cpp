@@ -7,17 +7,18 @@ namespace AbyssCore{
     }
 
     void Button::Paint(Renderer &renderer){
-        // switch(state){
-        //     case Idle:
-        //         Clear(anchor, style.background);
-        //     break;
-        //     case Pressed:
-        //         Clear(anchor, style.selected);
-        //     break;
-        //     case Hovered:
-        //         Clear(anchor, style.hover);
-        //     break;
-        // }
+        SDL_Rect rect = {0, 0, this->rect.w, this->rect.h};
+        switch(state){
+            case Idle:
+                renderer.DrawRect(rect, style.background, true, style.border);
+            break;
+            case Pressed:
+                renderer.DrawRect(rect, style.selected, true, style.border);
+            break;
+            case Hovered:
+                renderer.DrawRect(rect, style.hover, true, style.border);
+            break;
+        }
     }
 
     void Button::OnMouseDown(SDL_MouseButtonEvent event){

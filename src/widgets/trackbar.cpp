@@ -89,47 +89,25 @@ namespace AbyssCore{
     }
 
     void Trackbar::Paint(Renderer &renderer){
-        // Clear(anchor, style.background);
+        aRect rect = CalculateHandleRect();
 
-        // int x1 = HANDLE_OFFSET;
-        // int y1 = rect.h / 2;
-        // int x2 = rect.w - HANDLE_OFFSET;
-        // int y2 = y1;
+        int x = HANDLE_OFFSET;
+        int y = this->rect.h / 2;
+        int w = this->rect.w - 2 * HANDLE_OFFSET;
+        int h = 1;
 
-        // aRect rect = CalculateHandleRect();
+        renderer.DrawRect(SDL_Rect({x, y, w, h}), aColor({WHITE}), true, aColor({BLACK}));
 
-        // DrawLine(anchor, aPair({x1, y1, x2, y2}), aColor({BLACK}));
+        SDL_Rect sdl_rect = {rect.left, rect.top, rect.right - rect.left, rect.bottom- rect.top};
 
-        // unsigned int VAO, VBO;
-
-        //TODO: update rendering
-        // GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({anchor.x + rect.left, anchor.y + rect.top, TRACKBAR_WIDTH, TRACKBAR_HEIGHT}), style.background), 4, VAO, VBO);
-        // glBindVertexArray(VAO);
-
-        // colorShader->Use();
-
-        // aFColor selected = GLConvertColor(style.selected);
-        // aFColor border = GLConvertColor(style.border);
-
-        // switch(handleState){
-        //     case Idle:
-        //         colorShader->SetInt1("useVertexColor", 1);
-        //     break;
-        //     case Pressed:
-        //         colorShader->SetInt1("useVertexColor", 0);
-        //         colorShader->SetFloat4("color", selected.r, selected.g, selected.b, selected.a);
-        //     break;
-        // }
-
-        // glDrawArrays(GL_QUADS, 0, 4);
-
-        // colorShader->SetInt1("useVertexColor", 0);
-        // colorShader->SetFloat4("color", border.r, border.g, border.b, border.a);
-        
-        // glDrawArrays(GL_LINE_LOOP, 0, 4);
-
-        //TODO: update rendering
-        // GLDestroyVertexObjects(VAO, VBO);
+        switch(handleState){
+            case Idle:
+                renderer.DrawRect(sdl_rect, style.background, true, style.border);
+            break;
+            case Pressed:
+                renderer.DrawRect(sdl_rect, style.selected, true, style.border);
+            break;
+        }
     }
 
     void Trackbar::OnMouseDown(SDL_MouseButtonEvent event){
@@ -140,6 +118,15 @@ namespace AbyssCore{
             if(HandleHit(x, y)){
                 beginLMove = true;
                 handleState = Pressed;
+            }else{
+                int x_mouse = x - HANDLE_OFFSET;
+
+                double step = CalculateHandleStep();
+
+                double fnewValue = (double)x_mouse / step;
+                int value = (int)round(fnewValue) + minValue;
+
+                SetValue(value);
             }
         }
     }

@@ -119,20 +119,16 @@ namespace AbyssCore{
         glClearColor(1, 1, 1, 1);
         glClearStencil(0x00);
 
-        Uint64 NOW = SDL_GetPerformanceCounter();
-        Uint64 LAST = 0;
+        Uint64 now = SDL_GetPerformanceCounter();
+        Uint64 last = 0;
 
         glViewport(0, 0, screen_width, screen_height);
 
-        int frame = 0;
-
-        
-
         while(isRunning){
-            LAST = NOW;
-            NOW = SDL_GetPerformanceCounter();
+            last = now;
+            now = SDL_GetPerformanceCounter();
 
-            Time::deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
+            Time::deltaTime = (double)((now - last) * 1000 / (double)SDL_GetPerformanceFrequency());
 
             int lTime = SDL_GetTicks();
             
@@ -270,12 +266,13 @@ namespace AbyssCore{
                 }
             }
 
+            SDL_GL_SwapWindow(window);
+            // SDL_Delay(1000/120);
+
             int cTime = SDL_GetTicks();
             if(cTime - lTime > 0){
                 printf("FPS: %d\n", 1000/(cTime - lTime));
             }
-
-            SDL_GL_SwapWindow(window);
         }
 
         Resources::FreeResources();
@@ -457,7 +454,8 @@ namespace AbyssCore{
              vec4(rect.x, rect.y, rect.w, rect.h)}
         };
 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced), body, GL_STATIC_DRAW);
+        //TODO: optimize
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Instanced), body);
 
         glEnable(GL_STENCIL_TEST);
 
@@ -477,7 +475,6 @@ namespace AbyssCore{
         w->Paint(renderer);
 
         vector<Rectangle> rects = renderer.GetRectangles();
-        sort(rects.begin(), rects.end(), [](Rectangle r1, Rectangle r2) -> bool{return r1.id > r2.id;});
 
         int rectsSize = rects.size();
 
@@ -507,7 +504,10 @@ namespace AbyssCore{
             irects.push_back(inst);
         }
 
+        //TODO: optimize
         glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced) * rectsSize, irects.data(), GL_STATIC_DRAW);
+
+        //TODO:depth test
 
         glDrawArraysInstanced(GL_QUADS, 0, 4, rectsSize);
 
@@ -525,7 +525,7 @@ namespace AbyssCore{
 
                 aFPoint pos = OpenGL::PixelsToNormal(aPoint({wrect.x, wrect.y}), screen_width, screen_height);
 
-                Instanced body[] = {
+                Instanced wbody[] = {
                     {vec3(pos.x + defaultNormilizedWidth * scaleX, pos.y - defaultNormilizedHeight * scaleY, 0),
                     vec3(scaleX, scaleY, 1),
                     vec4(0, 0, 0, 0),
@@ -534,7 +534,62 @@ namespace AbyssCore{
                     vec4(wrect.x, wrect.y, wrect.w, wrect.h)}
                 };
 
-                glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced), body, GL_STATIC_DRAW);
+                //TODO: optimize
+                glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced), wbody, GL_STATIC_DRAW);
+
+                glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
+                glStencilFunc(GL_EQUAL, 1, 0xFF);
+                glStencilMask(0xFF);
+
+                glDrawArrays(GL_QUADS, 0, 4);
+
+                glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+                glStencilFunc(GL_EQUAL, 2, 0xFF);
+                glStencilMask(0x0);
+
+                Renderer renderer(wrect.x, wrect.y);
+
+                wg->Paint(renderer);
+
+                vector<Rectangle> rects = renderer.GetRectangles();
+
+                int rectsSize = rects.size();
+
+                vector<Instanced> irects = vector<Instanced>();
+
+                for(int i = 0; i < rectsSize; i++){
+                    aFPoint rpos = OpenGL::PixelsToNormal(rects[i].position, screen_width, screen_height);
+                    float scaleX = OpenGL::Proportion(rects[i].size.width, screen_width);
+                    float scaleY = OpenGL::Proportion(rects[i].size.height, screen_width);
+
+                    aFColor background = OpenGL::NormilizeColor(rects[i].backgroundColor);
+                    aFColor border = background;
+                    if(rects[i].drawBorder)
+                        border = OpenGL::NormilizeColor(rects[i].borderColor);
+
+                    float depth = OpenGL::Proportion(rects[i].id, renderer.MaxID());
+
+                    Instanced inst;
+
+                    inst.offset = {rpos.x + defaultNormilizedWidth * scaleX, rpos.y - defaultNormilizedHeight * scaleY, depth};
+                    inst.scale = {scaleX, scaleY, 1};
+                    inst.texOffset = {0, 0, 0, 0};
+                    inst.background = {background.r, background.g, background.b, background.a};
+                    inst.border = {border.r, border.g, border.b, border.a};
+                    inst.borderRect = {rects[i].position.x, rects[i].position.y, rects[i].size.width, rects[i].size.height};
+                
+                    irects.push_back(inst);
+                }
+
+                glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced) * rectsSize, irects.data(), GL_STATIC_DRAW);
+
+                glDrawArraysInstanced(GL_QUADS, 0, 4, rectsSize);
+
+                glStencilOp(GL_DECR, GL_KEEP, GL_KEEP);
+                glStencilFunc(GL_LESS, 2, 0xFF);
+                glStencilMask(0xFF);
+
+                glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced), wbody, GL_STATIC_DRAW);
 
                 glDrawArrays(GL_QUADS, 0, 4);
 

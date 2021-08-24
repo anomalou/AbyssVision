@@ -190,7 +190,7 @@ namespace AbyssCore{
                 beginRClick = true;
         }
 
-        if(HeaderHit(x, y)){
+        if(HeaderHit(x, y) && canMove){
             if(event.button == SDL_BUTTON_LEFT)
                 beginLMove = true;
             if(event.button == SDL_BUTTON_RIGHT)

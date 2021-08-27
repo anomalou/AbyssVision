@@ -118,15 +118,6 @@ namespace AbyssCore{
             if(HandleHit(x, y)){
                 beginLMove = true;
                 handleState = Pressed;
-            }else{
-                int x_mouse = x - HANDLE_OFFSET;
-
-                double step = CalculateHandleStep();
-
-                double fnewValue = (double)x_mouse / step;
-                int value = (int)round(fnewValue) + minValue;
-
-                SetValue(value);
             }
         }
     }

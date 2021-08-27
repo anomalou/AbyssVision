@@ -78,11 +78,19 @@ namespace AbyssCore{
     }aFColor;
 
     typedef struct{
+        uint16_t x;
+        uint16_t y;
+        uint16_t width;
+        uint16_t height;
+    }Texture;
+
+    typedef struct{
         unsigned int id;
+        int count;
         int width;
         int height;
-        int colorMode;
-    }Texture;
+        map<string, Texture> textures;
+    }Atlas;
 
     typedef struct{
         int minx;

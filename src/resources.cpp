@@ -2,11 +2,13 @@
 
 namespace AbyssCore{
 
-    map<string, Texture*> Resources::textures = map<string, Texture*>();
+    // map<string, Texture*> Resources::textures = map<string, Texture*>();
+    Atlas Resources::ui;
+    Atlas Resources::sprites;
     map<string, Font*> Resources::fonts = map<string, Font*>();
     map<string, unsigned int> Resources::shaders = map<string, unsigned int>();
 
-    map<string, Texture*> Resources::textCache = map<string, Texture*>();
+    // map<string, Texture*> Resources::textCache = map<string, Texture*>();
 
     bool Resources::GetShaderError(unsigned int id, int type){
         int success;
@@ -45,10 +47,13 @@ namespace AbyssCore{
     }
 
     void Resources::LoadBaseResources(){
-        LoadTexture("ozen.png", "ozzen");
-        LoadTexture("close.png", "close");
-        LoadTexture("minimize.png", "minimize");
-        LoadTexture("resize.png", "resize");
+        // LoadTexture("ozen.png", "ozzen");
+        // LoadTexture("close.png", "close");
+        // LoadTexture("minimize.png", "minimize");
+        // LoadTexture("resize.png", "resize");
+
+        ui = LoadAtlas("ui.ata");
+        // sprites = LoadAtlas("sprites.ata");
 
         LoadFont("arial.ttf", "arial15", 15);
         LoadFont("firacode.ttf", "firacode15", 15);
@@ -59,43 +64,117 @@ namespace AbyssCore{
         LoadShader("shaders/itexturev.glsl", "shaders/itexturef.glsl", "itexture");
     }
 
-    Texture Resources::LoadTexture(string path, string name){
-        SDL_Surface* img = IMG_Load(path.c_str());
+    // Texture Resources::LoadTexture(string path, string name){
+    //     SDL_Surface* img = IMG_Load(path.c_str());
 
-        if(img == NULL){
-            char texError[256];
-            snprintf(texError, 256, "This texture can't be loaded: %s(%s)", name.c_str(), path.c_str());
-            SDL_ShowSimpleMessageBox(SDL_MessageBoxFlags::SDL_MESSAGEBOX_ERROR, "Error!", texError, NULL);
-            return {0, 0, 0, 0};
+    //     if(img == NULL){
+    //         char texError[256];
+    //         snprintf(texError, 256, "This texture can't be loaded: %s(%s)", name.c_str(), path.c_str());
+    //         SDL_ShowSimpleMessageBox(SDL_MessageBoxFlags::SDL_MESSAGEBOX_ERROR, "Error!", texError, NULL);
+    //         return {0, 0, 0, 0};
+    //     }
+
+    //     char* namePtr = (char*)malloc(sizeof(char) * 256);
+    //     strcpy(namePtr, name.c_str());
+
+    //     while(textures.find(name) != textures.end()){
+    //         strcat(namePtr, "copy");
+    //     }
+
+    //     const char* nameConst = namePtr;
+
+    //     Texture* texture = (Texture*)malloc(sizeof(Texture));
+
+    //     if(img->format->BitsPerPixel == 24){
+    //         texture->id = OpenGL::Create2DTexture(img->pixels, img->w, img->h, GL_RGB, GL_LINEAR);
+    //         texture->colorMode = GL_RGB;
+    //     }else if(img->format->BitsPerPixel == 32){
+    //         texture->id = OpenGL::Create2DTexture(img->pixels, img->w, img->h, GL_RGBA, GL_LINEAR);
+    //         texture->colorMode = GL_RGBA;
+    //     }
+
+    //     texture->width = img->w;
+    //     texture->height = img->h;
+
+    //     textures.insert({nameConst, texture});
+
+    //     SDL_FreeSurface(img);
+
+    //     return *texture;
+    // }
+
+    Atlas Resources::LoadAtlas(string path){
+        ifstream stream(path, ios::binary);
+        Atlas atlas;
+
+        if(stream.is_open()){
+            int size;
+            stream.read((char*)&size, sizeof(size));
+            for(int i = 0; i < size; i++){
+                int length;
+                stream.read((char*)&length, sizeof(int));
+                string name;
+                char c;
+                for(int t = 0; t < length; t++){
+                    stream.read((char*)&c, sizeof(char));
+                    name.append(1, c);
+                }
+                uint16_t x;
+                uint16_t y;
+                uint16_t w;
+                uint16_t h;
+                stream.read((char*)&x, sizeof(uint16_t));
+                stream.read((char*)&y, sizeof(uint16_t));
+                stream.read((char*)&w, sizeof(uint16_t));
+                stream.read((char*)&h, sizeof(uint16_t));
+
+                Texture tex = {
+                    x,
+                    y,
+                    w,
+                    h
+                };
+
+                atlas.textures.insert({name, tex});
+            }
+
+            int width;
+            int height;
+
+            stream.read((char*)&width, sizeof(int));
+            stream.read((char*)&height, sizeof(int));
+
+            vector<float> pixelData = vector<float>();
+
+            for(int i = 0; i < (width * height); i++){
+                char r;
+                char g;
+                char b;
+                char a;
+
+                stream.read((char*)&r, sizeof(char));
+                stream.read((char*)&g, sizeof(char));
+                stream.read((char*)&b, sizeof(char));
+                stream.read((char*)&a, sizeof(char));
+
+                aFColor fColor = OpenGL::NormilizeColor(aColor{r, g, b, a});
+
+                pixelData.push_back(fColor.r);
+                pixelData.push_back(fColor.g);
+                pixelData.push_back(fColor.b);
+                pixelData.push_back(fColor.a);
+            }
+
+            size_t s = pixelData.size();
+
+            atlas.count = size;
+            atlas.width = width;
+            atlas.height = height;
+            
+            atlas.id = OpenGL::Create2DTexture(pixelData.data(), width, height, GL_RGBA, GL_NEAREST);
         }
 
-        char* namePtr = (char*)malloc(sizeof(char) * 256);
-        strcpy(namePtr, name.c_str());
-
-        while(textures.find(name) != textures.end()){
-            strcat(namePtr, "copy");
-        }
-
-        const char* nameConst = namePtr;
-
-        Texture* texture = (Texture*)malloc(sizeof(Texture));
-
-        if(img->format->BitsPerPixel == 24){
-            texture->id = OpenGL::Create2DTexture(img->pixels, img->w, img->h, GL_RGB, GL_LINEAR);
-            texture->colorMode = GL_RGB;
-        }else if(img->format->BitsPerPixel == 32){
-            texture->id = OpenGL::Create2DTexture(img->pixels, img->w, img->h, GL_RGBA, GL_LINEAR);
-            texture->colorMode = GL_RGBA;
-        }
-
-        texture->width = img->w;
-        texture->height = img->h;
-
-        textures.insert({nameConst, texture});
-
-        SDL_FreeSurface(img);
-
-        return *texture;
+        return atlas;
     }
 
     void Resources::LoadFont(string path, string name, int psize){
@@ -224,14 +303,14 @@ namespace AbyssCore{
         shaders.insert({name, id});
     }
 
-    Texture Resources::GetTexture(string name){
-        if(textures.find(name) != textures.end())
-            return *textures.at(name);
-        else{
-            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Cant get texture!", name.c_str(), NULL);
-            return {0, 0, 0, 0};
-        }
-    }
+    // Texture Resources::GetTexture(string name){
+    //     if(textures.find(name) != textures.end())
+    //         return *textures.at(name);
+    //     else{
+    //         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Cant get texture!", name.c_str(), NULL);
+    //         return {0, 0, 0, 0};
+    //     }
+    // }
 
     Font Resources::GetFont(string name){
         if(fonts.find(name) != fonts.end())
@@ -252,44 +331,44 @@ namespace AbyssCore{
         return 0;
     }
 
-    Texture Resources::CreateStringTexture(string str, string font, int maxChars, int maxLines){
-        if(textCache.find(str) != textCache.end()){
-            return *textCache.at(str);
-        }
+    // Texture Resources::CreateStringTexture(string str, string font, int maxChars, int maxLines){
+    //     if(textCache.find(str) != textCache.end()){
+    //         return *textCache.at(str);
+    //     }
 
-        if(fonts.find(font) == fonts.end()){
-            SDL_ShowSimpleMessageBox(SDL_MessageBoxFlags::SDL_MESSAGEBOX_ERROR, "Can't open font!", font.c_str(), NULL);
-            return {0, 0, 0, 0};
-        }
+    //     if(fonts.find(font) == fonts.end()){
+    //         SDL_ShowSimpleMessageBox(SDL_MessageBoxFlags::SDL_MESSAGEBOX_ERROR, "Can't open font!", font.c_str(), NULL);
+    //         return {0, 0, 0, 0};
+    //     }
 
-        SDL_Surface *surface = TTF_RenderText_Blended_Wrapped(fonts.at(font)->font, str.c_str(), SDL_Color({0, 0, 0, 255}), maxChars);
+    //     SDL_Surface *surface = TTF_RenderText_Blended_Wrapped(fonts.at(font)->font, str.c_str(), SDL_Color({0, 0, 0, 255}), maxChars);
 
-        unsigned int textTexture;
+    //     unsigned int textTexture;
 
-        textTexture = OpenGL::Create2DTexture(surface->pixels, surface->w, surface->h, GL_RGBA, GL_LINEAR);
+    //     textTexture = OpenGL::Create2DTexture(surface->pixels, surface->w, surface->h, GL_RGBA, GL_LINEAR);
 
-        Texture *tex = new Texture({textTexture, surface->w, surface->h, GL_RGBA});
+    //     Texture *tex = new Texture({textTexture, surface->w, surface->h, GL_RGBA});
 
-        if(textCache.size() > 100){
-            textCache.erase(textCache.begin());
-        }
+    //     if(textCache.size() > 100){
+    //         textCache.erase(textCache.begin());
+    //     }
 
-        textCache.insert({str.c_str(), tex});
+    //     textCache.insert({str.c_str(), tex});
 
-        return *tex;
-    }
+    //     return *tex;
+    // }
 
     void Resources::FreeResources(){
-        for(auto& item : textures){
-            glDeleteTextures(1, &item.second->id);
-        }
+        // for(auto& item : textures){
+        //     glDeleteTextures(1, &item.second->id);
+        // }
 
         for(auto& item : fonts){
             TTF_CloseFont(item.second->font);
         }
 
-        for(auto& item : textCache){
-            glDeleteTextures(1, &item.second->id);
-        }
+        // for(auto& item : textCache){
+        //     glDeleteTextures(1, &item.second->id);
+        // }
     }
 }

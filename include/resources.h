@@ -6,6 +6,7 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <map>
+#include <vector>
 
 #define TEXTURE_FLAGS IMG_INIT_PNG
 #define GLIPHS " !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
@@ -15,7 +16,9 @@ using namespace std;
 namespace AbyssCore{
     class Resources{
         private:
-            static map<string, Texture*> textures;
+            // static map<string, Texture*> textures;
+            static Atlas ui;
+            static Atlas sprites;
             static map<string, Font*> fonts;
             static map<string, unsigned int> shaders;
             
@@ -26,16 +29,16 @@ namespace AbyssCore{
 
         public:
             static void LoadBaseResources();
-            static Texture LoadTexture(string path, string name);
+            static Atlas LoadAtlas(string path);
             static void LoadFont(string path, string name, int psize);
             static void LoadShader(string vpath, string fpath, string name);
-            static Texture GetTexture(string name);
+            // static Texture GetTexture(string name);
             static Font GetFont(string name);
             static unsigned int GetShader(string name);
             /**
              * \brief Depricated
              */
-            static Texture CreateStringTexture(string str, string font, int maxChars = screen_width, int maxLines = 1);
+            // static Texture CreateStringTexture(string str, string font, int maxChars = screen_width, int maxLines = 1);
             static void FreeResources();
     };
 }

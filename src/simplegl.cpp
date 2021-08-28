@@ -5,19 +5,19 @@ namespace AbyssCore{
         // FillRect(anchor, SDL_Rect({0, 0, anchor.w, anchor.h}), color);
     }
 
-    void DrawLine(Anchor anchor, aPair rect, aColor color){
-        // aPair globRect = {anchor.x + rect.x1, anchor.y + rect.y1, anchor.x + rect.x2, anchor.y + rect.y2};
+    // void DrawLine(Anchor anchor, aPair rect, aColor color){
+    //     // aPair globRect = {anchor.x + rect.x1, anchor.y + rect.y1, anchor.x + rect.x2, anchor.y + rect.y2};
 
-        // unsigned int VAO, VBO;
+    //     // unsigned int VAO, VBO;
 
-        // colorShader->Use();
-        // colorShader->SetInt1("useVertexColor", 1);
+    //     // colorShader->Use();
+    //     // colorShader->SetInt1("useVertexColor", 1);
 
-        // GLCreateVertexObjects(GLCreateLineArray(globRect, color), 2, VAO, VBO);
-        // glBindVertexArray(VAO);
-        // glDrawArrays(GL_LINE_STRIP, 0, 2);
-        // GLDestroyVertexObjects(VAO, VBO);
-    }
+    //     // GLCreateVertexObjects(GLCreateLineArray(globRect, color), 2, VAO, VBO);
+    //     // glBindVertexArray(VAO);
+    //     // glDrawArrays(GL_LINE_STRIP, 0, 2);
+    //     // GLDestroyVertexObjects(VAO, VBO);
+    // }
 
     void DrawRect(Anchor anchor, SDL_Rect rect, aColor color){
         // SDL_Rect globRect = {anchor.x + rect.x, anchor.y + rect.y, rect.w, rect.h};

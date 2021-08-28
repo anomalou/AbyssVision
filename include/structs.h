@@ -25,16 +25,14 @@ namespace AbyssCore{
     }aFRect;
 
     typedef struct{
-        int x1;
-        int y1;
-        int x2;
-        int y2;
-    }aPair;
-
-    typedef struct{
         int x;
         int y;
     }aPoint;
+
+    typedef struct{
+        aPoint pos;
+        aPoint size;
+    }aPRect;
 
     typedef struct{
         int x;

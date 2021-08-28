@@ -135,131 +135,6 @@ namespace AbyssCore{
             glClear(GL_COLOR_BUFFER_BIT);
             glClear(GL_STENCIL_BUFFER_BIT);
 
-            // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-            // unsigned int VAO, VBO, texture;
-
-            // defaultShader->Use();
-
-            // Vertex* rect = GLCreateRectArray(SDL_Rect({10, 10, 100, 100}), aColor({WHITE}));
-            // GLBindVertices(rect, 4, VAO, VBO);
-
-            // unsigned char data[] = {
-            //     255, 255, 255, 0, 0, 0, 255, 255, 255, 0, 0, 0,
-            //     255, 255, 255, 0, 0, 0, 255, 255, 255, 0, 0, 0,
-            //     255, 255, 255, 0, 0, 0, 255, 255, 255, 0, 0, 0,
-            //     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
-            // };
-
-            // glGenTextures(1, &texture);
-            // GLBind2DTexture(texture);
-
-            // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-            // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-            // GLGenerateMipmap(GL_TEXTURE_2D);
-
-            // glDrawArrays(GL_QUADS, 0, 4);
-            // GLUnbindVertices(VAO, VBO);
-
-            // GLBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-            // glClearColor(1.0f, 0.8f, 0.8f, 1.0f);
-
-            // glClear(GL_COLOR_BUFFER_BIT);
-
-            // colorShader->Use();
-
-            // glViewport(0, 0, screen_width, screen_height);
-
-            // GLBindVertices(GLCreateRectArray(SDL_Rect({10, 10, 100, 100}), aColor({RED})), 4, globalVAO, globalVBO);
-            // glDrawArrays(GL_QUADS, 0, 4);
-            // GLUnbindVertices(globalVAO, globalVBO);
-
-            // GLBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-            // glViewport(0, 0, screen_width, screen_height);
-
-            // glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-            // glClear(GL_COLOR_BUFFER_BIT);
-
-            // textureShader->Use();
-
-            // textureShader->SetInt1(AString("flip"), 1);
-
-            // GLBind2DTexture(testTexture);
-
-            // GLBindVertices(GLCreateRectArray(SDL_Rect({0, 0, 360, 360}), aColor({WHITE})), 4, globalVAO, globalVBO);
-            // glDrawArrays(GL_QUADS, 0, 4);
-            // GLUnbindVertices(globalVAO, globalVBO);
-
-            // colorShader->Use();
-
-            // GLBindVertices(GLCreateRectArray(SDL_Rect({10, 10, 100, 100}), aColor({BLACK})), 4, globalVAO, globalVBO);
-            // glDrawArrays(GL_QUADS, 0, 4);
-            // GLUnbindVertices(globalVAO, globalVBO);
-            // float w = OpenGL::Proportion(50, screen_width);
-            // float h = OpenGL::Proportion(50, screen_height);
-
-            // float rect[] = {
-            //     -w, -h, 0,
-            //     -w, h, 0,
-            //     w, h, 0,
-            //     w, -h, 0
-            // };
-
-            // float scale_x = 4;
-            // float scale_y = 2;
-
-            // float offset[] = {
-            //     -1 + w, 0.9f - h, 0, scale_x, scale_y, 1,
-            //     1 - w * 2, 1 - h, 0, 2, 1, 1
-            // };
-
-            // unsigned int instancedVBO;
-
-            // OpenGL::GenArrayBuffer(instancedVBO, GL_STATIC_DRAW, sizeof(float) * 6 * 2, offset);
-
-
-            // OpenGL::BindVBO(windowVBO);
-            // OpenGL::BindVAO(windowVAO);
-
-            // glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 3 * 4, rect);
-
-
-            // OpenGL::UseProgram("interface");
-
-            // OpenGL::Set1i("textureFill", 0);
-            // OpenGL::Set1i("flipTexture", 1);
-
-            // OpenGL::Bind2DTexture(Resources::GetTexture("ozzen").id);
-
-            // OpenGL::Set1i("drawBorder", 0);
-            // OpenGL::Set4i("borderRect", 10, 10, 100, 100);
-            // OpenGL::Set4f("borderColor", 1, 0, 0, 1);
-            // OpenGL::Set4f("backgroundColor", 0, 0, 0, 1);
-
-            // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
-            // // glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(sizeof(float) * 3));
-            // glEnableVertexAttribArray(0);
-            // // glEnableVertexAttribArray(1);
-            // // glVertexAttribDivisor(0, 1);
-
-            // OpenGL::BindVBO(instancedVBO);
-
-            // glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)0);
-            // glEnableVertexAttribArray(2);
-            // glVertexAttribDivisor(2, 1);
-
-            // glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(sizeof(float) * 3));
-            // glEnableVertexAttribArray(3);
-            // glVertexAttribDivisor(3, 1);
-            
-
-            // glDrawArraysInstanced(GL_QUADS, 0, 4, 2);
-
-
             for(Window* w : group->GetPull()){
                 if(w->IsVisible()){
                     DrawWindow(w);
@@ -349,45 +224,17 @@ namespace AbyssCore{
     }
 
     void Application::DrawWindow(Window* w){
-        // SDL_Rect rect = w->GetRect();
-        // float scaleX = OpenGL::Proportion(rect.w, screen_width);
-
-        // float headerScaleY = 0;
-        // if(w->IsFull())
-        //     headerScaleY = OpenGL::Proportion(HEADER_HEIGHT, screen_width);
-
-        // float bodyScaleY = 0;
-        // if(!w->IsMinimized())
-        //     bodyScaleY = OpenGL::Proportion(rect.h, screen_width);
-
-        // aFPoint headerPos = OpenGL::PixelsToNormal(aPoint({rect.x, rect.y}), screen_width, screen_height);
-        // aFPoint bodyPos = OpenGL::PixelsToNormal(aPoint({rect.x, rect.y + HEADER_HEIGHT}), screen_width, screen_height);
-
-        // float window[] = {
-        //     headerPos.x + defaultNormilizedWidth * scaleX, headerPos.y - defaultNormilizedHeight * headerScaleY, 0, scaleX, headerScaleY, 1, rect.x, rect.y, rect.w, HEADER_HEIGHT,
-        //     bodyPos.x + defaultNormilizedWidth * scaleX, bodyPos.y - defaultNormilizedHeight * bodyScaleY, 0, scaleX, bodyScaleY, 1, rect.x, rect.y + HEADER_HEIGHT, rect.w, rect.h
-        // };
-
-        // OpenGL::BindVAO(windowVAO);
-        // OpenGL::BindVBO(instancedVBO);
-
-        // glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 10 * 2, window);
-
-        // OpenGL::UseProgram("interface");
-        // OpenGL::Set1i("drawBorder", 1);
-        // OpenGL::Set4f("borderColor", 1, 0, 0, 1);
-        // OpenGL::Set4f("backgroundColor", 0, 0, 0, 1);
-
-        // glDrawArraysInstanced(GL_QUADS, 0, 4, 2);
-
         glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced), NULL, GL_DYNAMIC_DRAW);
 
-        if(w->IsFull())
+        if(w->IsFull()){
             DrawWindowHead(w);
+        }
+
         if(!w->IsMinimized())
             DrawWindowBody(w);
-        // if(w->IsFull())
-            // DrawWindowControl(w);
+
+        if(w->IsFull())
+            DrawWindowControl(w);
     }
 
     void Application::DrawWindowHead(Window* w){
@@ -448,14 +295,15 @@ namespace AbyssCore{
         Instanced body[] = {
             {vec3(pos.x + defaultNormilizedWidth * scaleX, pos.y - defaultNormilizedHeight * scaleY, 0),
              vec3(scaleX, scaleY, 1),
-             vec4(0, 0, 0, 0),
+             vec4(1, 1, 1, 1),
              vec4(background.r, background.g, background.b, background.a),
              vec4(border.r, border.g, border.b, border.a),
              vec4(rect.x, rect.y, rect.w, rect.h)}
         };
 
         //TODO: optimize
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Instanced), body);
+        OpenGL::UseProgram("icolor");
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced), body, GL_DYNAMIC_DRAW);
 
         glEnable(GL_STENCIL_TEST);
 
@@ -592,54 +440,6 @@ namespace AbyssCore{
                 glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced), wbody, GL_STATIC_DRAW);
 
                 glDrawArrays(GL_QUADS, 0, 4);
-
-                // aFPoint wv1 = OpenGL::PixelsToNormal(aPoint({wrect.x, wrect.y + wrect.h}), screen_width, screen_height);
-                // aFPoint wv2 = OpenGL::PixelsToNormal(aPoint({wrect.x, wrect.y}), screen_width, screen_height);
-                // aFPoint wv3 = OpenGL::PixelsToNormal(aPoint({wrect.x + wrect.w, wrect.y}), screen_width, screen_height);
-                // aFPoint wv4 = OpenGL::PixelsToNormal(aPoint({wrect.x + wrect.w, wrect.y + wrect.h}), screen_width, screen_height);
-
-                // float wrectData[] = {
-                //     wv1.x, wv1.y, 0, 0, 0,
-                //     wv2.x, wv2.y, 0, 0, 1,
-                //     wv3.x, wv3.y, 0, 1, 1,
-                //     wv4.x, wv4.y, 0, 1, 0
-                // };
-
-                // OpenGL::UseProgram("interface");
-                // OpenGL::Set1i("textureFill", 0);
-                // OpenGL::Set1i("drawBorder", 1);
-                // OpenGL::Set4i("borderRect", wrect.x, wrect.y, wrect.w, wrect.h);
-                // OpenGL::Set4f("borderColor", border.r, border.g, border.b, border.a);
-                // OpenGL::Set4f("backgroundColor", background.r, background.g, background.b, background.a);
-
-                // glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 5 * 4, wrectData);
-
-                // glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
-                // glStencilFunc(GL_EQUAL, 1, 0xFF);
-                // glStencilMask(0xFF);
-
-                // glDrawArrays(GL_QUADS, 0, 4);
-
-                // glStencilFunc(GL_EQUAL, 2, 0xFF);
-                // glStencilMask(0);
-
-                // //TODO: here too
-
-                // // Anchor anchor = {wrect.x, wrect.y, wrect.w, wrect.h};
-
-                // // wg->Paint(anchor);
-
-                // OpenGL::UseProgram("interface");
-
-
-                // glStencilOp(GL_DECR, GL_KEEP, GL_KEEP);
-                // glStencilFunc(GL_LESS, 2, 0xFF);
-                // glStencilMask(0xFF);
-
-                // glDrawArrays(GL_QUADS, 0, 4);
-
-                // glStencilFunc(GL_EQUAL, 1, 0xFF);
-                // glStencilMask(0x00);
             }
         }
 
@@ -650,77 +450,84 @@ namespace AbyssCore{
     }
 
     void Application::DrawWindowControl(Window* w){
-        // SDL_Rect wRect = w->GetRect();
+        SDL_Rect wRect = w->GetRect();
 
-        // SDL_Rect closeHitBox = w->GetCloseHitBox();
-        // SDL_Rect minimazeHitBox = w->GetMinimizeHitBox();
-        // SDL_Rect resizeHitBox = w->GetResizeHitBox();
+        SDL_Rect closeHitBox = w->GetCloseHitBox();
+        SDL_Rect minimazeHitBox = w->GetMinimizeHitBox();
+        SDL_Rect resizeHitBox = w->GetResizeHitBox();
 
-        // SDL_Rect crossRect = {wRect.x + closeHitBox.x, wRect.y + closeHitBox.y, closeHitBox.w, closeHitBox.h};
-        // SDL_Rect minRect = {wRect.x + minimazeHitBox.x - 1, wRect.y + minimazeHitBox.y, minimazeHitBox.w, minimazeHitBox.h};
-        // SDL_Rect resRect = {wRect.x + resizeHitBox.x - 1, wRect.y + resizeHitBox.y - 1, resizeHitBox.w, resizeHitBox.h};
-        // SDL_Rect rects[2] = {crossRect, minRect};
+        aPRect crossRect = {{wRect.x + closeHitBox.x, wRect.y + closeHitBox.y}, {closeHitBox.w, closeHitBox.h}};
+        aPRect minRect = {{wRect.x + minimazeHitBox.x - 1, wRect.y + minimazeHitBox.y}, {minimazeHitBox.w, minimazeHitBox.h}};
+        aPRect resRect = {{wRect.x + resizeHitBox.x - 1, wRect.y + resizeHitBox.y - 1}, {resizeHitBox.w, resizeHitBox.h}};
 
-        // aColor control = w->style.control;
-        // aColor border = w->style.border;
-        // aFColor enabled = GLConvertColor(w->style.enabled);
-        // aFColor disabled = GLConvertColor(w->style.disabled);
+        // aFColor control = OpenGL::NormilizeColor(w->style.control);
 
-        // string uniformName = "colorModificator";
+        OpenGL::UseProgram("itexture");
+        OpenGL::Set1i("fFlip", 1);
 
-        // controlShader->Use();
+        int elementCount = 2;
 
-        // GLBind2DTexture(Resources::GetTexture("close").id);
+        Instanced inst[3];
 
-        // if(w->CanClose())
-        //     controlShader->SetFloat4(uniformName, enabled.r, enabled.g, enabled.b, enabled.a);
-        // else
-        //     controlShader->SetFloat4(uniformName, disabled.r, disabled.g, disabled.b, disabled.a);
+        aPoint ui_atlas_scale({Resources::ui.width, Resources::ui.height});
 
-        // GLCreateVertexObjects(GLCreateRectArray(rects[0], control), 4, globalVAO, globalVBO);
-
-        // glBindVertexArray(globalVAO);
-        // glDrawArrays(GL_QUADS, 0, 4);
-
-        // colorShader->Use();
-
-        // colorShader->SetInt1("useVertexColor", 0);
-        // colorShader->SetFloat4("color", border.r, border.g, border.b, border.a);
-
-        // glDrawArrays(GL_LINE_LOOP, 0, 4);
-        // GLDestroyVertexObjects(globalVAO, globalVBO);
-
-        // controlShader->Use();
-
-        // GLBind2DTexture(Resources::GetTexture("minimize").id);
-
-        // if(w->CanMinimize())
-        //     controlShader->SetFloat4(uniformName, enabled.r, enabled.g, enabled.b, enabled.a);
-        // else
-        //     controlShader->SetFloat4(uniformName, disabled.r, disabled.g, disabled.b, disabled.a);
-
-        // GLCreateVertexObjects(GLCreateRectArray(rects[1], control), 4, globalVAO, globalVBO);
+        //TODO: check this
+        Texture close = Resources::ui.textures["close"];
         
-        // glBindVertexArray(globalVAO);
-        // glDrawArrays(GL_QUADS, 0, 4);
+        aFPoint cpos = OpenGL::PixelsToNormal(crossRect.pos, screen_width, screen_height);
+        float cscaleX = OpenGL::Proportion(crossRect.size.x, screen_width);
+        float cscaleY = OpenGL::Proportion(crossRect.size.y, screen_width);
 
-        // colorShader->Use();
+        float ctposX = OpenGL::Proportion(close.x, ui_atlas_scale.x);
+        float ctposY = OpenGL::Proportion(close.y, ui_atlas_scale.y);
+        float ctsizeX = OpenGL::Proportion(close.width, ui_atlas_scale.x);
+        float ctsizeY = OpenGL::Proportion(close.height, ui_atlas_scale.y);
 
-        // glDrawArrays(GL_LINE_LOOP, 0, 4);
-        // GLDestroyVertexObjects(globalVAO, globalVBO);
+        inst[0].offset = {cpos.x + defaultNormilizedWidth * cscaleX, cpos.y - defaultNormilizedHeight * cscaleY, 0};
+        inst[0].scale = {cscaleX, cscaleY, 1};
+        inst[0].texOffset = {ctposX, ctposY, ctsizeX, ctsizeY};
 
-        // if(!w->IsMinimized() && w->CanResize()){
-        //     controlShader->Use();
+        //TODO: check this
+        Texture minimize = Resources::ui.textures["minimize"];
+        
+        aFPoint mpos = OpenGL::PixelsToNormal(minRect.pos, screen_width, screen_height);
+        float mscaleX = OpenGL::Proportion(minRect.size.x, screen_width);
+        float mscaleY = OpenGL::Proportion(minRect.size.y, screen_width);
 
-        //     controlShader->SetFloat4(uniformName, enabled.r, enabled.g, enabled.b, enabled.a);
+        float mtposX = OpenGL::Proportion(minimize.x, ui_atlas_scale.x);
+        float mtposY = OpenGL::Proportion(minimize.y, ui_atlas_scale.y);
+        float mtsizeX = OpenGL::Proportion(minimize.width, ui_atlas_scale.x);
+        float mtsizeY = OpenGL::Proportion(minimize.height, ui_atlas_scale.y);
 
-        //     GLBind2DTexture(Resources::GetTexture("resize").id);
+        inst[1].offset = {mpos.x + defaultNormilizedWidth * mscaleX, mpos.y - defaultNormilizedHeight * mscaleY, 0};
+        inst[1].scale = {mscaleX, mscaleY, 1};
+        inst[1].texOffset = {mtposX, mtposY, mtsizeX, mtsizeY};
 
-        //     GLCreateVertexObjects(GLCreateRectArray(resRect, control), 4, globalVAO, globalVBO);
-        //     glBindVertexArray(globalVAO);
-        //     glDrawArrays(GL_QUADS, 0, 4);
-        //     GLDestroyVertexObjects(globalVAO, globalVBO);
-        // }
+        if(!w->IsMinimized()){
+            //TODO: check this
+            Texture resize = Resources::ui.textures["resize"];
+            
+            aFPoint rpos = OpenGL::PixelsToNormal(resRect.pos, screen_width, screen_height);
+            float rscaleX = OpenGL::Proportion(resRect.size.x, screen_width);
+            float rscaleY = OpenGL::Proportion(resRect.size.y, screen_width);
+
+            float rtposX = OpenGL::Proportion(resize.x, ui_atlas_scale.x);
+            float rtposY = OpenGL::Proportion(resize.y, ui_atlas_scale.y);
+            float rtsizeX = OpenGL::Proportion(resize.width, ui_atlas_scale.x);
+            float rtsizeY = OpenGL::Proportion(resize.height, ui_atlas_scale.y);
+
+            inst[2].offset = {rpos.x + defaultNormilizedWidth * rscaleX, rpos.y - defaultNormilizedHeight * rscaleY, 0};
+            inst[2].scale = {rscaleX, rscaleY, 1};
+            inst[2].texOffset = {rtposX, rtposY, rtsizeX, rtsizeY};
+
+            elementCount++;
+        }
+
+        OpenGL::Bind2DTexture(Resources::ui.id);
+
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced) * elementCount, inst, GL_STATIC_DRAW);
+    
+        glDrawArraysInstanced(GL_QUADS, 0, 4, elementCount);
     }
 
     void Application::ProcessKey(SDL_Event event){

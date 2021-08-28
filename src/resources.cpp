@@ -144,7 +144,7 @@ namespace AbyssCore{
             stream.read((char*)&width, sizeof(int));
             stream.read((char*)&height, sizeof(int));
 
-            vector<float> pixelData = vector<float>();
+            vector<char> pixelData = vector<char>();
 
             for(int i = 0; i < (width * height); i++){
                 char r;
@@ -157,12 +157,12 @@ namespace AbyssCore{
                 stream.read((char*)&b, sizeof(char));
                 stream.read((char*)&a, sizeof(char));
 
-                aFColor fColor = OpenGL::NormilizeColor(aColor{r, g, b, a});
+                // aFColor fColor = OpenGL::NormilizeColor(aColor{r, g, b, a});
 
-                pixelData.push_back(fColor.r);
-                pixelData.push_back(fColor.g);
-                pixelData.push_back(fColor.b);
-                pixelData.push_back(fColor.a);
+                pixelData.push_back(r);
+                pixelData.push_back(g);
+                pixelData.push_back(b);
+                pixelData.push_back(a);
             }
 
             size_t s = pixelData.size();
@@ -301,6 +301,14 @@ namespace AbyssCore{
         glDeleteShader(fragment);
 
         shaders.insert({name, id});
+    }
+
+    Texture Resources::GetUI(string name){
+        if(ui.textures.find(name) != ui.textures.end()){
+            return ui.textures.at(name);
+        }else{
+            return Texture();
+        }
     }
 
     // Texture Resources::GetTexture(string name){

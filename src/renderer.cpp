@@ -7,6 +7,7 @@ namespace AbyssCore{
 
         rectangles = vector<Rectangle>();
         sprites = vector<Sprite>();
+        texts = vector<Text>();
     }
 
     void Renderer::DrawRect(SDL_Rect rect, aColor backgroundColor, bool drawBorder, aColor borderColor){
@@ -35,12 +36,27 @@ namespace AbyssCore{
         startID++;
     }
 
+    void Renderer::DrawText(aPoint pos, string str){
+        Text text;
+        text.id = startID;
+        text.position = {pos.x + startCoords.x, pos.y + startCoords.y};
+        text.str = str;
+
+        texts.push_back(text);
+
+        startID++;
+    }
+
     vector<Rectangle> Renderer::GetRectangles(){
         return vector<Rectangle>(rectangles);
     }
 
     vector<Sprite> Renderer::GetSprites(){
         return vector<Sprite>(sprites);
+    }
+
+    vector<Text> Renderer::GetTexts(){
+        return vector<Text>(texts);
     }
 
     int Renderer::MaxID(){

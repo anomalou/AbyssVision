@@ -91,15 +91,6 @@ namespace AbyssCore{
         glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)wglGetProcAddress("glVertexAttribDivisor");
 #endif
 
-        // controlShader = new Shader();
-        // controlShader->Load("shaders/controlVertex.glsl", "shaders/controlFragment.glsl");
-
-        // textureShader = new Shader();
-        // textureShader->Load("shaders/textureVertex.glsl", "shaders/textureFragment.glsl");
-
-        // colorShader = new Shader();
-        // colorShader->Load("shaders/colorVertex.glsl", "shaders/colorFragment.glsl");
-
         SDL_GL_SetSwapInterval(1);
 
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -112,20 +103,12 @@ namespace AbyssCore{
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
-        // if(GLGetError())
-        //     return false;
-
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
-        // if(GLGetError())
-        //     return false;
+        OpenGL::GetError();
 
         return true;
-    }
-
-    bool GLGetError(){
-        
     }
 
     aFPoint3 GLPixelsToNormal(aPoint3 coord, int w, int h){
@@ -364,7 +347,12 @@ namespace AbyssCore{
     }
 
     aFPoint OpenGL::TexelsToNormal(aPoint coord, int w, int h){
-        
+        aFPoint npoint = {
+            (float)coord.x / (float)w,
+            (float)coord.y / (float)h
+        };
+
+        return npoint;
     }
 
     aFColor OpenGL::NormilizeColor(aColor color){

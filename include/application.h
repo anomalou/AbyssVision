@@ -76,6 +76,9 @@ namespace AbyssCore{
 
             static void Input();
             static void Render();
+            static void RenderRects(Renderer renderer);
+            static void RenderSprites(Renderer renderer);
+            static void RenderText(Renderer renderer);
 
             static void CreateFramebuffer();
 

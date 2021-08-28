@@ -130,6 +130,12 @@ namespace AbyssCore{
         aSize size;
         string textureName;
     }Sprite;
+
+    typedef struct{
+        int id;
+        aPoint position;
+        string str;
+    }Text;
 }
 
 

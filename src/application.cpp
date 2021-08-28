@@ -223,6 +223,55 @@ namespace AbyssCore{
         glVertexAttribDivisor(7, 1);
     }
 
+    void Application::RenderRects(Renderer renderer){
+        vector<Rectangle> rects = renderer.GetRectangles();
+
+        int rectsSize = rects.size();
+
+        vector<Instanced> irects = vector<Instanced>();
+
+        for(int i = 0; i < rectsSize; i++){
+            aFPoint rpos = OpenGL::PixelsToNormal(rects[i].position, screen_width, screen_height);
+            float scaleX = OpenGL::Proportion(rects[i].size.width, screen_width);
+            float scaleY = OpenGL::Proportion(rects[i].size.height, screen_width);
+
+            aFColor background = OpenGL::NormilizeColor(rects[i].backgroundColor);
+            aFColor border = background;
+            if(rects[i].drawBorder)
+                border = OpenGL::NormilizeColor(rects[i].borderColor);
+
+            float depth = OpenGL::Proportion(rects[i].id, renderer.MaxID());
+
+            Instanced inst;
+
+            inst.offset = {rpos.x + defaultNormilizedWidth * scaleX, rpos.y - defaultNormilizedHeight * scaleY, depth};
+            inst.scale = {scaleX, scaleY, 1};
+            inst.texOffset = {0, 0, 0, 0};
+            inst.background = {background.r, background.g, background.b, background.a};
+            inst.border = {border.r, border.g, border.b, border.a};
+            inst.borderRect = {rects[i].position.x, rects[i].position.y, rects[i].size.width, rects[i].size.height};
+        
+            irects.push_back(inst);
+        }
+
+        //TODO: optimize
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced) * rectsSize, irects.data(), GL_STATIC_DRAW);
+
+        //TODO:depth test
+
+        OpenGL::UseProgram("icolor");
+
+        glDrawArraysInstanced(GL_QUADS, 0, 4, rectsSize);
+    }
+
+    void Application::RenderSprites(Renderer renderer){
+
+    }
+
+    void Application::RenderText(Renderer renderer){
+        
+    }
+
     void Application::DrawWindow(Window* w){
         glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced), NULL, GL_DYNAMIC_DRAW);
 
@@ -322,42 +371,7 @@ namespace AbyssCore{
 
         w->Paint(renderer);
 
-        vector<Rectangle> rects = renderer.GetRectangles();
-
-        int rectsSize = rects.size();
-
-        vector<Instanced> irects = vector<Instanced>();
-
-        for(int i = 0; i < rectsSize; i++){
-            aFPoint rpos = OpenGL::PixelsToNormal(rects[i].position, screen_width, screen_height);
-            float scaleX = OpenGL::Proportion(rects[i].size.width, screen_width);
-            float scaleY = OpenGL::Proportion(rects[i].size.height, screen_width);
-
-            aFColor background = OpenGL::NormilizeColor(rects[i].backgroundColor);
-            aFColor border = background;
-            if(rects[i].drawBorder)
-                border = OpenGL::NormilizeColor(rects[i].borderColor);
-
-            float depth = OpenGL::Proportion(rects[i].id, renderer.MaxID());
-
-            Instanced inst;
-
-            inst.offset = {rpos.x + defaultNormilizedWidth * scaleX, rpos.y - defaultNormilizedHeight * scaleY, depth};
-            inst.scale = {scaleX, scaleY, 1};
-            inst.texOffset = {0, 0, 0, 0};
-            inst.background = {background.r, background.g, background.b, background.a};
-            inst.border = {border.r, border.g, border.b, border.a};
-            inst.borderRect = {rects[i].position.x, rects[i].position.y, rects[i].size.width, rects[i].size.height};
-        
-            irects.push_back(inst);
-        }
-
-        //TODO: optimize
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced) * rectsSize, irects.data(), GL_STATIC_DRAW);
-
-        //TODO:depth test
-
-        glDrawArraysInstanced(GL_QUADS, 0, 4, rectsSize);
+        RenderRects(renderer);
 
         for(Widget * wg : w->GetPull()){
             if(wg->IsVisible() && wg->GetRect().x <= w->GetRect().w && wg->GetRect().y <= w->GetRect().h){
@@ -399,39 +413,7 @@ namespace AbyssCore{
 
                 wg->Paint(renderer);
 
-                vector<Rectangle> rects = renderer.GetRectangles();
-
-                int rectsSize = rects.size();
-
-                vector<Instanced> irects = vector<Instanced>();
-
-                for(int i = 0; i < rectsSize; i++){
-                    aFPoint rpos = OpenGL::PixelsToNormal(rects[i].position, screen_width, screen_height);
-                    float scaleX = OpenGL::Proportion(rects[i].size.width, screen_width);
-                    float scaleY = OpenGL::Proportion(rects[i].size.height, screen_width);
-
-                    aFColor background = OpenGL::NormilizeColor(rects[i].backgroundColor);
-                    aFColor border = background;
-                    if(rects[i].drawBorder)
-                        border = OpenGL::NormilizeColor(rects[i].borderColor);
-
-                    float depth = OpenGL::Proportion(rects[i].id, renderer.MaxID());
-
-                    Instanced inst;
-
-                    inst.offset = {rpos.x + defaultNormilizedWidth * scaleX, rpos.y - defaultNormilizedHeight * scaleY, depth};
-                    inst.scale = {scaleX, scaleY, 1};
-                    inst.texOffset = {0, 0, 0, 0};
-                    inst.background = {background.r, background.g, background.b, background.a};
-                    inst.border = {border.r, border.g, border.b, border.a};
-                    inst.borderRect = {rects[i].position.x, rects[i].position.y, rects[i].size.width, rects[i].size.height};
-                
-                    irects.push_back(inst);
-                }
-
-                glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced) * rectsSize, irects.data(), GL_STATIC_DRAW);
-
-                glDrawArraysInstanced(GL_QUADS, 0, 4, rectsSize);
+                RenderRects(renderer);
 
                 glStencilOp(GL_DECR, GL_KEEP, GL_KEEP);
                 glStencilFunc(GL_LESS, 2, 0xFF);
@@ -456,71 +438,54 @@ namespace AbyssCore{
         SDL_Rect minimazeHitBox = w->GetMinimizeHitBox();
         SDL_Rect resizeHitBox = w->GetResizeHitBox();
 
-        aPRect crossRect = {{wRect.x + closeHitBox.x, wRect.y + closeHitBox.y}, {closeHitBox.w, closeHitBox.h}};
-        aPRect minRect = {{wRect.x + minimazeHitBox.x - 1, wRect.y + minimazeHitBox.y}, {minimazeHitBox.w, minimazeHitBox.h}};
-        aPRect resRect = {{wRect.x + resizeHitBox.x - 1, wRect.y + resizeHitBox.y - 1}, {resizeHitBox.w, resizeHitBox.h}};
+        aPRect crects[] = {
+            {{wRect.x + closeHitBox.x, wRect.y + closeHitBox.y}, {closeHitBox.w, closeHitBox.h}},
+            {{wRect.x + minimazeHitBox.x - 1, wRect.y + minimazeHitBox.y}, {minimazeHitBox.w, minimazeHitBox.h}},
+            {{wRect.x + resizeHitBox.x - 1, wRect.y + resizeHitBox.y - 1}, {resizeHitBox.w, resizeHitBox.h}}
+        };
 
         // aFColor control = OpenGL::NormilizeColor(w->style.control);
 
         OpenGL::UseProgram("itexture");
         OpenGL::Set1i("fFlip", 1);
 
-        int elementCount = 2;
+        int elementCount;
+
+        if(w->IsMinimized())
+            elementCount = 2;
+        else
+            elementCount = 3;
 
         Instanced inst[3];
 
         aPoint ui_atlas_scale({Resources::ui.width, Resources::ui.height});
 
-        //TODO: check this
-        Texture close = Resources::ui.textures["close"];
-        
-        aFPoint cpos = OpenGL::PixelsToNormal(crossRect.pos, screen_width, screen_height);
-        float cscaleX = OpenGL::Proportion(crossRect.size.x, screen_width);
-        float cscaleY = OpenGL::Proportion(crossRect.size.y, screen_width);
+        for(int i = 0; i < elementCount; i++){
+            Texture tex;
 
-        float ctposX = OpenGL::Proportion(close.x, ui_atlas_scale.x);
-        float ctposY = OpenGL::Proportion(close.y, ui_atlas_scale.y);
-        float ctsizeX = OpenGL::Proportion(close.width, ui_atlas_scale.x);
-        float ctsizeY = OpenGL::Proportion(close.height, ui_atlas_scale.y);
-
-        inst[0].offset = {cpos.x + defaultNormilizedWidth * cscaleX, cpos.y - defaultNormilizedHeight * cscaleY, 0};
-        inst[0].scale = {cscaleX, cscaleY, 1};
-        inst[0].texOffset = {ctposX, ctposY, ctsizeX, ctsizeY};
-
-        //TODO: check this
-        Texture minimize = Resources::ui.textures["minimize"];
-        
-        aFPoint mpos = OpenGL::PixelsToNormal(minRect.pos, screen_width, screen_height);
-        float mscaleX = OpenGL::Proportion(minRect.size.x, screen_width);
-        float mscaleY = OpenGL::Proportion(minRect.size.y, screen_width);
-
-        float mtposX = OpenGL::Proportion(minimize.x, ui_atlas_scale.x);
-        float mtposY = OpenGL::Proportion(minimize.y, ui_atlas_scale.y);
-        float mtsizeX = OpenGL::Proportion(minimize.width, ui_atlas_scale.x);
-        float mtsizeY = OpenGL::Proportion(minimize.height, ui_atlas_scale.y);
-
-        inst[1].offset = {mpos.x + defaultNormilizedWidth * mscaleX, mpos.y - defaultNormilizedHeight * mscaleY, 0};
-        inst[1].scale = {mscaleX, mscaleY, 1};
-        inst[1].texOffset = {mtposX, mtposY, mtsizeX, mtsizeY};
-
-        if(!w->IsMinimized()){
             //TODO: check this
-            Texture resize = Resources::ui.textures["resize"];
-            
-            aFPoint rpos = OpenGL::PixelsToNormal(resRect.pos, screen_width, screen_height);
-            float rscaleX = OpenGL::Proportion(resRect.size.x, screen_width);
-            float rscaleY = OpenGL::Proportion(resRect.size.y, screen_width);
+            switch(i){
+                case 0:
+                    tex = Resources::ui.textures["close"];
+                break;
+                case 1:
+                    tex = Resources::ui.textures["minimize"];
+                break;
+                case 2:
+                    tex = Resources::ui.textures["resize"];
+                break;
+            }
 
-            float rtposX = OpenGL::Proportion(resize.x, ui_atlas_scale.x);
-            float rtposY = OpenGL::Proportion(resize.y, ui_atlas_scale.y);
-            float rtsizeX = OpenGL::Proportion(resize.width, ui_atlas_scale.x);
-            float rtsizeY = OpenGL::Proportion(resize.height, ui_atlas_scale.y);
+            aFPoint pos = OpenGL::PixelsToNormal(crects[i].pos, screen_width, screen_height);
+            float scaleX = OpenGL::Proportion(crects[i].size.x, screen_width);
+            float scaleY = OpenGL::Proportion(crects[i].size.y, screen_width);
 
-            inst[2].offset = {rpos.x + defaultNormilizedWidth * rscaleX, rpos.y - defaultNormilizedHeight * rscaleY, 0};
-            inst[2].scale = {rscaleX, rscaleY, 1};
-            inst[2].texOffset = {rtposX, rtposY, rtsizeX, rtsizeY};
+            aFPoint tpos = OpenGL::TexelsToNormal(aPoint({tex.x, tex.y}), ui_atlas_scale.x, ui_atlas_scale.y);
+            aFPoint tscale = OpenGL::TexelsToNormal(aPoint({tex.width, tex.height}), ui_atlas_scale.x, ui_atlas_scale.y);
 
-            elementCount++;
+            inst[i].offset = {pos.x + defaultNormilizedWidth * scaleX, pos.y - defaultNormilizedHeight * scaleY, 0};
+            inst[i].scale = {scaleX, scaleY, 1};
+            inst[i].texOffset = {tpos.x, tpos.y, tscale.x, tscale.y};
         }
 
         OpenGL::Bind2DTexture(Resources::ui.id);

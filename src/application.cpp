@@ -669,7 +669,7 @@ namespace MediumCore{
 
     bool Application::CreateSDLWindow(){
         window = SDL_CreateWindow(
-            "AbyssVision", 
+            "Medium", 
             SDL_WINDOWPOS_CENTERED, 
             SDL_WINDOWPOS_CENTERED, 
             RESOLUTION_X, 

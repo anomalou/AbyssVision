@@ -5,7 +5,7 @@
 #include <agl.h>
 
 
-namespace AbyssCore{
+namespace MediumCore{
     typedef struct{
         int x;
         int y;

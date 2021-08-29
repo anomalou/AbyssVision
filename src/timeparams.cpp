@@ -1,5 +1,5 @@
 #include <timeparams.h>
 
-namespace AbyssCore{
+namespace MediumCore{
     double Time::deltaTime = 0;
 }

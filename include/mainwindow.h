@@ -7,7 +7,7 @@
 #include <widgets/trackbar.h>
 #include <resources.h>
 
-namespace AbyssCore{
+namespace MediumCore{
     /**
      * \brief Main window class for debugging new features
      */

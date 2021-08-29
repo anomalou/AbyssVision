@@ -23,7 +23,7 @@
 
 using namespace std;
 
-namespace AbyssCore{
+namespace MediumCore{
 
     // typedef struct{
     //     int size;

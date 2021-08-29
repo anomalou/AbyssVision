@@ -1,7 +1,7 @@
 #include <mainwindow.h>
 #include <application.h>
 
-namespace AbyssCore{
+namespace MediumCore{
     void Open(Widget* sender, ActionEvent event){
         MainWindow* mainWindow = dynamic_cast<MainWindow*>(event.parent);
 
@@ -61,7 +61,7 @@ namespace AbyssCore{
 
         full->clickAction = FullAction;
 
-        trackbar->SetPos(10, 30);
+        trackbar->SetPos(10, 50);
         trackbar->SetSize(200, 50);
 
         trackbar->minValue = 1;
@@ -81,46 +81,11 @@ namespace AbyssCore{
     void MainWindow::Paint(Renderer &renderer){
         Window::Paint(renderer);
 
-        // float scale = (float)trackbar->GetValue() / 10;
-        // int toSize = scale * 200;
+        char fps[10];
 
-        // double odds = abs((double)toSize - currentSize);
+        snprintf(fps, 10, "FPS:%d", Application::fps);
 
-        // if(currentSize < toSize)
-        //     currentSize += (odds * Time::deltaTime / 100);
-        // else if(currentSize > toSize)
-        //     currentSize -= (odds * Time::deltaTime / 100);
-
-        // GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({anchor.x + 10, anchor.y + 70, (int)(round(currentSize)), (int)(round(currentSize))}), aColor({WHITE})), 4, ozzenVAO, ozzenVBO);
-
-        // textureShader->Use();
-
-        // textureShader->SetInt1("flip", 1);
-
-        // GLBind2DTexture(Resources::GetTexture("ozzen").id);
-
-        // glBindVertexArray(ozzenVAO);
-        // glDrawArrays(GL_QUADS, 0, 4);
-
-        // GLDestroyVertexObjects(ozzenVAO, ozzenVBO);
-
-        // GLRenderText("To start game tou should press play button", "arial15", aPoint({anchor.x + 300, anchor.y + 30}));
-
-        // Texture text = Resources::CreateStringTexture("Hellog world!!!", "arial30");
-
-        // unsigned int VAO, VBO;
-
-        // textureShader->Use();
-        // textureShader->SetInt1("flip", 1);
-
-        // GLCreateVertexObjects(GLCreateRectArray(SDL_Rect({anchor.x + 10, anchor.y, text.width, text.height}), aColor({WHITE})), 4, VAO, VBO);
-
-        // GLBindVertexArray(VAO);
-
-        // GLBind2DTexture(text.id);
-
-        // glDrawArrays(GL_QUADS, 0 ,4);
-
-        // GLDestroyVertexObjects(VAO, VBO);
+        renderer.DrawTextA(aPoint({10, 30}), fps, 0.5);
+        renderer.DrawTextA(aPoint({10, 250}), "Hello world!", (float)((float)trackbar->GetValue() / (float)10));
     }
 }

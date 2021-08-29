@@ -1,6 +1,6 @@
 #include <widget.h>
 
-namespace AbyssCore{
+namespace MediumCore{
     Widget::Widget(Window* parent){
         name = "\r";
         style = Style{{LIGHT_GRAY}, {GRAY}, {WHITE}, 0, {WHITE}, {BLACK}, {GRAY}, {WHITE}, {GRAY}, {GRAY}, {WHITE}};
@@ -60,5 +60,13 @@ namespace AbyssCore{
         }
 
         return false;
+    }
+
+    void Widget::OnKeyPressed(SDL_KeyboardEvent event){
+
+    }
+
+    void Widget::OnKeyReleased(SDL_KeyboardEvent event){
+
     }
 }

@@ -1,6 +1,6 @@
 #include <widgets/trackbar.h>
 
-namespace AbyssCore{
+namespace MediumCore{
     Trackbar::Trackbar(Window* parent) : Widget(parent){
         minValue = 0;
         maxValue = 10;

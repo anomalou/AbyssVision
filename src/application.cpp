@@ -1,6 +1,6 @@
 #include <application.h>
 
-namespace AbyssCore{
+namespace MediumCore{
     bool Application::isRunning;
     SDL_Window* Application::window;
     IWindowsGroup* Application::group;
@@ -16,6 +16,8 @@ namespace AbyssCore{
 
     unsigned int Application::framebuffer;
     unsigned int Application::framebufferTexture;
+
+    int Application::fps;
 
     bool Application::Init(){
         if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -57,6 +59,7 @@ namespace AbyssCore{
         render = new thread(Render);
 
         while(isRunning){
+            
             Input();
         }
 
@@ -74,7 +77,7 @@ namespace AbyssCore{
     void Application::Input(){
         SDL_Event event;
 
-        while(SDL_PollEvent(&event)){
+        if(SDL_WaitEvent(&event)){
             switch(event.type){
                 case SDL_QUIT:
                     isRunning = false;
@@ -97,6 +100,8 @@ namespace AbyssCore{
                     ProcessKey(event);
                 break;
             }
+
+            // SDL_Delay(fps);
         }
 
         group->ProcessWindows();
@@ -146,7 +151,8 @@ namespace AbyssCore{
 
             int cTime = SDL_GetTicks();
             if(cTime - lTime > 0){
-                printf("FPS: %d\n", 1000/(cTime - lTime));
+                fps = 1000/(cTime - lTime);
+                // printf("FPS: %d\n", fps);
             }
         }
 
@@ -228,40 +234,43 @@ namespace AbyssCore{
 
         int rectsSize = rects.size();
 
-        vector<Instanced> irects = vector<Instanced>();
+        if(rectsSize > 0){
+            OpenGL::BindVBO(instancedVBO);
+            vector<Instanced> irects = vector<Instanced>();
 
-        for(int i = 0; i < rectsSize; i++){
-            aFPoint rpos = OpenGL::PixelsToNormal(rects[i].position, screen_width, screen_height);
-            float scaleX = OpenGL::Proportion(rects[i].size.width, screen_width);
-            float scaleY = OpenGL::Proportion(rects[i].size.height, screen_width);
+            for(int i = 0; i < rectsSize; i++){
+                aFPoint rpos = OpenGL::PixelsToNormal(rects[i].position, screen_width, screen_height);
+                float scaleX = OpenGL::Proportion(rects[i].size.width, screen_width);
+                float scaleY = OpenGL::Proportion(rects[i].size.height, screen_width);
 
-            aFColor background = OpenGL::NormilizeColor(rects[i].backgroundColor);
-            aFColor border = background;
-            if(rects[i].drawBorder)
-                border = OpenGL::NormilizeColor(rects[i].borderColor);
+                aFColor background = OpenGL::NormilizeColor(rects[i].backgroundColor);
+                aFColor border = background;
+                if(rects[i].drawBorder)
+                    border = OpenGL::NormilizeColor(rects[i].borderColor);
 
-            float depth = OpenGL::Proportion(rects[i].id, renderer.MaxID());
+                float depth = OpenGL::Proportion(rects[i].id, renderer.MaxID());
 
-            Instanced inst;
+                Instanced inst;
 
-            inst.offset = {rpos.x + defaultNormilizedWidth * scaleX, rpos.y - defaultNormilizedHeight * scaleY, depth};
-            inst.scale = {scaleX, scaleY, 1};
-            inst.texOffset = {0, 0, 0, 0};
-            inst.background = {background.r, background.g, background.b, background.a};
-            inst.border = {border.r, border.g, border.b, border.a};
-            inst.borderRect = {rects[i].position.x, rects[i].position.y, rects[i].size.width, rects[i].size.height};
-        
-            irects.push_back(inst);
+                inst.offset = {rpos.x + defaultNormilizedWidth * scaleX, rpos.y - defaultNormilizedHeight * scaleY, depth};
+                inst.scale = {scaleX, scaleY, 1};
+                inst.texOffset = {0, 0, 0, 0};
+                inst.background = {background.r, background.g, background.b, background.a};
+                inst.border = {border.r, border.g, border.b, border.a};
+                inst.borderRect = {rects[i].position.x, rects[i].position.y, rects[i].size.width, rects[i].size.height};
+            
+                irects.push_back(inst);
+            }
+
+            //TODO: optimize
+            glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced) * rectsSize, irects.data(), GL_STATIC_DRAW);
+
+            //TODO:depth test
+
+            OpenGL::UseProgram("icolor");
+
+            glDrawArraysInstanced(GL_QUADS, 0, 4, rectsSize);
         }
-
-        //TODO: optimize
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced) * rectsSize, irects.data(), GL_STATIC_DRAW);
-
-        //TODO:depth test
-
-        OpenGL::UseProgram("icolor");
-
-        glDrawArraysInstanced(GL_QUADS, 0, 4, rectsSize);
     }
 
     void Application::RenderSprites(Renderer renderer){
@@ -269,7 +278,53 @@ namespace AbyssCore{
     }
 
     void Application::RenderText(Renderer renderer){
-        
+        vector<Text> texts = renderer.GetTexts();
+
+        int textsSize = texts.size();
+
+        if(textsSize > 0){
+            OpenGL::BindVBO(instancedVBO);
+            vector<Instanced> gliphs = vector<Instanced>();
+
+            //TODO: add font selector
+            Font font = Resources::GetCurrentFont();
+
+            OpenGL::Bind2DTexture(font.gliphsTexture);
+
+            for(Text text : texts){
+                float scale = text.scale;
+                aPoint startPoint = text.position;
+                for(int i = 0; i < text.str.length(); i++){
+                    char c = text.str[i];
+                    Gliph *gliph = new Gliph();
+                    if(font.gliphs.find(c) != font.gliphs.end()){
+                        gliph = font.gliphs.at(c);
+                        // gliph->
+                        aPoint gliphPos = {startPoint.x, startPoint.y - (int)(gliph->maxy * scale)};
+                        aFPoint npos = OpenGL::PixelsToNormal(gliphPos, screen_width, screen_height);
+                        float scaleX = OpenGL::Proportion((gliph->maxx - gliph->minx) * scale, screen_width);
+                        float scaleY = OpenGL::Proportion((gliph->maxy - gliph->miny) * scale, screen_width);
+
+                        Instanced glh;
+
+                        glh.offset = {npos.x + defaultNormilizedWidth * scaleX, npos.y - defaultNormilizedHeight * scaleY, 0};
+                        glh.scale = {scaleX, scaleY, 1};
+                        glh.texOffset = {gliph->texRect.left, gliph->texRect.bottom, gliph->texRect.right - gliph->texRect.left, gliph->texRect.top};
+
+                        gliphs.push_back(glh);
+
+                        startPoint.x += gliph->advance * scale;
+                    }
+                }
+            }
+
+            glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced) * gliphs.size(), gliphs.data(), GL_STATIC_DRAW);
+
+            OpenGL::UseProgram("itexture");
+            OpenGL::Set1i("fFlip", 1);
+
+            glDrawArraysInstanced(GL_QUADS, 0, 4, gliphs.size());
+        }
     }
 
     void Application::DrawWindow(Window* w){
@@ -372,6 +427,8 @@ namespace AbyssCore{
         w->Paint(renderer);
 
         RenderRects(renderer);
+        RenderSprites(renderer);
+        RenderText(renderer);
 
         for(Widget * wg : w->GetPull()){
             if(wg->IsVisible() && wg->GetRect().x <= w->GetRect().w && wg->GetRect().y <= w->GetRect().h){
@@ -398,6 +455,8 @@ namespace AbyssCore{
 
                 //TODO: optimize
                 glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced), wbody, GL_STATIC_DRAW);
+
+                OpenGL::UseProgram("icolor");
 
                 glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
                 glStencilFunc(GL_EQUAL, 1, 0xFF);
@@ -449,12 +508,16 @@ namespace AbyssCore{
         OpenGL::UseProgram("itexture");
         OpenGL::Set1i("fFlip", 1);
 
-        int elementCount;
+        int elementCount = 0;
 
-        if(w->IsMinimized())
-            elementCount = 2;
-        else
-            elementCount = 3;
+        if(w->CanClose())
+            elementCount++;
+
+        if(w->CanMinimize())
+            elementCount++;
+
+        if(w->CanResize() && !w->IsMinimized())
+            elementCount++;
 
         Instanced inst[3];
 

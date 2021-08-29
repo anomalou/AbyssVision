@@ -1,6 +1,6 @@
 #include <agl.h>
 
-namespace AbyssCore{
+namespace MediumCore{
 
     PFNGLCREATESHADERPROC glCreateShader;
     PFNGLCREATEPROGRAMPROC glCreateProgram;

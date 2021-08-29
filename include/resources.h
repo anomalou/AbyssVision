@@ -13,7 +13,7 @@
 
 using namespace std;
 
-namespace AbyssCore{
+namespace MediumCore{
     class Resources{
         private:
             // static map<string, Texture*> textures;
@@ -36,6 +36,7 @@ namespace AbyssCore{
             static void LoadShader(string vpath, string fpath, string name);
             static Texture GetUI(string name);
             static Font GetFont(string name);
+            static Font GetCurrentFont();
             static unsigned int GetShader(string name);
             /**
              * \brief Depricated

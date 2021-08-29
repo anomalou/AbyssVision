@@ -9,7 +9,7 @@
 
 using namespace std;
 
-namespace AbyssCore{
+namespace MediumCore{
     class IWindowsGroup{
         public:
             virtual vector<Window*> GetPull() = 0;

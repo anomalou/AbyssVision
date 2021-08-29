@@ -1,6 +1,6 @@
 #include <emptywindow.h>
 
-namespace AbyssCore{
+namespace MediumCore{
     EmptyWindow::EmptyWindow() : Window(){
         pos = {0, 0};
     }

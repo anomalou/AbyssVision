@@ -6,7 +6,7 @@
 
 using namespace std;
 
-namespace AbyssCore{
+namespace MediumCore{
     class SystemGroup : public IWindowsGroup{
         private:
             list<Window*> windowsPull;

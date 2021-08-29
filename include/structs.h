@@ -9,7 +9,7 @@
 using namespace std;
 using namespace glm;
 
-namespace AbyssCore{
+namespace MediumCore{
     typedef struct{
         int left;
         int right;
@@ -135,6 +135,7 @@ namespace AbyssCore{
         int id;
         aPoint position;
         string str;
+        float scale;
     }Text;
 }
 

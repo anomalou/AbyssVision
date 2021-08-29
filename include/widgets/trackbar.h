@@ -10,7 +10,7 @@
 
 #define HANDLE_OFFSET 15
 
-namespace AbyssCore{
+namespace MediumCore{
     class Trackbar : public Widget{
         private:
             int value;

@@ -1,6 +1,6 @@
 #include <renderer.h>
 
-namespace AbyssCore{
+namespace MediumCore{
     Renderer::Renderer(int x, int y){
         startCoords = {x, y};
         startID = 0;
@@ -36,11 +36,12 @@ namespace AbyssCore{
         startID++;
     }
 
-    void Renderer::DrawText(aPoint pos, string str){
+    void Renderer::DrawTextA(aPoint pos, string str, float scale){
         Text text;
         text.id = startID;
         text.position = {pos.x + startCoords.x, pos.y + startCoords.y};
         text.str = str;
+        text.scale = scale;
 
         texts.push_back(text);
 

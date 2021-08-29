@@ -1,6 +1,6 @@
 #include <systemgroup.h>
 
-namespace AbyssCore{
+namespace MediumCore{
     SystemGroup::SystemGroup(){
         windowsPull = list<Window*>();
     }

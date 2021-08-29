@@ -29,7 +29,7 @@
 using namespace std;
 using namespace glm;
 
-namespace AbyssCore{
+namespace MediumCore{
     class Application{
         private:
             static bool isRunning;
@@ -51,6 +51,9 @@ namespace AbyssCore{
 
             static unsigned int framebuffer;
             static unsigned int framebufferTexture;
+
+        public:
+            static int fps;
 
         private:
             static bool CreateSDLWindow();

@@ -7,7 +7,7 @@
 
 using namespace std;
 
-namespace AbyssCore{
+namespace MediumCore{
     class Renderer{
         private:
             aPoint startCoords;
@@ -20,7 +20,7 @@ namespace AbyssCore{
             Renderer(int x, int y);
             void DrawRect(SDL_Rect rect, aColor backgroundColor, bool drawBorder, aColor borderColor);
             void DrawSprite(SDL_Rect rect, string texture);
-            void DrawText(aPoint pos, string str);
+            void DrawTextA(aPoint pos, string str, float scale);
             vector<Rectangle> GetRectangles();
             vector<Sprite> GetSprites();
             vector<Text> GetTexts();

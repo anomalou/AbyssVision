@@ -8,7 +8,7 @@
 
 #define WINDOW_FLAGS SDL_WINDOW_OPENGL
 
-namespace AbyssCore{
+namespace MediumCore{
     extern int screen_width;
     extern int screen_height;
 

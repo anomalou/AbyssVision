@@ -13,7 +13,7 @@
 
 using namespace std;
 
-namespace AbyssCore{
+namespace MediumCore{
     class Window{
         protected:
             bool canMinimaze;

@@ -1,6 +1,6 @@
 #include <resources.h>
 
-namespace AbyssCore{
+namespace MediumCore{
 
     // map<string, Texture*> Resources::textures = map<string, Texture*>();
     Atlas Resources::ui;
@@ -55,8 +55,8 @@ namespace AbyssCore{
         ui = LoadAtlas("ui.ata");
         // sprites = LoadAtlas("sprites.ata");
 
-        LoadFont("arial.ttf", "arial15", 15);
-        LoadFont("firacode.ttf", "firacode15", 15);
+        LoadFont("arial.ttf", "arial", 50);
+        // LoadFont("firacode.ttf", "firacode", 50);
 
         // LoadShader("shaders/interfacev.glsl", "shaders/interfacef.glsl", "interface");
         // LoadShader("shaders/windowv.glsl", "shaders/windowf.glsl", "window");
@@ -171,7 +171,7 @@ namespace AbyssCore{
             atlas.width = width;
             atlas.height = height;
             
-            atlas.id = OpenGL::Create2DTexture(pixelData.data(), width, height, GL_RGBA, GL_NEAREST);
+            atlas.id = OpenGL::Create2DTexture(pixelData.data(), width, height, GL_RGBA, GL_LINEAR);
         }
 
         return atlas;
@@ -222,7 +222,7 @@ namespace AbyssCore{
                 min = gliph->miny;
 
             float a = (float)(offset + gliph->minx) / (float)gliphSurface->w;
-            float b = (float)(offset + gliph->advance) / (float)gliphSurface->w;
+            float b = (float)(offset + gliph->maxx) / (float)gliphSurface->w;
 
             offset += gliph->advance;
 
@@ -236,8 +236,8 @@ namespace AbyssCore{
         for(int i = 0; i < 96; i++){
             char c = GLIPHS[i];
             Gliph *gliph = font->gliphs.at(c);
-            gliph->texRect.bottom = (float)(min + gliph->miny) / (float)(psize);
-            gliph->texRect.top = (float)(min + gliph->maxy) / (float)(psize);
+            gliph->texRect.bottom = (float)(min + gliph->miny) / (float)(gliphSurface->h);
+            gliph->texRect.top = (float)(gliph->maxy - gliph->miny) / (float)(gliphSurface->h);
         }
 
         SDL_FreeSurface(gliphSurface);
@@ -327,6 +327,13 @@ namespace AbyssCore{
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Cant get font!", name.c_str(), NULL);
             return {};
         }
+    }
+
+    Font Resources::GetCurrentFont(){
+        if(!fonts.empty()){
+            return *(prev(fonts.end())->second);
+        }
+        return Font();
     }
 
     unsigned int Resources::GetShader(string name){

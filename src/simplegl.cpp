@@ -1,6 +1,6 @@
 #include <simplegl.h>
 
-namespace AbyssCore{
+namespace MediumCore{
     void Clear(Anchor anchor, aColor color){
         // FillRect(anchor, SDL_Rect({0, 0, anchor.w, anchor.h}), color);
     }

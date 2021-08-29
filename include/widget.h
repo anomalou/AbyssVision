@@ -10,7 +10,7 @@
 
 using namespace std;
 
-namespace AbyssCore{
+namespace MediumCore{
     class Window;
 
     typedef struct{
@@ -56,6 +56,9 @@ namespace AbyssCore{
             virtual void SetDisable(bool d);
 
             virtual bool WidgetHit(int x, int y);
+
+            virtual void OnKeyPressed(SDL_KeyboardEvent event);
+            virtual void OnKeyReleased(SDL_KeyboardEvent event);
 
             virtual void OnMouseDown(SDL_MouseButtonEvent event) = 0;
             virtual void OnMouseUp(SDL_MouseButtonEvent event) = 0;

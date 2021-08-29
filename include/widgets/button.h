@@ -3,7 +3,7 @@
 
 #include <widget.h>
 
-namespace AbyssCore{
+namespace MediumCore{
     class Button : public Widget{
         private:
             bool beginClick;

@@ -5,7 +5,7 @@
 #include <agl.h>
 #include <colors.h>
 
-namespace AbyssCore{
+namespace MediumCore{
     typedef struct{
         aColor background;
         aColor border;

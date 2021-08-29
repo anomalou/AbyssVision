@@ -1,6 +1,6 @@
 #include <widgets/button.h>
 
-namespace AbyssCore{
+namespace MediumCore{
     Button::Button(Window* parent) : Widget(parent){
         beginClick = false;
         state = Idle;

@@ -3,7 +3,7 @@
 
 #include <window.h>
 
-namespace AbyssCore{
+namespace MediumCore{
     /**
      * \brief Sub window class for debugging
      */

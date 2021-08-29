@@ -1,7 +1,7 @@
 #ifndef TIMEPARAMS_H
 #define TIMEPARAMS_H
 
-namespace AbyssCore{
+namespace MediumCore{
     class Time{
         public:
             static double deltaTime;

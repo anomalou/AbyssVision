@@ -2,7 +2,7 @@
 #include <SDL.h>
 #include <application.h>
 
-using namespace AbyssCore;
+using namespace MediumCore;
 
 int main(int argc, char* args[]){
     
@@ -10,35 +10,17 @@ int main(int argc, char* args[]){
     // OpenFont("arial.ttf");
 
     MainWindow* mw = new MainWindow();
-    EmptyWindow* ew1 = new EmptyWindow();
-    EmptyWindow* ew2 = new EmptyWindow();
-    EmptyWindow* ew3 = new EmptyWindow();
-    EmptyWindow* ew4 = new EmptyWindow();
-    EmptyWindow* ew5 = new EmptyWindow();
-    EmptyWindow* ew6 = new EmptyWindow();
-    EmptyWindow* ew7 = new EmptyWindow();
-    EmptyWindow* ew8 = new EmptyWindow();
-    EmptyWindow* ew9 = new EmptyWindow();
-
-    ew2->SetPos(100, 0);
-    ew3->SetPos(200, 0);
-
-    // mw->AllowClose(false);
-    // mw->AllowMinimize(false);
     mw->SetSize(RESOLUTION_X - 100, RESOLUTION_Y - 100);
     mw->SetTitle("Main menu");
 
     Application::Init();
 
-    Application::GetGroup()->Create(ew1, "empty window 1");
-    Application::GetGroup()->Create(ew2, "empty window 2");
-    Application::GetGroup()->Create(ew3, "empty window 3");
-    Application::GetGroup()->Create(ew4, "empty window 4");
-    Application::GetGroup()->Create(ew5, "empty window 5");
-    Application::GetGroup()->Create(ew6, "empty window 6");
-    Application::GetGroup()->Create(ew7, "empty window 7");
-    Application::GetGroup()->Create(ew8, "empty window 8");
-    Application::GetGroup()->Create(ew9, "empty window 9");
+    for(int i = 0; i < 10; i++){
+        EmptyWindow* ew = new EmptyWindow();
+        char str[256];
+        snprintf(str, 256, "ew%d", i);
+        Application::GetGroup()->Create(ew, str);
+    }
 
     Application::GetGroup()->Create(mw, "main window");
 

@@ -10,6 +10,7 @@ Full manual for using will be later.
     - ```SDL2_image.dll```
     - ```SDL2_ttf.dll```
     - ```ui.ata```
+    - Directory ```shaders```
     - At least one of font:
         - ```arial.ttf```
         - ```firacode.ttf```

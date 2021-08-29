@@ -2,21 +2,16 @@
 #define WIDGET_H
 
 #include <SDL.h>
-#include <astring.h>
+#include <simplegl.h>
 #include <colors.h>
 #include <style.h>
 #include <map>
+#include <renderer.h>
 
 using namespace std;
 
-namespace AbyssCore{
+namespace MediumCore{
     class Window;
-
-    typedef enum{
-        Click,
-        Drag,
-        Move
-    }ActionType;
 
     typedef struct{
         Window* parent;
@@ -28,18 +23,16 @@ namespace AbyssCore{
     }ActionEvent;
 
     class Widget{
-
-        typedef void (*Action)(Widget*, ActionEvent);
+        protected:
+            typedef void (*Action)(Widget*, ActionEvent);
 
         protected:
-            AString* name;
+            string name;
             SDL_Rect rect;
+            Window* parent;
             
-            State state;
             bool isVisible;
             bool isDisabled;
-
-            map<ActionType, Action> actions;
 
         public:
             /**
@@ -48,39 +41,31 @@ namespace AbyssCore{
             Style style;
 
         public:
-            Widget();
+            Widget(Window* parent);
 
-            virtual AString* GetName();
+            virtual string GetName();
             virtual SDL_Rect GetRect();
-            virtual State GetState();
             virtual bool IsVisible();
             virtual bool IsDisabled();
 
-            virtual void SetName(AString* name);
+            virtual void SetName(string name);
             virtual void SetPos(int x, int y);
             virtual void SetSize(int w, int h);
             virtual void SetRect(SDL_Rect rect);
-            virtual void SetState(State state);
             virtual void SetVisible(bool v);
             virtual void SetDisable(bool d);
-            virtual void SetAction(ActionType type, Action action);
 
-            /**
-             * \brief void * parent ptr to parent window
-             */
-            virtual void ProcessClick(SDL_MouseButtonEvent event, Window * parent);
+            virtual bool WidgetHit(int x, int y);
 
-            /**
-             * \brief void * parent ptr to parent window
-             */
-            virtual void ProcessDrag(SDL_MouseMotionEvent event, Window * parent);
+            virtual void OnKeyPressed(SDL_KeyboardEvent event);
+            virtual void OnKeyReleased(SDL_KeyboardEvent event);
 
-            /**
-             * \brief void * parent ptr to parent window
-             */
-            virtual void ProcessMove(SDL_MouseMotionEvent event, Window * parent);
+            virtual void OnMouseDown(SDL_MouseButtonEvent event) = 0;
+            virtual void OnMouseUp(SDL_MouseButtonEvent event) = 0;
+            virtual void OnMouseMove(SDL_MouseMotionEvent event) = 0;
+            virtual void OnMouseWheel(SDL_MouseWheelEvent event, aPoint pos) = 0;
 
-            virtual void Paint(SDL_Renderer* render);
+            virtual void Paint(Renderer &renderer) = 0;
     };
 }
 

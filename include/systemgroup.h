@@ -6,23 +6,22 @@
 
 using namespace std;
 
-namespace AbyssCore{
+namespace MediumCore{
     class SystemGroup : public IWindowsGroup{
         private:
             list<Window*> windowsPull;
 
-        protected:
-            virtual int FreeID();
-
         public:
             SystemGroup();
             virtual vector<Window*> GetPull();
-            virtual bool Create(Window* window, AString* byName);
+            virtual vector<Window*> GetInvertedPull();
+            virtual bool Create(Window* window, string byName);
             virtual bool Destroy(Window* window);
-            virtual Window* Find(AString* byName);
-            virtual Window* Find(int byID);
+            virtual Window* Find(string byName);
             virtual void FocusWindow(Window* window);
+            // virtual void SetBackground(Window* window);
             virtual Window* CurrentFocus();
+            // virtual Window* Background();
             virtual void ProcessWindows();
     };
 }

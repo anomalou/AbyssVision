@@ -1,18 +1,8 @@
 #include <systemgroup.h>
 
-namespace AbyssCore{
+namespace MediumCore{
     SystemGroup::SystemGroup(){
         windowsPull = list<Window*>();
-    }
-
-    int SystemGroup::FreeID(){
-        int max = START_ID;
-        for(Window* w : windowsPull){
-            if(w->GetID() > max)
-                max = w->GetID();
-        }
-
-        return max;
     }
 
     vector<Window*> SystemGroup::GetPull(){
@@ -25,12 +15,24 @@ namespace AbyssCore{
         return pull;
     }
 
-    bool SystemGroup::Create(Window* window, AString* byName){
+    vector<Window*> SystemGroup::GetInvertedPull(){
+        vector<Window*> windowPull = GetPull();
+        vector<Window*> invertPull = vector<Window*>();
+
+        while(windowPull.size() != 0){
+            invertPull.push_back(windowPull.back());
+            windowPull.pop_back();
+        }
+
+        return invertPull;
+    }
+
+    bool SystemGroup::Create(Window* window, string byName){
         if(window == nullptr)
             return false;
 
         for(Window* w : windowsPull){
-            if(strcmp(byName->ToChars(), w->GetName()->ToChars()) == 0)
+            if(strcmp(byName.c_str(), w->GetName().c_str()) == 0)
                 return false;
         }
 
@@ -44,36 +46,23 @@ namespace AbyssCore{
         for(auto w = windowsPull.begin(); w != windowsPull.end(); w++){
             if(*w == window){
                 windowsPull.erase(w);
-                // if(window == focus)
-                //     focus = windowsPull.back();
                 return true;
             }
         }
         return false;
     }
 
-    Window* SystemGroup::Find(AString* byName){
+    Window* SystemGroup::Find(string byName){
         for(Window* w : windowsPull){
-            if(strcmp(w->GetName()->ToChars(), byName->ToChars()) == 0){
+            if(strcmp(w->GetName().c_str(), byName.c_str()) == 0){
                 return w;
             }
         }
 
-        return nullptr;
-    }
-
-    Window* SystemGroup::Find(int byID){
-        for(Window* w : windowsPull){
-            if(w->GetID() == byID){
-                return w;
-            }
-        }
-
-        return nullptr;
+        return NULL;
     }
 
     void SystemGroup::FocusWindow(Window* window){
-        // focus = window;
         for(auto w = windowsPull.begin(); w != windowsPull.end(); w++){
             if(*w == window){
                 windowsPull.erase(w);
@@ -84,13 +73,20 @@ namespace AbyssCore{
     }
 
     Window* SystemGroup::CurrentFocus(){
-        return windowsPull.back();
+        if(windowsPull.size() > 0)
+            return windowsPull.back();
+        return NULL;
     }
 
     void SystemGroup::ProcessWindows(){
-        for(Window* w : windowsPull){
-            if(w->NeedDestroy())
-                Destroy(w);
+        vector<Window*> toDestroy = vector<Window*>();
+        for(auto i = windowsPull.begin(); i != windowsPull.end(); i++){
+            if((*i)->NeedDestroy())
+                toDestroy.push_back(*i);
+        }
+
+        for(Window* w : toDestroy){
+            Destroy(w);
         }
     }
 }

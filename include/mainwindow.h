@@ -3,9 +3,11 @@
 
 #include <window.h>
 #include <emptywindow.h>
-#include <button.h>
+#include <widgets/button.h>
+#include <widgets/trackbar.h>
+#include <resources.h>
 
-namespace AbyssCore{
+namespace MediumCore{
     /**
      * \brief Main window class for debugging new features
      */
@@ -15,12 +17,16 @@ namespace AbyssCore{
             Button* hide;
             Button* slide;
             Button* full;
+            Trackbar* trackbar;
 
         private:
             EmptyWindow* window;
+            unsigned int ozzenVAO, ozzenVBO;
+            double currentSize;
 
         public:
             MainWindow();
+            void Paint(Renderer &anchor);
 
         friend void Open(Widget* sender, ActionEvent event);
         friend void Hide(Widget* sender, ActionEvent event);

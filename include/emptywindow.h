@@ -3,7 +3,7 @@
 
 #include <window.h>
 
-namespace AbyssCore{
+namespace MediumCore{
     /**
      * \brief Sub window class for debugging
      */
@@ -13,7 +13,7 @@ namespace AbyssCore{
             EmptyWindow();
 
         public:
-            void Paint(SDL_Renderer* render) override;
+            virtual void Paint(Renderer &renderer) override;
     };
 }
 

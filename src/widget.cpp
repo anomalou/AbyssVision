@@ -1,26 +1,20 @@
 #include <widget.h>
 
-namespace AbyssCore{
-    Widget::Widget(){
-        name = new AString();
+namespace MediumCore{
+    Widget::Widget(Window* parent){
+        name = "\r";
         style = Style{{LIGHT_GRAY}, {GRAY}, {WHITE}, 0, {WHITE}, {BLACK}, {GRAY}, {WHITE}, {GRAY}, {GRAY}, {WHITE}};
+        this->parent = parent;
         isVisible = true;
-
-        state = Idle;
-
-        actions = map<ActionType, Action>();
+        isDisabled = false;
     }
 
-    AString* Widget::GetName(){
+    string Widget::GetName(){
         return name;
     }
 
     SDL_Rect Widget::GetRect(){
         return rect;
-    }
-
-    State Widget::GetState(){
-        return state;
     }
 
     bool Widget::IsVisible(){
@@ -31,7 +25,7 @@ namespace AbyssCore{
         return isDisabled;
     }
 
-    void Widget::SetName(AString* name){
+    void Widget::SetName(string name){
         this->name = name;
     }
 
@@ -47,10 +41,6 @@ namespace AbyssCore{
         this->rect = rect;
     }
 
-    void Widget::SetState(State state){
-        this->state = state;
-    }
-
     void Widget::SetVisible(bool v){
         isVisible = v;
     }
@@ -59,69 +49,24 @@ namespace AbyssCore{
         isDisabled = d;
     }
 
-    void Widget::SetAction(ActionType type, Action action){
-        if(actions.count(type) == 0){
-            actions.insert(make_pair(type, action));
+    bool Widget::WidgetHit(int x, int y){
+        int left = rect.x;
+        int right = rect.x + rect.w;
+        int top = rect.y;
+        int bottom = rect.y + rect.h;
+
+        if(x > left && x < right && y > top && y < bottom){
+            return true;
         }
+
+        return false;
     }
 
-    void Widget::ProcessClick(SDL_MouseButtonEvent event, Window * parent){
-        if(actions.count(Click) != 0){
-            ActionEvent aevent = {
-                parent,
-                event.x,
-                event.y,
-                0,
-                0,
-                event.button
-            };
-            actions[Click](this, aevent);
-        }
+    void Widget::OnKeyPressed(SDL_KeyboardEvent event){
+
     }
 
-    void Widget::ProcessDrag(SDL_MouseMotionEvent event, Window * parent){
-        if(actions.count(Drag) != 0){
-            ActionEvent aevent = {
-                parent,
-                event.x,
-                event.y,
-                event.xrel,
-                event.yrel,
-                event.state
-            };
-            actions[Drag](this, aevent);
-        }
-    }
+    void Widget::OnKeyReleased(SDL_KeyboardEvent event){
 
-    void Widget::ProcessMove(SDL_MouseMotionEvent event, Window * parent){
-        if(actions.count(Move) != 0){
-            ActionEvent aevent = {
-                parent,
-                event.x,
-                event.y,
-                event.xrel,
-                event.yrel,
-                event.state
-            };
-            actions[Move](this, aevent);
-        }
-    }
-
-    void Widget::Paint(SDL_Renderer* render){
-        if(state == Idle)
-            SDL_SetRenderDrawColor(render, style.background.r, style.background.g, style.background.b, style.background.a);
-        else if(state == Pressed)
-            SDL_SetRenderDrawColor(render, style.selected.r, style.selected.g, style.selected.b, style.selected.a);
-        else if(state == Hovered)
-            SDL_SetRenderDrawColor(render, style.hover.r, style.hover.g, style.hover.b, style.hover.a);
-        
-        SDL_RenderClear(render);
-
-        SDL_SetRenderDrawColor(render, style.border.r, style.border.g, style.border.b, style.border.a);
-        SDL_Rect rect = this->rect;
-        rect.x = 0;
-        rect.y = 0;
-
-        SDL_RenderDrawRect(render, &rect);
     }
 }

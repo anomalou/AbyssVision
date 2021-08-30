@@ -286,8 +286,6 @@ namespace MediumCore{
             OpenGL::BindVBO(instancedVBO);
             vector<Instanced> gliphs = vector<Instanced>();
 
-            //TODO: check this for memory leak
-            // TODO: MEMORY LEAK START
             Font font = Resources::GetCurrentFont();
 
             OpenGL::Bind2DTexture(font.gliphsTexture);
@@ -332,8 +330,6 @@ namespace MediumCore{
             OpenGL::Set1i("fFlip", 1);
 
             glDrawArraysInstanced(GL_QUADS, 0, 4, gliphs.size());
-
-            // TODO: MEMORY LEAK END
         }
     }
 
@@ -483,6 +479,8 @@ namespace MediumCore{
                 wg->Paint(renderer);
 
                 RenderRects(renderer);
+                RenderSprites(renderer);
+                RenderText(renderer);
 
                 glStencilOp(GL_DECR, GL_KEEP, GL_KEEP);
                 glStencilFunc(GL_LESS, 2, 0xFF);

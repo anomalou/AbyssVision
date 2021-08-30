@@ -4,6 +4,7 @@ namespace MediumCore{
     LineEdit::LineEdit(Window* parent) : Widget(parent){
         text = "";
 
+        typingMode = false;
         state = Idle;
 
         style.focus = aColor({BLACK});
@@ -11,7 +12,17 @@ namespace MediumCore{
     }
    
     void LineEdit::OnKeyPressed(SDL_KeyboardEvent event){
-        
+        if(typingMode){
+            if(event.keysym.sym == SDLK_BACKSPACE){
+                if(text.length() > 0)
+                    text.erase(text.begin() + text.length() - 1, text.end());
+            }else{
+                const char* c = SDL_GetKeyName(event.keysym.sym);
+                size_t length = strlen(c);
+                if(length <= 1)
+                    text.append(c);
+            }
+        }
     }
 
     void LineEdit::OnKeyReleased(SDL_KeyboardEvent event){
@@ -23,10 +34,13 @@ namespace MediumCore{
             int x = event.x;
             int y = event.y;
 
-            if(WidgetHit(x, y))
+            if(WidgetHit(x, y)){
                 state = Pressed;
-            else
+                typingMode = true;
+            }else{
                 state = Idle;
+                typingMode = false;
+            }
         }
     }
 
@@ -46,5 +60,7 @@ namespace MediumCore{
                 renderer.DrawRect(SDL_Rect({OFFSET, OFFSET, width, height}), aColor({WHITE}), true, style.focus);
             break;
         }
+
+        renderer.DrawTextLine(aPoint({OFFSET * 2, height}), text, 0, 0.7, width);
     }
 }

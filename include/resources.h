@@ -38,10 +38,6 @@ namespace MediumCore{
             static Font GetFont(string name);
             static Font GetCurrentFont();
             static unsigned int GetShader(string name);
-            /**
-             * \brief Depricated
-             */
-            // static Texture CreateStringTexture(string str, string font, int maxChars = screen_width, int maxLines = 1);
             static void FreeResources();
     };
 }

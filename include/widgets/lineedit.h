@@ -12,6 +12,8 @@ namespace MediumCore{
     class LineEdit : public Widget{
         private:
             string text;
+
+            bool typingMode;
             State state;
         
         public:

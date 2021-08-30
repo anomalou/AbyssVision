@@ -286,7 +286,8 @@ namespace MediumCore{
             OpenGL::BindVBO(instancedVBO);
             vector<Instanced> gliphs = vector<Instanced>();
 
-            //TODO: add font selector
+            //TODO: check this for memory leak
+            // TODO: MEMORY LEAK START
             Font font = Resources::GetCurrentFont();
 
             OpenGL::Bind2DTexture(font.gliphsTexture);
@@ -294,13 +295,20 @@ namespace MediumCore{
             for(Text text : texts){
                 float scale = text.scale;
                 aPoint startPoint = text.position;
+                aPoint offset = startPoint;
                 for(int i = 0; i < text.str.length(); i++){
                     char c = text.str[i];
-                    Gliph *gliph = new Gliph();
+
                     if(font.gliphs.find(c) != font.gliphs.end()){
+                        Gliph *gliph;
+
                         gliph = font.gliphs.at(c);
-                        // gliph->
-                        aPoint gliphPos = {startPoint.x, startPoint.y - (int)(gliph->maxy * scale)};
+
+                        if(((offset.x + gliph->advance * scale) - startPoint.x) > text.maxWidth && text.maxWidth != 0){
+                            break;
+                        }
+
+                        aPoint gliphPos = {offset.x, offset.y - (int)(gliph->maxy * scale)};
                         aFPoint npos = OpenGL::PixelsToNormal(gliphPos, screen_width, screen_height);
                         float scaleX = OpenGL::Proportion((gliph->maxx - gliph->minx) * scale, screen_width);
                         float scaleY = OpenGL::Proportion((gliph->maxy - gliph->miny) * scale, screen_width);
@@ -313,7 +321,7 @@ namespace MediumCore{
 
                         gliphs.push_back(glh);
 
-                        startPoint.x += gliph->advance * scale;
+                        offset.x += gliph->advance * scale;
                     }
                 }
             }
@@ -324,6 +332,8 @@ namespace MediumCore{
             OpenGL::Set1i("fFlip", 1);
 
             glDrawArraysInstanced(GL_QUADS, 0, 4, gliphs.size());
+
+            // TODO: MEMORY LEAK END
         }
     }
 

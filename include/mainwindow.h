@@ -5,6 +5,7 @@
 #include <emptywindow.h>
 #include <widgets/button.h>
 #include <widgets/trackbar.h>
+#include <widgets/lineedit.h>
 #include <resources.h>
 
 namespace MediumCore{
@@ -13,25 +14,15 @@ namespace MediumCore{
      */
     class MainWindow : public Window{
         private:
-            Button* open;
-            Button* hide;
-            Button* slide;
-            Button* full;
             Trackbar* trackbar;
+            LineEdit* lineedit;
 
         private:
             EmptyWindow* window;
-            unsigned int ozzenVAO, ozzenVBO;
-            double currentSize;
 
         public:
             MainWindow();
             void Paint(Renderer &anchor);
-
-        friend void Open(Widget* sender, ActionEvent event);
-        friend void Hide(Widget* sender, ActionEvent event);
-        friend void MoveAction(Widget* sender, ActionEvent event);
-        friend void FullAction(Widget* sender, ActionEvent event);
             
     };
 }

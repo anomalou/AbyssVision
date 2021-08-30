@@ -69,4 +69,20 @@ namespace MediumCore{
     void Widget::OnKeyReleased(SDL_KeyboardEvent event){
 
     }
+
+    void Widget::OnMouseDown(SDL_MouseButtonEvent event){
+
+    }
+
+    void Widget::OnMouseUp(SDL_MouseButtonEvent event){
+
+    }
+
+    void Widget::OnMouseMove(SDL_MouseMotionEvent event){
+
+    }
+
+    void Widget::OnMouseWheel(SDL_MouseWheelEvent event, aPoint pos){
+
+    }
 }

@@ -60,10 +60,10 @@ namespace MediumCore{
             virtual void OnKeyPressed(SDL_KeyboardEvent event);
             virtual void OnKeyReleased(SDL_KeyboardEvent event);
 
-            virtual void OnMouseDown(SDL_MouseButtonEvent event) = 0;
-            virtual void OnMouseUp(SDL_MouseButtonEvent event) = 0;
-            virtual void OnMouseMove(SDL_MouseMotionEvent event) = 0;
-            virtual void OnMouseWheel(SDL_MouseWheelEvent event, aPoint pos) = 0;
+            virtual void OnMouseDown(SDL_MouseButtonEvent event);
+            virtual void OnMouseUp(SDL_MouseButtonEvent event);
+            virtual void OnMouseMove(SDL_MouseMotionEvent event);
+            virtual void OnMouseWheel(SDL_MouseWheelEvent event, aPoint pos);
 
             virtual void Paint(Renderer &renderer) = 0;
     };

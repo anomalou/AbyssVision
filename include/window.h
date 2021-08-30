@@ -91,10 +91,6 @@ namespace MediumCore{
             virtual void OnMouseMove(SDL_MouseMotionEvent event);
             virtual void OnMouseWheel(SDL_MouseWheelEvent event, aPoint pos);
 
-            // virtual void CloseAction();
-            // virtual void MinimazeAction();
-            // virtual void ResizeAction(int w, int h);
-
             virtual void Paint(Renderer &renderer);
 
             virtual vector<Widget*> GetPull();

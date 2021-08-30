@@ -36,12 +36,17 @@ namespace MediumCore{
         startID++;
     }
 
-    void Renderer::DrawTextA(aPoint pos, string str, float scale){
+    void Renderer::DrawTextLine(aPoint pos, string str, int maxChars, float scale, int maxWidth){
         Text text;
         text.id = startID;
         text.position = {pos.x + startCoords.x, pos.y + startCoords.y};
+
+        if(str.length() > maxChars && maxChars != 0)
+            str.erase(str.begin() + (maxChars), str.end());
+
         text.str = str;
         text.scale = scale;
+        text.maxWidth = maxWidth;
 
         texts.push_back(text);
 

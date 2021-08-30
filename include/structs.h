@@ -136,6 +136,7 @@ namespace MediumCore{
         aPoint position;
         string str;
         float scale;
+        int maxWidth;
     }Text;
 }
 

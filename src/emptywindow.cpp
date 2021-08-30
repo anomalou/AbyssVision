@@ -7,8 +7,7 @@ namespace MediumCore{
 
     void EmptyWindow::Paint(Renderer &renderer){
         Window::Paint(renderer);
-        // Clear(anchor, aColor({WHITE}));
 
-        // DrawRect(anchor, SDL_Rect({pos.x, pos.y, 10, 10}), aColor({BLACK}));
+        renderer.DrawTextLine(aPoint({0, 30}), "I'm empty =)", 0.35);
     }
 }

@@ -209,6 +209,7 @@ namespace MediumCore{
 
         int offset = 0;
 
+        int maxHeight = 0;
         int min = 0;
 
         for(int i = 0; i < 96; i++){
@@ -220,6 +221,9 @@ namespace MediumCore{
 
             if(gliph->miny < min)
                 min = gliph->miny;
+
+            if(gliph->maxy - gliph->miny > maxHeight)
+                maxHeight = gliph->maxy - gliph->miny;
 
             float a = (float)(offset + gliph->minx) / (float)gliphSurface->w;
             float b = (float)(offset + gliph->maxx) / (float)gliphSurface->w;
@@ -241,6 +245,8 @@ namespace MediumCore{
         }
 
         SDL_FreeSurface(gliphSurface);
+
+        font->height = maxHeight;
 
         fonts.insert({nameConst, font});
     }
@@ -334,6 +340,62 @@ namespace MediumCore{
             return *(prev(fonts.end())->second);
         }
         return Font();
+    }
+
+    int Resources::CountStringWidth(string str, Font font, float scale){
+        int width = 0;
+        for(int i = 0; i < str.length(); i++){
+            Gliph* gliph = font.gliphs[str[i]];
+            width += gliph->advance * scale;
+        }
+
+        return width;
+    }
+
+    char Resources::ConvertKeyCode(SDL_Keycode keycode){
+        string code = SDL_GetKeyName(keycode);
+        if(code.length() == 1)
+            return code[0];
+        else{
+            switch(keycode){
+                case SDLK_AMPERSAND:
+                    return '&';
+                case SDLK_ASTERISK:
+                    return '*';
+                case SDLK_AT:
+                    return '@';
+                case SDLK_CARET:
+                    return '^';
+                case SDLK_COLON:
+                    return ':';
+                case SDLK_DOLLAR:
+                    return '$';
+                case SDLK_EXCLAIM:
+                    return '!';
+                case SDLK_GREATER:
+                    return '>';
+                case SDLK_HASH:
+                    return '#';
+                case SDLK_LEFTPAREN:
+                    return '(';
+                case SDLK_LESS:
+                    return '<';
+                case SDLK_PERCENT:
+                    return '%';
+                case SDLK_PLUS:
+                    return '+';
+                case SDLK_QUESTION:
+                    return '?';
+                case SDLK_QUOTEDBL:
+                    return '"';
+                case SDLK_RIGHTPAREN:
+                    return ')';
+                case SDLK_UNDERSCORE:
+                    return '_';
+                default:
+                    return ' ';
+            }
+        }
     }
 
     unsigned int Resources::GetShader(string name){

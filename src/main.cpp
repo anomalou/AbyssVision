@@ -27,14 +27,14 @@ int main(int argc, char* args[]){
 
     Application::Init();
 
-    for(int i = 0; i < 10; i++){
+    for(int i = 0; i < 1; i++){
         // EmptyWindow* ew = new EmptyWindow();
         // char str[256];
         // snprintf(str, 256, "ew%d", i);
         // Application::GetGroup()->Create(ew, str);
 
         MainWindow* mw = new MainWindow();
-        mw->SetSize(200, 200);
+        mw->SetSize(300, 300);
         char str[256];
         snprintf(str, 256, "ew%d", i);
         mw->SetTitle(str);

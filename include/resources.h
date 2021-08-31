@@ -37,6 +37,8 @@ namespace MediumCore{
             static Texture GetUI(string name);
             static Font GetFont(string name);
             static Font GetCurrentFont();
+            static int CountStringWidth(string str, Font font, float scale = 1);
+            static char ConvertKeyCode(SDL_Keycode keycode);
             static unsigned int GetShader(string name);
             static void FreeResources();
     };

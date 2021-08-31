@@ -102,6 +102,7 @@ namespace MediumCore{
     typedef struct{
         TTF_Font* font;
         int psize;
+        int height;
         unsigned int gliphsTexture;
         map<char, Gliph*> gliphs;
     }Font;

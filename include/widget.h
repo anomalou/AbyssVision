@@ -2,11 +2,11 @@
 #define WIDGET_H
 
 #include <SDL.h>
-#include <simplegl.h>
 #include <colors.h>
 #include <style.h>
 #include <map>
 #include <renderer.h>
+#include <timeparams.h>
 
 using namespace std;
 

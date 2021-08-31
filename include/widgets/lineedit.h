@@ -4,17 +4,24 @@
 #include <widget.h>
 #include <string>
 
-#define OFFSET 5
-
 using namespace std;
 
 namespace MediumCore{
     class LineEdit : public Widget{
         private:
             string text;
+            float scale;
+            int startPointText;
+            int startPointCursore;
+            double textPosition;
+            double cursorePosition;
 
             bool typingMode;
             State state;
+
+        public:
+            float smooth;
+            int cursoreOffset;
         
         public:
             LineEdit(Window* parent);

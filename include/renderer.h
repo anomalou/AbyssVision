@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <structs.h>
+#include <colors.h>
 
 #define TEXT_SCALE 0.35
 
@@ -20,7 +21,7 @@ namespace MediumCore{
         
         public:
             Renderer(int x, int y);
-            void DrawRect(SDL_Rect rect, aColor backgroundColor, bool drawBorder, aColor borderColor);
+            void DrawRect(SDL_Rect rect, aColor backgroundColor, bool drawBorder, aColor borderColor = {WHITE});
             void DrawSprite(SDL_Rect rect, string texture);
             void DrawTextLine(aPoint pos, string str, int maxChars = 0, float scale = TEXT_SCALE, int maxWidth = 0);
             vector<Rectangle> GetRectangles();

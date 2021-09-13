@@ -4,7 +4,7 @@ namespace MediumCore{
 
     // map<string, Texture*> Resources::textures = map<string, Texture*>();
     Atlas Resources::ui;
-    map<string, Atlas> atlases = map<string, Atlas>();
+    map<string, Atlas> Resources::atlases = map<string, Atlas>();
     map<string, Font*> Resources::fonts = map<string, Font*>();
     map<string, unsigned int> Resources::shaders = map<string, unsigned int>();
 
@@ -53,6 +53,7 @@ namespace MediumCore{
         // LoadTexture("resize.png", "resize");
 
         ui = LoadAtlas("ui.ata");
+        LoadAtlas("test_atlas.ata");
         // sprites = LoadAtlas("sprites.ata");
 
         LoadFont("arial.ttf", "arial", 50);
@@ -70,6 +71,14 @@ namespace MediumCore{
         Atlas atlas;
 
         if(stream.is_open()){
+            string atlasName;
+            short length;
+            stream.read((char*)&length, sizeof(short));
+            for(int i = 0; i < length; i++){
+                char c;
+                stream.read((char*)&c, sizeof(char));
+                atlasName.append(1, c);
+            }
             int size;
             stream.read((char*)&size, sizeof(size));
             for(int i = 0; i < size; i++){
@@ -134,6 +143,8 @@ namespace MediumCore{
             atlas.height = height;
             
             atlas.id = OpenGL::Create2DTexture(pixelData.data(), width, height, GL_RGBA, GL_LINEAR);
+
+            atlases.insert({atlasName, atlas});
         }
 
         return atlas;

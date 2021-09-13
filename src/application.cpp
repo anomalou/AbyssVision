@@ -274,12 +274,11 @@ namespace MediumCore{
     }
 
     void Application::RenderSprites(Renderer renderer){
-        Atlas atlas = Resources::GetAtlas(renderer.SelectedAtlas());
+        vector<Sprite> sprites = renderer.GetSprites();
         //TODO: Update atlas file writing
-        if(atlas.id != 0){
-            vector<Sprite> sprites = renderer.GetSprites();
-
-            if(sprites.size() > 0){
+        if(sprites.size() > 0){
+            Atlas atlas = Resources::GetAtlas(renderer.SelectedAtlas());
+            if(atlas.id != 0){
                 OpenGL::BindVBO(instancedVBO);
                 vector<Instanced> isprites = vector<Instanced>();
 

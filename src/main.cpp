@@ -27,7 +27,7 @@ int main(int argc, char* args[]){
 
     Application::Init();
 
-    for(int i = 0; i < 100; i++){
+    for(int i = 0; i < 1; i++){
         // for(int t = 0; t < 10; t++){
             MainWindow* mw = new MainWindow();
             // mw->SetPos(100 * i, 100 * t);

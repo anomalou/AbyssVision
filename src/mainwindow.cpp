@@ -29,7 +29,10 @@ namespace MediumCore{
 
         snprintf(fps, 10, "FPS:%d", Application::fps);
 
+        renderer.SelectAtlas("test_atlas");
+
         renderer.DrawTextLine(aPoint({10, 30}), fps, 0, 0.5);
         renderer.DrawTextLine(aPoint({10, 250}), "Hello world!", 5, (float)((float)trackbar->GetValue() / (float)10));
+        renderer.DrawSprite(SDL_Rect({300, 50, 50, 50}), "tree");
     }
 }

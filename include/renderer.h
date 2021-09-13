@@ -18,12 +18,15 @@ namespace MediumCore{
             vector<Rectangle> rectangles;
             vector<Sprite> sprites;
             vector<Text> texts;
+            string selectedAtlas;
         
         public:
             Renderer(int x, int y);
+            void SelectAtlas(string name);
             void DrawRect(SDL_Rect rect, aColor backgroundColor, bool drawBorder, aColor borderColor = {WHITE});
             void DrawSprite(SDL_Rect rect, string texture);
             void DrawTextLine(aPoint pos, string str, int maxChars = 0, float scale = TEXT_SCALE, int maxWidth = 0);
+            string SelectedAtlas();
             vector<Rectangle> GetRectangles();
             vector<Sprite> GetSprites();
             vector<Text> GetTexts();

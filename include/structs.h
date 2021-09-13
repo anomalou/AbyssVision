@@ -139,6 +139,14 @@ namespace MediumCore{
         float scale;
         int maxWidth;
     }Text;
+
+    typedef struct{
+        unsigned int id;
+        string name;
+        int width;
+        int height;
+        //TODO: insert block pointers here
+    }Location;
 }
 
 

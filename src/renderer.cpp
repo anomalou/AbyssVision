@@ -5,9 +5,15 @@ namespace MediumCore{
         startCoords = {x, y};
         startID = 0;
 
+        selectedAtlas = "";
+
         rectangles = vector<Rectangle>();
         sprites = vector<Sprite>();
         texts = vector<Text>();
+    }
+
+    void Renderer::SelectAtlas(string name){
+        selectedAtlas = name;
     }
 
     void Renderer::DrawRect(SDL_Rect rect, aColor backgroundColor, bool drawBorder, aColor borderColor){
@@ -51,6 +57,10 @@ namespace MediumCore{
         texts.push_back(text);
 
         startID++;
+    }
+
+    string Renderer::SelectedAtlas(){
+        return selectedAtlas;
     }
 
     vector<Rectangle> Renderer::GetRectangles(){

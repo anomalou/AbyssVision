@@ -27,19 +27,22 @@ int main(int argc, char* args[]){
 
     Application::Init();
 
-    for(int i = 0; i < 1; i++){
+    for(int i = 0; i < 100; i++){
+        // for(int t = 0; t < 10; t++){
+            MainWindow* mw = new MainWindow();
+            // mw->SetPos(100 * i, 100 * t);
+            mw->SetSize(100, 100);
+            char str[256];
+            snprintf(str, 256, "ew%d", i);
+            mw->SetTitle(str);
+            // mw->AllowResize(false);
+            Application::GetGroup()->Create(mw, str);
+        // }
         // EmptyWindow* ew = new EmptyWindow();
         // char str[256];
         // snprintf(str, 256, "ew%d", i);
         // Application::GetGroup()->Create(ew, str);
 
-        MainWindow* mw = new MainWindow();
-        mw->SetSize(300, 300);
-        char str[256];
-        snprintf(str, 256, "ew%d", i);
-        mw->SetTitle(str);
-        // mw->AllowResize(false);
-        Application::GetGroup()->Create(mw, str);
     }
 
     // Application::GetGroup()->Create(e1, "e1");

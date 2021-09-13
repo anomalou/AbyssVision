@@ -16,15 +16,13 @@ using namespace std;
 namespace MediumCore{
     class Resources{
         private:
-            // static map<string, Texture*> textures;
+            static map<string, Atlas> atlases;
             static map<string, Font*> fonts;
             static map<string, unsigned int> shaders;
-            
-            static map<string, Texture*> textCache;
+
 
         public:
             static Atlas ui;
-            static Atlas sprites;
 
         private:
             static bool GetShaderError(unsigned int id, int type);
@@ -35,6 +33,7 @@ namespace MediumCore{
             static void LoadFont(string path, string name, int psize);
             static void LoadShader(string vpath, string fpath, string name);
             static Texture GetUI(string name);
+            static Atlas GetAtlas(string name);
             static Font GetFont(string name);
             static Font GetCurrentFont();
             static int CountStringWidth(string str, Font font, float scale = 1);

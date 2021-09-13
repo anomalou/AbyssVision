@@ -4,7 +4,7 @@ namespace MediumCore{
 
     // map<string, Texture*> Resources::textures = map<string, Texture*>();
     Atlas Resources::ui;
-    Atlas Resources::sprites;
+    map<string, Atlas> atlases = map<string, Atlas>();
     map<string, Font*> Resources::fonts = map<string, Font*>();
     map<string, unsigned int> Resources::shaders = map<string, unsigned int>();
 
@@ -64,46 +64,8 @@ namespace MediumCore{
         LoadShader("shaders/itexturev.glsl", "shaders/itexturef.glsl", "itexture");
     }
 
-    // Texture Resources::LoadTexture(string path, string name){
-    //     SDL_Surface* img = IMG_Load(path.c_str());
-
-    //     if(img == NULL){
-    //         char texError[256];
-    //         snprintf(texError, 256, "This texture can't be loaded: %s(%s)", name.c_str(), path.c_str());
-    //         SDL_ShowSimpleMessageBox(SDL_MessageBoxFlags::SDL_MESSAGEBOX_ERROR, "Error!", texError, NULL);
-    //         return {0, 0, 0, 0};
-    //     }
-
-    //     char* namePtr = (char*)malloc(sizeof(char) * 256);
-    //     strcpy(namePtr, name.c_str());
-
-    //     while(textures.find(name) != textures.end()){
-    //         strcat(namePtr, "copy");
-    //     }
-
-    //     const char* nameConst = namePtr;
-
-    //     Texture* texture = (Texture*)malloc(sizeof(Texture));
-
-    //     if(img->format->BitsPerPixel == 24){
-    //         texture->id = OpenGL::Create2DTexture(img->pixels, img->w, img->h, GL_RGB, GL_LINEAR);
-    //         texture->colorMode = GL_RGB;
-    //     }else if(img->format->BitsPerPixel == 32){
-    //         texture->id = OpenGL::Create2DTexture(img->pixels, img->w, img->h, GL_RGBA, GL_LINEAR);
-    //         texture->colorMode = GL_RGBA;
-    //     }
-
-    //     texture->width = img->w;
-    //     texture->height = img->h;
-
-    //     textures.insert({nameConst, texture});
-
-    //     SDL_FreeSurface(img);
-
-    //     return *texture;
-    // }
-
     Atlas Resources::LoadAtlas(string path){
+        //TODO: Update reading with atlas name
         ifstream stream(path, ios::binary);
         Atlas atlas;
 
@@ -313,7 +275,17 @@ namespace MediumCore{
         if(ui.textures.find(name) != ui.textures.end()){
             return ui.textures.at(name);
         }else{
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "UI Texture error!", "Cant load selected texture from UI atlas!", NULL);
             return Texture();
+        }
+    }
+
+    Atlas Resources::GetAtlas(string name){
+        if(atlases.find(name) != atlases.end()){
+            return atlases.at(name);
+        }else{
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Atlas error!", "Cant load selected texture atlas!", NULL);
+            return Atlas();
         }
     }
 
@@ -407,33 +379,6 @@ namespace MediumCore{
 
         return 0;
     }
-
-    // Texture Resources::CreateStringTexture(string str, string font, int maxChars, int maxLines){
-    //     if(textCache.find(str) != textCache.end()){
-    //         return *textCache.at(str);
-    //     }
-
-    //     if(fonts.find(font) == fonts.end()){
-    //         SDL_ShowSimpleMessageBox(SDL_MessageBoxFlags::SDL_MESSAGEBOX_ERROR, "Can't open font!", font.c_str(), NULL);
-    //         return {0, 0, 0, 0};
-    //     }
-
-    //     SDL_Surface *surface = TTF_RenderText_Blended_Wrapped(fonts.at(font)->font, str.c_str(), SDL_Color({0, 0, 0, 255}), maxChars);
-
-    //     unsigned int textTexture;
-
-    //     textTexture = OpenGL::Create2DTexture(surface->pixels, surface->w, surface->h, GL_RGBA, GL_LINEAR);
-
-    //     Texture *tex = new Texture({textTexture, surface->w, surface->h, GL_RGBA});
-
-    //     if(textCache.size() > 100){
-    //         textCache.erase(textCache.begin());
-    //     }
-
-    //     textCache.insert({str.c_str(), tex});
-
-    //     return *tex;
-    // }
 
     void Resources::FreeResources(){
         // for(auto& item : textures){

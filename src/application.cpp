@@ -274,7 +274,50 @@ namespace MediumCore{
     }
 
     void Application::RenderSprites(Renderer renderer){
+        Atlas atlas = Resources::GetAtlas(renderer.SelectedAtlas());
+        //TODO: Update atlas file writing
+        if(atlas.id != 0){
+            vector<Sprite> sprites = renderer.GetSprites();
 
+            if(sprites.size() > 0){
+                OpenGL::BindVBO(instancedVBO);
+                vector<Instanced> isprites = vector<Instanced>();
+
+                for(int i = 0; i < sprites.size(); i++){
+                    Sprite sprite = sprites[i];
+                    if(atlas.textures.find(sprite.textureName) == atlas.textures.end()){
+                        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Texture not founded!", sprite.textureName.c_str(), window);
+                        continue;
+                    }
+
+                    Texture texture = atlas.textures.at(sprite.textureName);
+
+                    aFPoint pos = OpenGL::PixelsToNormal(sprite.position, screen_width, screen_height);
+                    float scaleX = OpenGL::Proportion(sprite.size.width, screen_width);
+                    float scaleY = OpenGL::Proportion(sprite.size.height, screen_width);
+
+                    aFPoint tpos = OpenGL::TexelsToNormal(aPoint({texture.x, texture.y}), atlas.width, atlas.height);
+                    float tscaleX = OpenGL::Proportion(texture.width, atlas.width);
+                    float tscaleY = OpenGL::Proportion(texture.height, atlas.height);
+
+                    Instanced iso;
+
+                    iso.offset = {pos.x + defaultNormilizedWidth * scaleX, pos.y - defaultNormilizedHeight * scaleY, 0};
+                    iso.scale = {scaleX, scaleY, 1};
+                    iso.texOffset = {tpos.x, tpos.y, tscaleX, tscaleY};
+
+                    isprites.push_back(iso);
+                }
+
+                OpenGL::Bind2DTexture(atlas.id);
+                OpenGL::UseProgram("itexture");
+                OpenGL::Set1i("fFlip", 1);
+
+                glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced) * isprites.size(), isprites.data(), GL_STATIC_DRAW);
+
+                glDrawArraysInstanced(GL_QUADS, 0, 4, isprites.size());
+            }
+        }
     }
 
     void Application::RenderText(Renderer renderer){

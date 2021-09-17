@@ -19,6 +19,7 @@
 #include <timeparams.h>
 #include <resources.h>
 #include <renderer.h>
+#include <gamecore.h>
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
@@ -32,8 +33,6 @@ using namespace glm;
 namespace MediumCore{
     class Application{
         private:
-            static bool isRunning;
-
             static SDL_Window* window;
 
             static IWindowsGroup* group;
@@ -59,7 +58,8 @@ namespace MediumCore{
             static bool CreateSDLWindow();
             static void DisposeWindow();
 
-            static void DrawWindow(Window* w);
+            static void DrawGameScene();
+            static void DrawWindows();
 
             static void CreateDefaultBuffers();
 

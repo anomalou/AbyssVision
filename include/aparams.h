@@ -12,6 +12,8 @@ namespace MediumCore{
     extern int screen_width;
     extern int screen_height;
 
+    extern bool isRunning;
+
     extern SDL_Point mousePosition;
 }
 

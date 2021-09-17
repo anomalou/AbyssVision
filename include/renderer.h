@@ -14,14 +14,18 @@ namespace MediumCore{
     class Renderer{
         private:
             aPoint startCoords;
+            aSize maxSize;
             int startID;
             vector<Rectangle> rectangles;
             vector<Sprite> sprites;
             vector<Text> texts;
             string selectedAtlas;
+
+        private:
+            bool InRect(SDL_Rect rect);
         
         public:
-            Renderer(int x, int y);
+            Renderer(int x, int y, int w, int h);
             void SelectAtlas(string name);
             void DrawRect(SDL_Rect rect, aColor backgroundColor, bool drawBorder, aColor borderColor = {WHITE});
             void DrawSprite(SDL_Rect rect, string texture);

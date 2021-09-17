@@ -1,8 +1,9 @@
 #include <renderer.h>
 
 namespace MediumCore{
-    Renderer::Renderer(int x, int y){
+    Renderer::Renderer(int x, int y, int w, int h){
         startCoords = {x, y};
+        maxSize = {w, h};
         startID = 0;
 
         selectedAtlas = "";
@@ -10,6 +11,14 @@ namespace MediumCore{
         rectangles = vector<Rectangle>();
         sprites = vector<Sprite>();
         texts = vector<Text>();
+    }
+
+    bool Renderer::InRect(SDL_Rect rect){
+        if(rect.x > maxSize.width || rect.y > maxSize.height)
+            return false;
+        if((rect.x + rect.w) < 0 || (rect.y + rect.h) < 0)
+            return false;
+        return true;
     }
 
     void Renderer::SelectAtlas(string name){
@@ -25,6 +34,9 @@ namespace MediumCore{
         rectangle.drawBorder = drawBorder;
         rectangle.borderColor = borderColor;
 
+        if(!InRect(SDL_Rect(rect)))
+            return;
+
         rectangles.push_back(rectangle);
 
         startID++;
@@ -36,6 +48,9 @@ namespace MediumCore{
         sprite.position = {rect.x + startCoords.x, rect.y + startCoords.y};
         sprite.size = {rect.w, rect.h};
         sprite.textureName = texture;
+
+        if(!InRect(SDL_Rect(rect)))
+            return;
 
         sprites.push_back(sprite);
 
@@ -53,6 +68,8 @@ namespace MediumCore{
         text.str = str;
         text.scale = scale;
         text.maxWidth = maxWidth;
+
+        //TODO: add check for glich out of rect size
 
         texts.push_back(text);
 

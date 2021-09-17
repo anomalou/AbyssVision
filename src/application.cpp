@@ -1,7 +1,6 @@
 #include <application.h>
 
 namespace MediumCore{
-    bool Application::isRunning;
     SDL_Window* Application::window;
     IWindowsGroup* Application::group;
     thread* Application::render;
@@ -140,11 +139,14 @@ namespace MediumCore{
             glClear(GL_COLOR_BUFFER_BIT);
             glClear(GL_STENCIL_BUFFER_BIT);
 
-            for(Window* w : group->GetPull()){
-                if(w->IsVisible()){
-                    DrawWindow(w);
-                }
-            }
+            //Render game scene
+
+            //Render UI
+
+            //Render window interface
+            DrawGameScene();
+
+            DrawWindows();
 
             SDL_GL_SwapWindow(window);
             // SDL_Delay(1000/120);
@@ -375,18 +377,31 @@ namespace MediumCore{
         }
     }
 
-    void Application::DrawWindow(Window* w){
+    void Application::DrawGameScene(){
+        Renderer renderer(0, 0, screen_width, screen_height);
+
+        GameCore::Paint(renderer);
+
+        RenderRects(renderer);
+        RenderSprites(renderer);
+        RenderText(renderer);
+    }
+
+    void Application::DrawWindows(){
         glBufferData(GL_ARRAY_BUFFER, sizeof(Instanced), NULL, GL_DYNAMIC_DRAW);
 
-        if(w->IsFull()){
-            DrawWindowHead(w);
+        for(Window* w : group->GetPull()){
+            if(w->IsFull()){
+                DrawWindowHead(w);
+            }
+
+            if(!w->IsMinimized())
+                DrawWindowBody(w);
+
+            if(w->IsFull())
+                DrawWindowControl(w);
         }
 
-        if(!w->IsMinimized())
-            DrawWindowBody(w);
-
-        if(w->IsFull())
-            DrawWindowControl(w);
     }
 
     void Application::DrawWindowHead(Window* w){
@@ -470,7 +485,7 @@ namespace MediumCore{
         glStencilFunc(GL_EQUAL, 1, 0xFF);
         glStencilMask(0);
 
-        Renderer renderer(rect.x, rect.y);
+        Renderer renderer(rect.x, rect.y, rect.w, rect.h);
 
         w->Paint(renderer);
 
@@ -516,7 +531,7 @@ namespace MediumCore{
                 glStencilFunc(GL_EQUAL, 2, 0xFF);
                 glStencilMask(0x0);
 
-                Renderer renderer(wrect.x, wrect.y);
+                Renderer renderer(wrect.x, wrect.y, wrect.w, wrect.h);
 
                 wg->Paint(renderer);
 
@@ -617,7 +632,10 @@ namespace MediumCore{
             if(event.key.state == SDL_RELEASED){
                 focus->OnKeyReleased(event.key);
             }
+            return;
         }
+
+        GameCore::ProcessKey(event.key);
     }
 
     void Application::ProcessMouse(SDL_Event event){
